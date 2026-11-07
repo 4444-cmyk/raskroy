@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.14">
+<meta name="app-build" content="2026-11-08.17">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1601,10 +1601,10 @@ label {
   </div>
 
   <div class="grid" data-tab="calc">
-    <div class="m"><p class="l">Кусков из трубы</p><p class="v" id="per">—</p><p class="s" id="perS"></p></div>
-    <div class="m"><p class="l">Пачек</p><p class="v" id="bn">—</p><p class="s" id="bs"></p></div>
-    <div class="m"><p class="l">Общий остаток</p><p class="v" id="w">—</p><p class="s" id="ws2"></p></div>
-    <div class="m"><p class="l">Всего заготовок</p><p class="v" id="tot">—</p><p class="s" id="ts"></p></div>
+    <div class="m"><p class="l">Труб</p><p class="v" id="pipesV">—</p><p class="s" id="pipesS"></p></div>
+    <div class="m"><p class="l">Заготовок из трубы</p><p class="v" id="per">—</p><p class="s" id="perS"></p></div>
+    <div class="m"><p class="l">Обрезки</p><p class="v" id="wasteV">—</p><p class="s" id="wasteS"></p></div>
+    <div class="m"><p class="l">Резов</p><p class="v" id="cutsV">—</p><p class="s" id="cutsS"></p></div>
   </div>
 
   <div class="card" data-tab="calc">
@@ -1896,14 +1896,14 @@ function calc(){
   }
   if (have > 0) $('hs').textContent = ($('hs').textContent ? $('hs').textContent + ' · ' : '') + 'уже есть ' + have + ' шт';
   if (bad > 0) $('hs').textContent = ($('hs').textContent ? $('hs').textContent + ' · ' : '') + 'брак ' + bad + ' шт';
+  $('pipesV').textContent = n;
+  $('pipesS').textContent = bn + ' ' + plural(bn, 'пачка', 'пачки', 'пачек') + ' (' + (bn > 1 ? 'по ' : '') + b + ')' + (bn * b - n > 0 ? ', останется ' + (bn * b - n) : '');
   $('per').textContent = per;
-  $('perS').textContent = 'обрезок ' + fmt(wFull) + ' мм';
-  $('bn').textContent = bn;
-  $('bs').textContent = 'лишних труб: ' + (bn * b - n);
-  $('w').textContent = fmt(waste / 1000) + ' м';
-  $('ws2').textContent = Math.round(waste / (n * L) * 1000) / 10 + '% материала';
-  $('tot').textContent = qAll + ' шт';
-  $('ts').textContent = (have > 0 || bad > 0 ? 'резать ' + q + ', резов: ' : 'резов: ') + cuts;
+  $('perS').textContent = 'обрезок ' + num(fmt(wFull)) + ' мм';
+  $('wasteV').textContent = num(Math.round(waste / (n * L) * 1000) / 10) + '%';
+  $('wasteS').textContent = num(Math.round(waste / 100) / 10) + ' м';
+  $('cutsV').textContent = cuts;
+  $('cutsS').textContent = (have > 0 || bad > 0) ? 'резать ' + q + ' из ' + qAll : '';
 
   $('bar1').style.display = full > 0 ? '' : 'none';
   $('c1').style.display = full > 0 ? '' : 'none';
