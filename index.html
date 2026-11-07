@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.7">
+<meta name="app-build" content="2026-11-08.8">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1454,7 +1454,7 @@ label {
   <div class="bk-banner" id="bkBanner" hidden role="status">
     <p id="bkText"></p>
     <div class="bk-act">
-      <button type="button" class="nbtn main" id="bkSend">Отправить копию</button>
+      <button type="button" class="nbtn main" id="bkSend">Отправить резервную копию</button>
       <button type="button" class="nbtn sec" id="bkLater">Позже</button>
     </div>
   </div>
@@ -1468,9 +1468,6 @@ label {
   <div class="hero" data-tab="calc">
     <p class="big" id="hsMain">—</p>
     <p class="sub" id="hs"></p>
-  </div>
-  <div class="actions" data-tab="calc">
-    <button type="button" class="act main" id="shareBtn">Поделиться</button>
   </div>
 
   <div class="card" id="diaCard" data-tab="calc">
@@ -1649,7 +1646,8 @@ label {
     <h2>Сохранённые раскрои</h2>
     <div id="histList"></div>
     <button type="button" class="hist-clear" id="histClearBtn" hidden>Очистить всё</button>
-    <button type="button" class="nbtn main" id="sendHistBtn" style="width:100%;margin-top:12px;height:50px">Отправить копию</button>
+    <button type="button" class="nbtn main" id="shareBtn" style="width:100%;margin-top:12px;height:50px">Поделиться раскроем</button>
+    <button type="button" class="nbtn sec" id="sendHistBtn" style="width:100%;margin-top:8px;min-height:44px">Отправить резервную копию</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
       <button type="button" class="nbtn sec" id="exportHistBtn" style="min-height:44px">Скачать файл</button>
       <button type="button" class="nbtn sec" id="importHistBtn" style="min-height:44px">Восстановить</button>
@@ -2939,9 +2937,11 @@ function renderHist(){
   if (!archives.length){
     list.innerHTML = '<p class="hist-empty">Пока пусто. Нажмите «Сохранить раскрой», чтобы запомнить текущий.</p>';
     clearBtn.hidden = true;
+    $('shareBtn').hidden = true;
     return;
   }
   clearBtn.hidden = false;
+  $('shareBtn').hidden = false;
 
   // group by day (archives is already newest-first)
   var groups = [];
