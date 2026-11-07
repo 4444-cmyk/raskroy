@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.13">
+<meta name="app-build" content="2026-11-08.14">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2129,15 +2129,29 @@ function saveDone(){
   try{ localStorage.setItem(DONE_KEY, JSON.stringify(doneAll)); }catch(e){}
 }
 
+// Разбивка оставшихся труб по числу заготовок: «23 целых + 1 на 2 заготовки»
+function leftBreakdown(groups){
+  var keys = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; });
+  if (keys.length < 2) return '';
+  return ' (' + keys.map(function(r){
+    var n = groups[r];
+    return r === S.per ? n + ' ' + plural(n, 'целая', 'целых', 'целых')
+                       : n + ' на ' + r + ' ' + pieceWord(r, 'на');
+  }).join(' + ') + ')';
+}
+
 function renderList(){
-  var h = '', pd = 0, cd = 0, i;
+  var h = '', pd = 0, cd = 0, i, lg = {};
   nextIdx = -1;
   for (i = 0; i < S.n; i++){
     var pc = pcOf(i);
     var c = Math.min(cnt[i] || 0, pc);
     cd += c;
     if (c >= pc) pd++;
-    else if (nextIdx < 0) nextIdx = i;
+    else {
+      lg[pc - c] = (lg[pc - c] || 0) + 1;
+      if (nextIdx < 0) nextIdx = i;
+    }
   }
   for (i = 0; i < S.n; i++){
     var pc2 = pcOf(i);
@@ -2160,8 +2174,8 @@ function renderList(){
   var pl = S.n - pd, cl = S.q - cd;
   var badTxt = S.bad > 0 ? 'Брак: ' + S.bad : '';
   leftTxt = all ? badTxt :
-    'Осталось: ' + pl + ' ' + plural(pl, 'труба', 'трубы', 'труб') + ', ' +
-    cl + ' ' + plural(cl, 'заготовка', 'заготовки', 'заготовок') + ' (' + fmt(cl * S.p / 1000) + ' м)' + (badTxt ? ' · ' + badTxt : '');
+    'Осталось: ' + pl + ' ' + plural(pl, 'труба', 'трубы', 'труб') + leftBreakdown(lg) + ', ' +
+    cl + ' ' + plural(cl, 'заготовка', 'заготовки', 'заготовок') + (badTxt ? ' · ' + badTxt : '');
   $('left').textContent = leftTxt;
   $('left').style.color = '';
 
