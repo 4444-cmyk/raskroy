@@ -1,0 +1,2845 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Раскрой">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Раскрой труб</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --soft: rgba(120, 120, 128, 0.12);
+  --text: #000000;
+  --text2: rgba(60, 60, 67, 0.68);
+  --muted: rgba(60, 60, 67, 0.42);
+  --line: rgba(60, 60, 67, 0.14);
+  --line2: rgba(60, 60, 67, 0.28);
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-line: rgba(255, 255, 255, 0.85);
+  --tile: rgba(255, 255, 255, 0.78);
+  --acc-bg: #d6e8ff;
+  --acc-fg: #0051c7;
+  --acc-line: #5aa0ff;
+  --done-bg: #007aff;
+  --done-fg: #ffffff;
+  --warn-bg: #ffe9c4;
+  --warn-fg: #8a4a00;
+  --danger: #ff3b30;
+  --blob1: rgba(0, 122, 255, 0.22);
+  --blob2: rgba(175, 82, 222, 0.14);
+  --blob3: rgba(52, 199, 89, 0.15);
+  --shadow: 0 12px 40px rgba(20, 30, 60, 0.09), 0 2px 8px rgba(20, 30, 60, 0.04);
+  --shadow-sm: 0 4px 16px rgba(20, 30, 60, 0.06);
+  --stage: #e8ebf2;
+  --dot: rgba(60, 60, 67, 0.16);
+  --radius-xl: 32px;
+  --radius-lg: 26px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000;
+    --card: #1c1c1e;
+    --soft: rgba(235, 235, 245, 0.12);
+    --text: #ffffff;
+    --text2: rgba(235, 235, 245, 0.68);
+    --muted: rgba(235, 235, 245, 0.4);
+    --line: rgba(235, 235, 245, 0.16);
+    --line2: rgba(235, 235, 245, 0.3);
+    --glass: rgba(38, 38, 42, 0.72);
+    --glass-line: rgba(255, 255, 255, 0.12);
+    --tile: rgba(255, 255, 255, 0.08);
+    --acc-bg: #0a2f5c;
+    --acc-fg: #9ec5ff;
+    --acc-line: #0a84ff;
+    --done-bg: #0a84ff;
+    --done-fg: #ffffff;
+    --warn-bg: #4a3208;
+    --warn-fg: #ffd48a;
+    --danger: #ff6961;
+    --blob1: rgba(10, 132, 255, 0.32);
+    --blob2: rgba(191, 90, 242, 0.2);
+    --blob3: rgba(48, 209, 88, 0.14);
+    --shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.35);
+    --stage: #121316;
+    --dot: rgba(235, 235, 245, 0.12);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --card: #1c1c1e;
+  --soft: rgba(235, 235, 245, 0.12);
+  --text: #ffffff;
+  --text2: rgba(235, 235, 245, 0.68);
+  --muted: rgba(235, 235, 245, 0.4);
+  --line: rgba(235, 235, 245, 0.16);
+  --line2: rgba(235, 235, 245, 0.3);
+  --glass: rgba(38, 38, 42, 0.72);
+  --glass-line: rgba(255, 255, 255, 0.12);
+  --tile: rgba(255, 255, 255, 0.08);
+  --acc-bg: #0a2f5c;
+  --acc-fg: #9ec5ff;
+  --acc-line: #0a84ff;
+  --done-bg: #0a84ff;
+  --done-fg: #ffffff;
+  --warn-bg: #4a3208;
+  --warn-fg: #ffd48a;
+  --danger: #ff6961;
+  --blob1: rgba(10, 132, 255, 0.32);
+  --blob2: rgba(191, 90, 242, 0.2);
+  --blob3: rgba(48, 209, 88, 0.14);
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --stage: #121316;
+  --dot: rgba(235, 235, 245, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 45% at 5% -5%, var(--blob1), transparent 70%),
+    radial-gradient(70% 40% at 100% 25%, var(--blob2), transparent 68%),
+    radial-gradient(75% 45% at -5% 105%, var(--blob3), transparent 70%);
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-block: max(12px, env(safe-area-inset-top)) 32px;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+/* title removed */
+
+.theme-row {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--soft);
+}
+
+.theme-chip {
+  flex: 1;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.theme-chip.on {
+  background: var(--done-bg);
+  color: var(--done-fg);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.fold-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  text-align: left;
+}
+
+.fold-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.fold-val {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text2);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.fold-chev {
+  font-size: 22px;
+  color: var(--muted);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+
+.fold-head[aria-expanded="true"] .fold-chev {
+  transform: rotate(-90deg);
+}
+
+.fold-body {
+  margin-top: 12px;
+}
+
+.fold-body[hidden] {
+  display: none;
+}
+
+/* Glass cards */
+.card, .m {
+  background: var(--glass);
+  border: 0.5px solid var(--glass-line);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  box-shadow: var(--shadow), inset 0 1px 0 var(--glass-line);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card, .m, .act { background: var(--card); }
+}
+
+.card {
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  margin: 0 0 14px;
+}
+
+.card h2 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0 0 16px;
+}
+
+/* Hero */
+.hero {
+  border-radius: 34px;
+  padding: 24px 24px 22px;
+  margin: 0 0 12px;
+  color: var(--done-fg);
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 42%, transparent 70%),
+    var(--done-bg);
+  box-shadow:
+    0 16px 40px rgba(0, 122, 255, 0.34),
+    0 4px 12px rgba(0, 122, 255, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 80% -20%, rgba(255,255,255,0.25), transparent 55%);
+  pointer-events: none;
+}
+
+.hero .big {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+}
+
+.hero .sub {
+  font-size: 15px;
+  margin: 8px 0 0;
+  opacity: 0.9;
+  font-weight: 450;
+  position: relative;
+}
+
+/* Copy button */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.act {
+  height: 48px;
+  border-radius: 24px;
+  border: 0;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  background: var(--glass);
+  border: 0.5px solid var(--glass-line);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--glass-line);
+  color: var(--done-bg);
+}
+
+.act:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+.act.main {
+  background: var(--done-bg);
+  color: var(--done-fg);
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(0, 122, 255, 0.32), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+.hist-day {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  margin: 18px 0 6px;
+  letter-spacing: -0.01em;
+}
+
+.hist-day:first-child {
+  margin-top: 4px;
+}
+
+.hist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--line);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.hist-item:last-child {
+  border-bottom: 0;
+}
+
+.hist-item:active {
+  opacity: 0.7;
+}
+
+.hist-time {
+  flex: none;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  min-width: 42px;
+}
+
+.hist-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.hist-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hist-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hist-del {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  border: 0;
+  background: var(--soft);
+  color: var(--danger);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hist-empty {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  padding: 20px 0 8px;
+}
+
+.hist-clear {
+  display: block;
+  width: 100%;
+  height: 42px;
+  margin-top: 14px;
+  border-radius: 21px;
+  border: 0.5px solid var(--line);
+  background: transparent;
+  color: var(--text2);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Undo toast */
+.toast {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 110;
+  max-width: 448px;
+  min-height: 56px;
+  margin: 0 auto;
+  padding: 6px 6px 6px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 28px;
+  background: rgba(44, 44, 48, 0.96);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  animation: toastin 0.22s ease-out;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+.toast button {
+  flex: none;
+  height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #6cb0ff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.toast button:active {
+  opacity: 0.7;
+}
+
+@keyframes toastin {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+}
+
+/* Share sheet */
+.sheet-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 101;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--card);
+  border-radius: 24px 24px 0 0;
+  padding: 12px 20px calc(20px + env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet[hidden], .sheet-bg[hidden] {
+  display: none;
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--soft);
+  margin: 0 auto 14px;
+}
+
+.sheet-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+  text-align: center;
+}
+
+.sheet-sub {
+  font-size: 14px;
+  color: var(--text2);
+  margin: 0 0 14px;
+  text-align: center;
+}
+
+.sheet-list {
+  overflow-y: auto;
+  flex: 1;
+  margin: 0 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.share-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--line);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.share-item:last-child {
+  border-bottom: 0;
+}
+
+.share-check {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  border: 2px solid var(--line2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.share-item.on .share-check {
+  background: var(--done-bg);
+  border-color: var(--done-bg);
+  color: #fff;
+}
+
+.share-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.share-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.share-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 2px 0 0;
+}
+
+.share-empty {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  padding: 24px 8px;
+}
+
+.sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sheet-actions .nbtn {
+  height: 50px;
+}
+
+/* Fields */
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 14px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0 0 7px 4px;
+  font-weight: 500;
+}
+
+.step {
+  display: flex;
+  align-items: stretch;
+  height: 52px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: var(--soft);
+}
+
+.step:focus-within {
+  box-shadow: 0 0 0 2.5px var(--done-bg);
+}
+
+.step input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: center;
+  padding: 0;
+  -moz-appearance: textfield;
+  font-variant-numeric: tabular-nums;
+}
+
+.step input::-webkit-outer-spin-button,
+.step input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.sb {
+  flex: none;
+  width: 48px;
+  border: 0;
+  background: transparent;
+  color: var(--done-bg);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.sb:active {
+  background: var(--soft);
+}
+
+.step.sm {
+  height: 42px;
+  border-radius: 21px;
+}
+
+.step.sm .sb {
+  width: 40px;
+  font-size: 22px;
+}
+
+.step.sm input {
+  font-size: 16px;
+}
+
+.pset {
+  flex: none;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--soft);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.pset:active {
+  transform: scale(0.94);
+}
+
+.pset.on {
+  background: var(--done-bg);
+  color: var(--done-fg);
+  box-shadow: 0 3px 10px rgba(0, 122, 255, 0.35);
+}
+
+/* Stage / SVG */
+.stage {
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 0 0 16px;
+  background-color: var(--stage);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
+  background-size: 15px 15px;
+}
+
+.stage svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pring {
+  fill: var(--acc-bg);
+  fill-rule: evenodd;
+  stroke: var(--done-bg);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.phi {
+  fill: none;
+  stroke: #fff;
+  stroke-opacity: 0.7;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.dim, .ext {
+  fill: none;
+  stroke: var(--text2);
+  stroke-width: 1.2;
+}
+
+.ext {
+  stroke-dasharray: 3 3;
+  stroke-opacity: 0.65;
+}
+
+.dimt {
+  fill: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.wl {
+  fill: none;
+  stroke: var(--done-bg);
+  stroke-width: 1.3;
+}
+
+.wd {
+  fill: var(--done-bg);
+}
+
+.wc {
+  fill: var(--text2);
+  font-size: 11px;
+}
+
+.wt {
+  fill: var(--acc-fg);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Controls */
+.ctl {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.crow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rl {
+  flex: none;
+  width: 58px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+.crow .step {
+  flex: none;
+  width: 126px;
+}
+
+.crow .step.sm .sb {
+  width: 36px;
+}
+
+.psets {
+  display: flex;
+  gap: 7px;
+}
+
+.rng {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  --p: 50%;
+}
+
+.rng::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--done-bg) var(--p), var(--soft) var(--p));
+}
+
+.rng::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--soft);
+}
+
+.rng::-moz-range-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--done-bg);
+}
+
+.rng::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: #fff;
+  border: 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.28), 0 0 0 0.5px rgba(0,0,0,0.08);
+}
+
+.rng::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.28), 0 0 0 0.5px rgba(0,0,0,0.08);
+}
+
+.rng:focus-visible {
+  outline: 2px solid var(--done-bg);
+  outline-offset: 3px;
+  border-radius: 16px;
+}
+
+.err {
+  font-size: 14px;
+  color: var(--danger);
+  margin-top: 14px;
+  font-weight: 500;
+}
+
+.err:empty {
+  display: none;
+}
+
+.jsb {
+  display: none;
+  margin: 0 0 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--warn-bg);
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.fhint {
+  grid-column: 1 / -1;
+  margin: -6px 4px 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text2);
+}
+
+/* Metrics grid */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0 0 14px;
+}
+
+.m {
+  border-radius: 26px;
+  padding: 16px 18px;
+}
+
+.m .l {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0;
+  font-weight: 500;
+}
+
+.m .v {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin: 5px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.m .s {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 3px 0 0;
+}
+
+/* How to cut */
+.legend {
+  display: flex;
+  gap: 18px;
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0 0 14px;
+  font-weight: 500;
+}
+
+.legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  margin-right: 7px;
+  vertical-align: -1px;
+}
+
+.pipe {
+  display: flex;
+  height: 44px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 0.5px solid var(--line2);
+  margin: 0 0 8px;
+}
+
+.pc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--acc-bg);
+  color: var(--acc-fg);
+  border-right: 2px solid var(--card);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ws {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.cap {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0 0 16px;
+  font-weight: 450;
+}
+
+.cap:last-child {
+  margin-bottom: 0;
+}
+
+/* Checklist */
+.lhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.lhead h2 {
+  margin: 0;
+}
+
+.ltools {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--soft);
+}
+
+.chip {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.chip.on {
+  background: var(--done-bg);
+  color: var(--done-fg);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.32);
+}
+
+.ptxt {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.prog {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--soft);
+  overflow: hidden;
+  margin: 12px 0 10px;
+}
+
+.prog i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 5px;
+  background: var(--done-bg);
+  transition: width 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.left {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0 0 16px;
+  min-height: 18px;
+  font-weight: 450;
+}
+
+.now {
+  background: var(--soft);
+  border-radius: 26px;
+  padding: 16px;
+  margin: 0 0 18px;
+}
+
+.nowT {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.nowS {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 4px 0 14px;
+  font-weight: 450;
+}
+
+.nowS:empty {
+  margin: 0;
+}
+
+.nrow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.nbtn {
+  height: 52px;
+  padding: 0 10px;
+  white-space: nowrap;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  border: 1px solid transparent;
+  background: var(--card);
+  color: var(--done-bg);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.nbtn:active {
+  transform: scale(0.97);
+  opacity: 0.88;
+}
+
+.nbtn.main {
+  background: var(--done-bg);
+  color: var(--done-fg);
+  box-shadow: 0 6px 18px rgba(0, 122, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+.nbtn.sec {
+  height: 44px;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text2);
+  border-color: var(--line);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.tile {
+  height: 58px;
+  padding: 0;
+  border-radius: 18px;
+  border: 0.5px solid var(--line);
+  background: var(--tile);
+  color: var(--text);
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  cursor: pointer;
+  touch-action: manipulation;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.tile:active {
+  transform: scale(0.94);
+}
+
+.tile.holding::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.38);
+  animation: holdfill 0.6s linear forwards;
+  pointer-events: none;
+}
+
+@keyframes holdfill {
+  from { height: 0; }
+  to { height: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile.holding::after {
+    animation-duration: 0.01s;
+  }
+}
+
+.tile b {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.tile span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.tile.last {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  border-color: transparent;
+}
+
+.tile.last span {
+  color: var(--warn-fg);
+}
+
+.tile.part {
+  background: var(--acc-bg);
+  border: 2px solid var(--done-bg);
+}
+
+.tile.part,
+.tile.part span {
+  color: var(--acc-fg);
+}
+
+.tile.part span {
+  font-weight: 600;
+}
+
+.tile.on,
+.tile.last.on {
+  background: var(--done-bg);
+  color: var(--done-fg);
+  border-color: var(--done-bg);
+  box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
+}
+
+.tile.on span,
+.tile.last.on span {
+  color: var(--done-fg);
+  opacity: 0.85;
+}
+
+.tile.next {
+  border: 2px solid var(--done-bg);
+}
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--text2);
+  flex-wrap: wrap;
+  font-weight: 500;
+}
+
+.range input {
+  width: 64px;
+  height: 44px;
+  text-align: center;
+  border: 0;
+  border-radius: 22px;
+  background: var(--soft);
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 500;
+  font-family: inherit;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.range input::-webkit-outer-spin-button,
+.range input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.range input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2.5px var(--done-bg);
+}
+
+.range .nbtn {
+  height: 44px;
+  margin-left: auto;
+  font-size: 14px;
+  background: var(--done-bg);
+  color: var(--done-fg);
+}
+
+/* Big mode */
+#listCard.big .tiles {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px;
+}
+
+#listCard.big .tile {
+  height: 82px;
+  border-radius: 22px;
+}
+
+#listCard.big .tile b {
+  font-size: 26px;
+}
+
+#listCard.big .tile span {
+  font-size: 15px;
+}
+
+#listCard.big .nbtn {
+  height: 68px;
+  font-size: 19px;
+}
+
+#listCard.big .nbtn.sec {
+  height: 52px;
+  font-size: 16px;
+}
+
+#listCard.big .nowT {
+  font-size: 22px;
+}
+
+#listCard.big .nowS {
+  font-size: 15px;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="jsb" id="jsBanner" role="alert"></div>
+  <div class="hero">
+    <p class="big" id="hsMain">—</p>
+    <p class="sub" id="hs"></p>
+  </div>
+  <div class="actions">
+    <button type="button" class="act main" id="shareBtn">Поделиться</button>
+  </div>
+  <div class="theme-row" id="themeRow">
+    <button type="button" class="theme-chip on" data-theme="auto">Авто</button>
+    <button type="button" class="theme-chip" data-theme="light">Светлая</button>
+    <button type="button" class="theme-chip" data-theme="dark">Тёмная</button>
+  </div>
+
+  <div class="card" id="diaCard">
+    <button type="button" class="fold-head" id="foldDia" aria-expanded="false">
+      <span class="fold-title">Сечение</span>
+      <span class="fold-val" id="foldDiaVal">Ø50 × 1,2</span>
+      <span class="fold-chev" aria-hidden="true">›</span>
+    </button>
+    <div class="fold-body" id="foldDiaBody" hidden>
+      <div class="stage">
+        <svg viewBox="0 0 320 130" role="img" aria-label="Сечение трубы с размерами">
+          <line id="extL" class="ext" x1="0" y1="0" x2="0" y2="0"/>
+          <line id="extR" class="ext" x1="0" y1="0" x2="0" y2="0"/>
+          <path id="pRing" class="pring" d=""/>
+          <path id="pHi" class="phi" d=""/>
+          <line id="dimL" class="dim" x1="0" y1="0" x2="0" y2="0"/>
+          <line id="dimT1" class="dim" x1="0" y1="0" x2="0" y2="0"/>
+          <line id="dimT2" class="dim" x1="0" y1="0" x2="0" y2="0"/>
+          <text id="dimTxt" class="dimt" x="160" y="130" text-anchor="middle">Ø50 мм</text>
+          <g id="wGrp">
+            <polyline id="wLine" class="wl" points="0,0 0,0 0,0"/>
+            <circle id="wDot" class="wd" cx="0" cy="0" r="2.6"/>
+            <text id="wCap" class="wc" x="0" y="0">стенка</text>
+            <text id="wTxt" class="wt" x="0" y="0">1,2 мм</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="ctl" style="margin-top:12px">
+      <div class="crow">
+        <label class="rl" for="d">Диаметр</label>
+        <div class="step sm">
+          <button type="button" class="sb" data-t="d" data-s="-1" aria-label="Меньше">−</button>
+          <input id="d" type="number" inputmode="decimal" value="50" min="1" step="any">
+          <button type="button" class="sb" data-t="d" data-s="1" aria-label="Больше">+</button>
+        </div>
+        <input type="range" class="rng" id="dR" min="10" max="100" step="1" value="50" aria-label="Диаметр, ползунок">
+      </div>
+      <div class="crow">
+        <label class="rl" for="t">Стенка</label>
+        <div class="step sm">
+          <button type="button" class="sb" data-t="t" data-s="-0.1" aria-label="Тоньше">−</button>
+          <input id="t" type="number" inputmode="decimal" value="1.2" min="0.1" step="any">
+          <button type="button" class="sb" data-t="t" data-s="0.1" aria-label="Толще">+</button>
+        </div>
+        <div class="psets">
+          <button type="button" class="pset" data-v="1.2">1,2</button>
+          <button type="button" class="pset" data-v="1.5">1,5</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Параметры</h2>
+    <div class="fields">
+      <div>
+        <label for="q">Нужно заготовок, шт</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="q" data-s="-1" aria-label="Меньше">−</button>
+          <input id="q" type="number" inputmode="decimal" value="400" min="1" step="any">
+          <button type="button" class="sb" data-t="q" data-s="1" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <div>
+        <label for="p">Длина заготовки, мм</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="p" data-s="-1" aria-label="Меньше">−</button>
+          <input id="p" type="number" inputmode="decimal" value="610" min="1" step="any">
+          <button type="button" class="sb" data-t="p" data-s="1" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <div>
+        <label for="L">Длина трубы, мм</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="L" data-s="-100" aria-label="Меньше">−</button>
+          <input id="L" type="number" inputmode="decimal" value="6000" min="1" step="any">
+          <button type="button" class="sb" data-t="L" data-s="100" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <div>
+        <label for="b">Труб в пачке, шт</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="b" data-s="-1" aria-label="Меньше">−</button>
+          <input id="b" type="number" inputmode="decimal" value="50" min="1" step="any">
+          <button type="button" class="sb" data-t="b" data-s="1" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <div>
+        <label for="k">Пропил реза, мм</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="k" data-s="-0.5" aria-label="Меньше">−</button>
+          <input id="k" type="number" inputmode="decimal" value="0" min="0" step="any">
+          <button type="button" class="sb" data-t="k" data-s="0.5" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <div>
+        <label for="h">Уже есть, шт</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="h" data-s="-1" aria-label="Меньше">−</button>
+          <input id="h" type="number" inputmode="decimal" value="0" min="0" step="any">
+          <button type="button" class="sb" data-t="h" data-s="1" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <p class="fhint">Пропил — толщина пилы или круга (0 — не учитывать). «Уже есть» — заготовки, которые уже нарезаны или лежат на складе: их вычтем из заказа.</p>
+    </div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="grid">
+    <div class="m"><p class="l">Кусков из трубы</p><p class="v" id="per">—</p><p class="s" id="perS"></p></div>
+    <div class="m"><p class="l">Пачек</p><p class="v" id="bn">—</p><p class="s" id="bs"></p></div>
+    <div class="m"><p class="l">Общий остаток</p><p class="v" id="w">—</p><p class="s" id="ws2"></p></div>
+    <div class="m"><p class="l">Всего заготовок</p><p class="v" id="tot">—</p><p class="s" id="ts"></p></div>
+  </div>
+
+  <div class="card">
+    <h2>Как резать</h2>
+    <div class="legend">
+      <span><i style="background:var(--acc-bg);border:1px solid var(--acc-line)"></i>заготовка</span>
+      <span><i style="background:var(--warn-bg)"></i>остаток</span>
+    </div>
+    <div class="pipe" id="bar1"></div>
+    <p class="cap" id="c1"></p>
+    <div class="pipe" id="bar2"></div>
+    <p class="cap" id="c2"></p>
+  </div>
+
+  <div class="card" id="listCard">
+    <div class="lhead">
+      <h2>Чек-лист резки</h2>
+      <div class="ltools">
+        <button type="button" class="chip" id="bigBtn" aria-pressed="false">Крупно</button>
+        <button type="button" class="chip on" id="fbBtn" aria-pressed="true">Вибрация</button>
+        <button type="button" class="chip on" id="wakeBtn" aria-pressed="true">Экран</button>
+        <button type="button" class="chip on" id="guardBtn" aria-pressed="true">Защита</button>
+      </div>
+    </div>
+
+    <div class="ptxt"><span id="pt1"></span><span id="pt2"></span></div>
+    <div class="prog"><i id="pfill"></i></div>
+    <p class="left" id="left"></p>
+
+    <div class="now">
+      <p class="nowT" id="nowT"></p>
+      <p class="nowS" id="nowS"></p>
+      <div class="nrow" id="actRow">
+        <button type="button" class="nbtn" id="pieceBtn">+1 заготовка</button>
+        <button type="button" class="nbtn main" id="nextBtn">Готово</button>
+      </div>
+      <div class="nrow" style="margin-top:10px">
+        <button type="button" class="nbtn sec" id="undoBtn">Назад</button>
+        <button type="button" class="nbtn sec" id="badBtn" style="color:var(--warn-fg)">Брак +1</button>
+      </div>
+      <div class="nrow" style="margin-top:10px;grid-template-columns:1fr">
+        <button type="button" class="nbtn sec" id="resetDone">Сбросить отметки</button>
+      </div>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="range">
+      <span>Трубы с</span>
+      <input id="rFrom" type="number" inputmode="numeric" value="1" min="1" aria-label="С трубы номер">
+      <span>по</span>
+      <input id="rTo" type="number" inputmode="numeric" value="1" min="1" aria-label="По трубу номер">
+      <button type="button" class="nbtn" id="rBtn">Готовы</button>
+    </div>
+
+    <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:14px;height:50px">Сохранить раскрой</button>
+  </div>
+
+  <div class="card" id="histCard">
+    <h2>Сохранённые раскрои</h2>
+    <div id="histList"></div>
+    <button type="button" class="hist-clear" id="histClearBtn" hidden>Очистить всё</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+      <button type="button" class="nbtn sec" id="exportHistBtn" style="min-height:44px">Скачать копию</button>
+      <button type="button" class="nbtn sec" id="importHistBtn" style="min-height:44px">Восстановить</button>
+    </div>
+    <input type="file" id="importHistFile" accept=".json,application/json" hidden>
+    <p id="storageStatus" style="font-size:12px;line-height:1.45;color:var(--text2);margin:10px 2px 0">Проверка сохранения…</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <span id="toastText"></span>
+  <button type="button" id="toastUndo">Отменить</button>
+</div>
+
+<div class="sheet-bg" id="shareSheetBg" hidden></div>
+<div class="sheet" id="shareSheet" hidden>
+  <div class="sheet-handle"></div>
+  <h3 class="sheet-title">Поделиться</h3>
+  <p class="sheet-sub">Сегодня отмечены · можно выбрать любые</p>
+  <div class="sheet-list" id="shareList"></div>
+  <div class="sheet-actions">
+    <button type="button" class="nbtn sec" id="shareCancel">Отмена</button>
+    <button type="button" class="nbtn main" id="shareDo">Поделиться</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var b = document.getElementById('jsBanner');
+  if (b) b.style.display = 'none';
+})();
+
+window.onerror = function(msg, src, line){
+  var b = document.getElementById('jsBanner');
+  if (b){
+    b.style.display = 'block';
+    b.textContent = 'Ошибка скрипта: ' + msg + (line ? ' (строка ' + line + ')' : '') + '. Пришлите этот текст.';
+  }
+};
+
+var IDS = ['q','p','L','b','d','t','k','h'];
+var KEY = 'pipecalc.v1';
+var S = null;
+
+function $(id){ return document.getElementById(id); }
+function fmt(x){ return Math.round(x * 10) / 10; }
+function plural(n, a, b, c){
+  var m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return a;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return b;
+  return c;
+}
+function num(x){ return String(Math.round(x * 100) / 100).replace('.', ','); }
+
+function save(){
+  try{
+    var o = {};
+    IDS.forEach(function(id){ o[id] = $(id).value; });
+    localStorage.setItem(KEY, JSON.stringify(o));
+  }catch(e){}
+}
+
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if (!raw) return;
+    var o = JSON.parse(raw);
+    IDS.forEach(function(id){
+      if (o && o[id] !== undefined && o[id] !== null && o[id] !== '') $(id).value = o[id];
+    });
+  }catch(e){}
+}
+
+function draw(el, cuts, p, L, off){
+  var h = '';
+  for (var i = 0; i < cuts; i++){
+    h += '<div class="pc" style="width:' + (p / L * 100) + '%">' + p + '</div>';
+  }
+  var rest = Math.max(L - cuts * p, 0);
+  if (rest > 0){
+    h += '<div class="ws" style="width:' + (rest / L * 100) + '%">' + (rest / L > 0.08 ? fmt(off === undefined ? rest : off) : '') + '</div>';
+  }
+  el.innerHTML = h;
+}
+
+function calc(){
+  var L = +$('L').value, p = +$('p').value, q = +$('q').value, b = +$('b').value;
+  var kerf = $('k').value === '' ? 0 : +$('k').value;
+  var have = $('h').value === '' ? 0 : +$('h').value;
+  var qAll = q;
+  if (!(L > 0 && p > 0 && q > 0 && b > 0)){
+    $('err').textContent = 'Заполните все поля положительными числами';
+    S = null;
+    return;
+  }
+  if (!(kerf >= 0)){
+    $('err').textContent = 'Пропил не может быть отрицательным';
+    S = null;
+    return;
+  }
+  if (!(have >= 0)){
+    $('err').textContent = '«Уже есть» не может быть отрицательным';
+    S = null;
+    return;
+  }
+  if (q !== Math.floor(q) || b !== Math.floor(b) || have !== Math.floor(have)){
+    $('err').textContent = 'Количество заготовок, «Уже есть» и труб в пачке — целые числа';
+    S = null;
+    return;
+  }
+  q = qAll - have;   // дальше q — сколько нужно нарезать
+  if (q <= 0){
+    $('err').textContent = 'Все заготовки уже есть — резать нечего';
+    S = null;
+    return;
+  }
+  var q0 = q;      // план без учёта брака
+  var jobSig = [q0, p, L, +$('d').value || 0, +$('t').value || 0, kerf].join('|');
+  var bad = getBad(jobSig);
+  q = q0 + bad;    // плюс заготовки взамен брака
+  if (p > L){
+    $('err').textContent = 'Заготовка длиннее трубы';
+    S = null;
+    return;
+  }
+  $('err').textContent = '';
+
+  // После каждой заготовки уходит kerf мм. Если у торца трубы ничего не остаётся, последний рез не нужен.
+  function pipeInfo(c){
+    var free = Math.round((L - (c * p + (c - 1) * kerf)) * 1000) / 1000;
+    if (free > 0) return {cuts: c, off: Math.max(free - kerf, 0)};
+    return {cuts: c - 1, off: 0};
+  }
+  var per   = Math.floor((L + kerf) / (p + kerf) + 1e-9);
+  var full  = Math.floor(q / per);
+  var rem   = q - full * per;
+  var n     = full + (rem > 0 ? 1 : 0);
+  var bn    = Math.ceil(n / b);
+  var iFull = pipeInfo(per);
+  var iLast = rem > 0 ? pipeInfo(rem) : {cuts: 0, off: 0};
+  var wFull = iFull.off;
+  var wLast = iLast.off;
+  var waste = n * L - q * p;
+  var cuts  = full * iFull.cuts + iLast.cuts;
+
+  S = {L:L, p:p, q:q, q0:q0, bad:bad, sig:jobSig, h:have, k:kerf, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, cuts:cuts};
+
+  if (rem > 0 && full === 0) {
+    $('hsMain').textContent = '1 труба × ' + rem + ' шт';
+    $('hs').textContent = '';
+  } else if (rem > 0) {
+    $('hsMain').textContent = full + ' ' + plural(full, 'труба', 'трубы', 'труб') + ' × ' + per + ' шт';
+    $('hs').textContent = '1 труба × ' + rem + ' шт';
+  } else {
+    $('hsMain').textContent = n + ' ' + plural(n, 'труба', 'трубы', 'труб') + ' × ' + per + ' шт';
+    $('hs').textContent = '';
+  }
+  if (have > 0) $('hs').textContent = ($('hs').textContent ? $('hs').textContent + ' · ' : '') + 'уже есть ' + have + ' шт';
+  if (bad > 0) $('hs').textContent = ($('hs').textContent ? $('hs').textContent + ' · ' : '') + 'брак ' + bad + ' шт';
+  $('per').textContent = per;
+  $('perS').textContent = 'обрезок ' + fmt(wFull) + ' мм';
+  $('bn').textContent = bn;
+  $('bs').textContent = 'лишних труб: ' + (bn * b - n);
+  $('w').textContent = fmt(waste / 1000) + ' м';
+  $('ws2').textContent = Math.round(waste / (n * L) * 1000) / 10 + '% материала';
+  $('tot').textContent = qAll + ' шт';
+  $('ts').textContent = (have > 0 || bad > 0 ? 'резать ' + q + ', резов: ' : 'резов: ') + cuts;
+
+  $('bar1').style.display = full > 0 ? '' : 'none';
+  $('c1').style.display = full > 0 ? '' : 'none';
+  if (full > 0) draw($('bar1'), per, p, L, wFull);
+  $('c1').textContent = 'Целая труба ×' + full + ': ' + per + ' × ' + p + ' мм, обрезок ' + fmt(wFull) + ' мм' + (kerf > 0 ? ', пропил ' + num(kerf) + ' мм' : '');
+  if (rem > 0){
+    $('bar2').style.display = '';
+    draw($('bar2'), rem, p, L, wLast);
+    $('c2').textContent = 'Последняя труба: ' + rem + ' × ' + p + ' мм, остаток ' + fmt(wLast) + ' мм в запас';
+  } else {
+    $('bar2').style.display = 'none';
+    $('c2').textContent = 'Все трубы режутся одинаково';
+  }
+}
+
+function setA(id, a, v){ $(id).setAttribute(a, v); }
+
+var pipeCur = null, pipeAnim = null;
+function pipeR(d){ return Math.max(10, Math.min(40, 8 + 32 * Math.pow(Math.min(d, 100) / 100, 0.7))); }
+function circPath(cx, cy, r){
+  return 'M ' + (cx - r) + ' ' + cy + ' a ' + r + ' ' + r + ' 0 1 0 ' + (2 * r) + ' 0 a ' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0 Z ';
+}
+function pipeDraw(r, w){
+  var cx = 160, cy = 50;
+  var ir = Math.max(r - w, 1);
+  setA('pRing', 'd', circPath(cx, cy, r) + circPath(cx, cy, ir));
+  var ra = r - 1.6, a1 = 200 * Math.PI / 180, a2 = 252 * Math.PI / 180;
+  setA('pHi', 'd', 'M ' + (cx + ra * Math.cos(a1)) + ' ' + (cy + ra * Math.sin(a1)) +
+    ' A ' + ra + ' ' + ra + ' 0 0 1 ' + (cx + ra * Math.cos(a2)) + ' ' + (cy + ra * Math.sin(a2)));
+  var y = cy + r + 14;
+  setA('dimL', 'x1', cx - r); setA('dimL', 'x2', cx + r); setA('dimL', 'y1', y); setA('dimL', 'y2', y);
+  setA('dimT1', 'x1', cx - r); setA('dimT1', 'x2', cx - r); setA('dimT1', 'y1', y - 5); setA('dimT1', 'y2', y + 5);
+  setA('dimT2', 'x1', cx + r); setA('dimT2', 'x2', cx + r); setA('dimT2', 'y1', y - 5); setA('dimT2', 'y2', y + 5);
+  setA('extL', 'x1', cx - r); setA('extL', 'x2', cx - r); setA('extL', 'y1', cy); setA('extL', 'y2', y + 5);
+  setA('extR', 'x1', cx + r); setA('extR', 'x2', cx + r); setA('extR', 'y1', cy); setA('extR', 'y2', y + 5);
+  setA('dimTxt', 'y', y + 19);
+  var th = -30 * Math.PI / 180, pm = r - w / 2, po = r + 12;
+  var px = cx + pm * Math.cos(th), py = cy + pm * Math.sin(th);
+  var qx = cx + po * Math.cos(th), qy = cy + po * Math.sin(th);
+  setA('wLine', 'points', px + ',' + py + ' ' + qx + ',' + qy + ' ' + (qx + 16) + ',' + qy);
+  setA('wDot', 'cx', px); setA('wDot', 'cy', py);
+  setA('wCap', 'x', qx + 22); setA('wCap', 'y', qy - 8);
+  setA('wTxt', 'x', qx + 22); setA('wTxt', 'y', qy + 8);
+}
+function pipeTo(r, w){
+  if (pipeAnim){ cancelAnimationFrame(pipeAnim); pipeAnim = null; }
+  var calm = false;
+  try{ calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  if (!pipeCur || calm || !window.requestAnimationFrame){
+    pipeCur = {r: r, w: w};
+    pipeDraw(r, w);
+    return;
+  }
+  var r0 = pipeCur.r, w0 = pipeCur.w, t0 = null;
+  function step(ts){
+    if (t0 === null) t0 = ts;
+    var k = Math.min((ts - t0) / 220, 1), e = 1 - Math.pow(1 - k, 3);
+    pipeCur = {r: r0 + (r - r0) * e, w: w0 + (w - w0) * e};
+    pipeDraw(pipeCur.r, pipeCur.w);
+    pipeAnim = k < 1 ? requestAnimationFrame(step) : null;
+  }
+  pipeAnim = requestAnimationFrame(step);
+}
+function syncRange(id, v){
+  var el = $(id), mn = +el.min, mx = +el.max;
+  var c = Math.max(mn, Math.min(mx, v));
+  el.value = c;
+  el.style.setProperty('--p', ((c - mn) / (mx - mn) * 100) + '%');
+}
+function drawDia(){
+  var d = +$('d').value;
+  if (!(d > 0)) return;
+  var t = +$('t').value;
+  var hasT = t > 0 && t < d / 2;
+  var r = pipeR(d);
+  var w = hasT ? Math.min(r * 0.42, Math.max(2.4, r * (0.06 + 3.2 * t / d))) : Math.max(3, r * 0.14);
+  $('dimTxt').textContent = 'Ø' + num(d) + ' мм';
+  $('wGrp').style.display = hasT ? '' : 'none';
+  if (hasT) $('wTxt').textContent = num(t) + ' мм';
+  pipeTo(r, w);
+  Array.prototype.forEach.call(document.querySelectorAll('.pset'), function(b){
+    b.className = 'pset' + (hasT && Math.abs(+b.getAttribute('data-v') - t) < 0.001 ? ' on' : '');
+  });
+  syncRange('dR', d);
+  var fv = $('foldDiaVal');
+  if (fv) fv.textContent = 'Ø' + num(d) + (t > 0 ? ' × ' + num(t) : '');
+}
+$('dR').addEventListener('input', function(){ $('d').value = this.value; update(); });
+
+var DONE_KEY = 'pipecalc.done.v2';
+var UI_KEY = 'pipecalc.ui.v1';
+var OLD_DONE_KEY = 'pipecalc.done.v1';
+var doneAll = {};
+try{ doneAll = JSON.parse(localStorage.getItem(OLD_DONE_KEY)) || {}; }catch(e){ doneAll = {}; }
+try{
+  var d2 = JSON.parse(localStorage.getItem(DONE_KEY));
+  if (d2){ for (var kk in d2){ doneAll[kk] = d2[kk]; } }
+}catch(e){}
+var curSig = null, cnt = {}, hist = [], nextIdx = -1, legacyDone = false;
+var ui = {big:false, fb:true, wake:true, guard:true, theme:'auto', foldDia:false};
+var leftTxt = '', hintTimer = null;
+try{
+  var u = JSON.parse(localStorage.getItem(UI_KEY));
+  if (u){
+    ui.big = !!u.big; ui.fb = u.fb !== false; ui.wake = u.wake !== false; ui.guard = u.guard !== false;
+    if (u.theme === 'light' || u.theme === 'dark' || u.theme === 'auto') ui.theme = u.theme;
+    ui.foldDia = !!u.foldDia;
+  }
+}catch(e){}
+
+function saveUI(){
+  try{ localStorage.setItem(UI_KEY, JSON.stringify(ui)); }catch(e){}
+}
+
+function applyTheme(){
+  var root = document.documentElement;
+  if (ui.theme === 'light') {
+    root.setAttribute('data-theme', 'light');
+    root.style.colorScheme = 'light';
+  } else if (ui.theme === 'dark') {
+    root.setAttribute('data-theme', 'dark');
+    root.style.colorScheme = 'dark';
+  } else {
+    root.removeAttribute('data-theme');
+    root.style.colorScheme = 'light dark';
+  }
+  var dark = ui.theme === 'dark' || (ui.theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  Array.prototype.forEach.call(document.querySelectorAll('.theme-chip'), function(b){
+    b.className = 'theme-chip' + (b.getAttribute('data-theme') === ui.theme ? ' on' : '');
+  });
+}
+
+function applyFold(){
+  var head = $('foldDia');
+  var body = $('foldDiaBody');
+  if (!head || !body) return;
+  head.setAttribute('aria-expanded', ui.foldDia ? 'true' : 'false');
+  if (ui.foldDia) body.removeAttribute('hidden');
+  else body.setAttribute('hidden', '');
+}
+
+function applyUI(){
+  $('listCard').className = 'card' + (ui.big ? ' big' : '');
+  $('bigBtn').className = 'chip' + (ui.big ? ' on' : '');
+  $('bigBtn').setAttribute('aria-pressed', ui.big ? 'true' : 'false');
+  $('fbBtn').className = 'chip' + (ui.fb ? ' on' : '');
+  $('fbBtn').setAttribute('aria-pressed', ui.fb ? 'true' : 'false');
+  var wOn = ui.wake && wakeState !== 'fail';
+  $('wakeBtn').className = 'chip' + (wOn ? ' on' : '');
+  $('wakeBtn').setAttribute('aria-pressed', wOn ? 'true' : 'false');
+  $('guardBtn').className = 'chip' + (ui.guard ? ' on' : '');
+  $('guardBtn').setAttribute('aria-pressed', ui.guard ? 'true' : 'false');
+  applyTheme();
+  applyFold();
+}
+
+var hapEl = null;
+function hapTick(){
+  // iOS Safari: Vibration API нет, но переключатель <input switch> даёт лёгкий отклик (iOS 17.4+)
+  try{
+    if (!hapEl){
+      hapEl = document.createElement('label');
+      hapEl.setAttribute('aria-hidden', 'true');
+      hapEl.style.display = 'none';
+      var inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.setAttribute('switch', '');
+      hapEl.appendChild(inp);
+      document.body.appendChild(hapEl);
+    }
+    hapEl.click();
+  }catch(e){}
+}
+function feedback(strong){
+  if (!ui.fb) return;
+  try{
+    if (navigator.vibrate){ navigator.vibrate(strong ? [25, 40, 25] : 15); return; }
+  }catch(e){}
+  hapTick();
+  if (strong) setTimeout(hapTick, 90);
+}
+
+function pcOf(i){ return (S.rem > 0 && i === S.n - 1) ? S.rem : S.per; }
+
+function getBad(sig){
+  var r = doneAll[sig];
+  return (r && !(r instanceof Array) && r.bad > 0) ? r.bad : 0;
+}
+
+function putBad(sig, v){
+  var r = doneAll[sig];
+  if (!r || r instanceof Array){ r = {c: {}, h: []}; doneAll[sig] = r; }
+  r.bad = v;
+}
+
+function saveDone(){
+  if (!curSig) return;
+  var bad = getBad(curSig);
+  delete doneAll[curSig];
+  doneAll[curSig] = {c: cnt, h: hist, bad: bad};
+  var keys = Object.keys(doneAll);
+  while (keys.length > 20){ delete doneAll[keys.shift()]; }
+  try{ localStorage.setItem(DONE_KEY, JSON.stringify(doneAll)); }catch(e){}
+}
+
+function renderList(){
+  var h = '', pd = 0, cd = 0, i;
+  nextIdx = -1;
+  for (i = 0; i < S.n; i++){
+    var pc = pcOf(i);
+    var c = Math.min(cnt[i] || 0, pc);
+    cd += c;
+    if (c >= pc) pd++;
+    else if (nextIdx < 0) nextIdx = i;
+  }
+  for (i = 0; i < S.n; i++){
+    var pc2 = pcOf(i);
+    var c2 = Math.min(cnt[i] || 0, pc2);
+    var on = c2 >= pc2;
+    var part = c2 > 0 && !on;
+    var isLast = S.rem > 0 && i === S.n - 1;
+    h += '<button type="button" class="tile' + (on ? ' on' : '') + (part ? ' part' : '') +
+         (isLast ? ' last' : '') + (i === nextIdx ? ' next' : '') +
+         '" data-i="' + i + '" aria-pressed="' + on + '"><b>' + (i + 1) + (on ? ' ✓' : '') +
+         '</b><span>' + (part ? c2 + '/' + pc2 : '×' + pc2) + '</span></button>';
+  }
+  $('tiles').innerHTML = h;
+
+  var all = pd === S.n;
+  $('pt1').textContent = all ? 'Всё распилено' : 'Труб: ' + pd + ' из ' + S.n;
+  $('pt2').textContent = 'Заготовок: ' + cd + ' из ' + S.q;
+  $('pfill').style.width = (cd / S.q * 100) + '%';
+
+  var pl = S.n - pd, cl = S.q - cd;
+  var badTxt = S.bad > 0 ? 'Брак: ' + S.bad : '';
+  leftTxt = all ? badTxt :
+    'Осталось: ' + pl + ' ' + plural(pl, 'труба', 'трубы', 'труб') + ', ' +
+    cl + ' ' + plural(cl, 'заготовка', 'заготовки', 'заготовок') + ' (' + fmt(cl * S.p / 1000) + ' м)' + (badTxt ? ' · ' + badTxt : '');
+  $('left').textContent = leftTxt;
+  $('left').style.color = '';
+
+  if (nextIdx < 0){
+    $('nowT').textContent = 'Всё распилено';
+    $('nowS').textContent = '';
+    $('actRow').style.display = 'none';
+  } else {
+    var pcn = pcOf(nextIdx), cn = Math.min(cnt[nextIdx] || 0, pcn);
+    $('nowT').textContent = 'Следующая: труба №' + (nextIdx + 1) + (S.rem > 0 && nextIdx === S.n - 1 ? ' (последняя)' : '');
+    $('nowS').textContent = 'Отрезано заготовок: ' + cn + ' из ' + pcn + ' по ' + S.p + ' мм';
+    $('actRow').style.display = '';
+    $('nextBtn').textContent = 'Готово №' + (nextIdx + 1);
+  }
+
+  $('undoBtn').style.opacity = hist.length ? '1' : '0.45';
+  var f = +$('rFrom').value, t = +$('rTo').value;
+  if (!(f >= 1)) $('rFrom').value = 1;
+  if (!(t >= 1)) $('rTo').value = S.n;
+}
+
+function apply(changes){
+  var grp = [], strong = false;
+  changes.forEach(function(ch){
+    var i = ch[0], v = ch[1];
+    var prev = cnt[i] || 0;
+    if (prev === v) return;
+    grp.push([i, prev]);
+    if (v > 0) cnt[i] = v; else delete cnt[i];
+    if (v >= pcOf(i)) strong = true;
+  });
+  if (!grp.length) return false;
+  hist.push(grp);
+  if (hist.length > 50) hist.shift();
+  saveDone();
+  renderList();
+  feedback(strong);
+  return true;
+}
+
+function syncList(){
+  var card = $('listCard');
+  if (!S){ card.style.display = 'none'; curSig = null; return; }
+  card.style.display = '';
+  var sig = S.sig;
+  if (sig !== curSig){
+    curSig = sig;
+    cnt = {};
+    hist = [];
+    var rec = doneAll[sig];
+    if (!rec && !legacyDone){
+      // перенос отметок из старого формата ключа (без диаметра, стенки и пропила), один раз при запуске
+      var oldSig = S.q0 + '|' + S.p + '|' + S.L;
+      if (doneAll[oldSig]){ rec = doneAll[oldSig]; delete doneAll[oldSig]; doneAll[sig] = rec; }
+    }
+    legacyDone = true;
+    if (rec instanceof Array){
+      rec.forEach(function(i){ if (i < S.n) cnt[i] = pcOf(i); });
+    } else if (rec && rec.c){
+      Object.keys(rec.c).forEach(function(k){
+        var i = +k;
+        if (i < S.n) cnt[i] = Math.min(rec.c[k], pcOf(i));
+      });
+      hist = (rec.h || []).slice(-50);
+    }
+    $('rFrom').value = 1;
+    $('rTo').value = S.n;
+  }
+  renderList();
+}
+
+function showHint(msg){
+  $('left').textContent = msg;
+  $('left').style.color = 'var(--done-bg)';
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(function(){
+    $('left').textContent = leftTxt;
+    $('left').style.color = '';
+  }, 2200);
+}
+
+var holdTile = null, holdTm = null, justHeld = false, hx = 0, hy = 0;
+function tileHoldCancel(){
+  clearTimeout(holdTm);
+  holdTm = null;
+  if (holdTile){ holdTile.classList.remove('holding'); holdTile = null; }
+}
+
+$('tiles').addEventListener('click', function(e){
+  var t = e.target.closest ? e.target.closest('.tile') : null;
+  if (!t || !S || justHeld) return;
+  var i = +t.getAttribute('data-i');
+  var full = (cnt[i] || 0) >= pcOf(i);
+  if (full){
+    if (ui.guard && e.detail !== 0){
+      showHint('Чтобы снять отметку, удерживайте плитку');
+      return;
+    }
+    apply([[i, 0]]);
+    return;
+  }
+  apply([[i, pcOf(i)]]);
+});
+
+$('tiles').addEventListener('pointerdown', function(e){
+  if (!ui.guard || !S) return;
+  var t = e.target.closest ? e.target.closest('.tile') : null;
+  if (!t || !t.classList.contains('on')) return;
+  tileHoldCancel();
+  holdTile = t;
+  hx = e.clientX; hy = e.clientY;
+  t.classList.add('holding');
+  var i = +t.getAttribute('data-i');
+  holdTm = setTimeout(function(){
+    holdTm = null;
+    holdTile = null;
+    justHeld = true;
+    setTimeout(function(){ justHeld = false; }, 500);
+    apply([[i, 0]]);
+    feedback(true);
+  }, 600);
+});
+$('tiles').addEventListener('pointermove', function(e){
+  if (holdTile && Math.abs(e.clientX - hx) + Math.abs(e.clientY - hy) > 14) tileHoldCancel();
+});
+['pointerup','pointercancel'].forEach(function(ev){
+  document.addEventListener(ev, tileHoldCancel);
+});
+$('tiles').addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+$('guardBtn').addEventListener('click', function(){
+  ui.guard = !ui.guard;
+  saveUI();
+  applyUI();
+  tileHoldCancel();
+});
+
+$('pieceBtn').addEventListener('click', function(){
+  if (!S || nextIdx < 0) return;
+  apply([[nextIdx, (cnt[nextIdx] || 0) + 1]]);
+});
+
+$('nextBtn').addEventListener('click', function(){
+  if (!S || nextIdx < 0) return;
+  apply([[nextIdx, pcOf(nextIdx)]]);
+});
+
+$('undoBtn').addEventListener('click', function(){
+  if (!S || !hist.length) return;
+  var g = hist.pop();
+  var badChanged = false;
+  g.forEach(function(pair){
+    if (pair[0] === -1){   // запись о браке: [-1, на сколько увеличили]
+      putBad(curSig, Math.max(getBad(curSig) - pair[1], 0));
+      badChanged = true;
+      return;
+    }
+    if (pair[1] > 0) cnt[pair[0]] = pair[1]; else delete cnt[pair[0]];
+  });
+  saveDone();
+  if (badChanged) update(); else renderList();
+  feedback(false);
+});
+
+$('badBtn').addEventListener('click', function(){
+  if (!S || !curSig) return;
+  putBad(curSig, getBad(curSig) + 1);
+  hist.push([[-1, 1]]);
+  if (hist.length > 50) hist.shift();
+  saveDone();
+  update();
+  feedback(true);
+});
+
+$('rBtn').addEventListener('click', function(){
+  if (!S) return;
+  var f = Math.round(+$('rFrom').value), t = Math.round(+$('rTo').value);
+  if (!(f >= 1)) f = 1;
+  if (f > S.n) f = S.n;
+  if (!(t >= f)) t = f;
+  if (t > S.n) t = S.n;
+  $('rFrom').value = f;
+  $('rTo').value = t;
+  var ch = [];
+  for (var i = f - 1; i < t; i++){ ch.push([i, pcOf(i)]); }
+  apply(ch);
+});
+
+var resetTimer = null;
+function resetArm(on){
+  var b = $('resetDone');
+  clearTimeout(resetTimer);
+  if (on){
+    b.textContent = 'Ещё раз: сбросить';
+    b.setAttribute('data-armed', '1');
+    b.style.color = 'var(--danger)';
+    b.style.borderColor = 'var(--danger)';
+    resetTimer = setTimeout(function(){ resetArm(false); }, 3000);
+  } else {
+    b.textContent = 'Сбросить отметки';
+    b.removeAttribute('data-armed');
+    b.style.color = '';
+    b.style.borderColor = '';
+  }
+}
+$('resetDone').addEventListener('click', function(){
+  if (!S) return;
+  if (this.getAttribute('data-armed')){
+    cnt = {};
+    hist = [];
+    putBad(curSig, 0);
+    saveDone();
+    update();
+    resetArm(false);
+  } else {
+    resetArm(true);
+  }
+});
+
+$('bigBtn').addEventListener('click', function(){ ui.big = !ui.big; saveUI(); applyUI(); });
+
+$('foldDia').addEventListener('click', function(){
+  ui.foldDia = !ui.foldDia;
+  saveUI();
+  applyFold();
+});
+
+Array.prototype.forEach.call(document.querySelectorAll('.theme-chip'), function(b){
+  b.addEventListener('click', function(){
+    ui.theme = b.getAttribute('data-theme');
+    saveUI();
+    applyTheme();
+  });
+});
+try {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+    if (ui.theme === 'auto') applyTheme();
+  });
+} catch(e){}
+$('fbBtn').addEventListener('click', function(){
+  ui.fb = !ui.fb;
+  saveUI();
+  applyUI();
+  if (ui.fb) feedback(false);
+});
+
+var wakeLock = null;
+var wakeState = '';
+function wakeOn(){
+  if (!('wakeLock' in navigator)) return Promise.resolve(false);
+  return navigator.wakeLock.request('screen').then(function(l){
+    wakeLock = l;
+    l.addEventListener('release', function(){ if (wakeLock === l) wakeLock = null; });
+    return true;
+  }, function(){ return false; });
+}
+function wakeOff(){
+  if (wakeLock){ try{ wakeLock.release(); }catch(e){} wakeLock = null; }
+}
+function wakeSync(manual){
+  if (!ui.wake){ wakeOff(); return; }
+  if (!S || document.visibilityState !== 'visible' || wakeLock) return;
+  if (wakeState === 'fail' && !manual) return;
+  wakeOn().then(function(ok){
+    wakeState = ok ? 'ok' : 'fail';
+    applyUI();
+    if (!ok && manual){
+      var b = $('wakeBtn');
+      b.textContent = 'Недоступно';
+      setTimeout(function(){ b.textContent = 'Экран'; }, 2200);
+    }
+  });
+}
+document.addEventListener('visibilitychange', function(){ wakeSync(false); });
+$('wakeBtn').addEventListener('click', function(){
+  ui.wake = !ui.wake;
+  wakeState = '';
+  saveUI();
+  applyUI();
+  if (ui.wake) wakeSync(true); else wakeOff();
+});
+
+function safe(fn){
+  try{ fn(); }catch(e){
+    var b = $('jsBanner');
+    if (b){
+      b.style.display = 'block';
+      b.textContent = 'Ошибка: ' + (e && e.message ? e.message : e) + '. Пришлите этот текст.';
+    }
+  }
+}
+
+function update(){
+  safe(calc);
+  safe(drawDia);
+  safe(syncList);
+  safe(function(){ wakeSync(false); });
+  safe(save);
+}
+
+function bump(id, delta){
+  var el = $(id);
+  var v = parseFloat(el.value);
+  if (isNaN(v)) v = 0;
+  v = Math.round((v + delta) * 100) / 100;
+  var mn = id === 't' ? 0.1 : ((id === 'k' || id === 'h') ? 0 : 1);
+  if (v < mn) v = mn;
+  el.value = v;
+  update();
+}
+
+var holdT = null, holdI = null;
+function stopHold(){
+  clearTimeout(holdT); clearInterval(holdI);
+  holdT = null; holdI = null;
+}
+Array.prototype.forEach.call(document.querySelectorAll('.sb'), function(btn){
+  var id = btn.getAttribute('data-t');
+  var s = +btn.getAttribute('data-s');
+  btn.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    stopHold();
+    bump(id, s);
+    holdT = setTimeout(function(){
+      holdI = setInterval(function(){ bump(id, s); }, 70);
+    }, 450);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){
+    btn.addEventListener(ev, stopHold);
+  });
+  btn.addEventListener('click', function(e){
+    if (e.detail === 0) bump(id, s);
+  });
+  btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+});
+
+function summaryText(){
+  if (!S) return null;
+  var d = +$('d').value, t = +$('t').value;
+  var lines = [];
+  lines.push('Раскрой труб');
+  lines.push('────────────');
+  lines.push('Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм');
+  lines.push('Нужно труб: ' + S.n + ' шт (' + S.bn + ' ' + plural(S.bn, 'пачка', 'пачки', 'пачек') + ')');
+  lines.push('Заготовок: ' + S.q + ' шт по ' + S.p + ' мм');
+  lines.push('Из целой трубы: ' + S.per + ' шт, обрезок ' + fmt(S.wFull) + ' мм');
+  if (S.rem > 0) lines.push('Последняя труба: ' + S.rem + ' шт, остаток ' + fmt(S.wLast) + ' мм');
+  return lines.join('\n');
+}
+
+function copyText(t){
+  if (navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(t);
+  }
+  return new Promise(function(res, rej){
+    var ta = document.createElement('textarea');
+    ta.value = t;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, t.length);
+    var ok = false;
+    try{ ok = document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    if (ok) res(); else rej();
+  });
+}
+
+var flashTimers = {};
+function flashBtn(id, text, restore){
+  var btn = $(id);
+  if (!btn) return;
+  var orig = restore || btn.getAttribute('data-orig') || btn.textContent;
+  btn.setAttribute('data-orig', orig);
+  btn.textContent = text;
+  clearTimeout(flashTimers[id]);
+  flashTimers[id] = setTimeout(function(){ btn.textContent = orig; }, 1800);
+}
+
+function archiveLine(item){
+  var dia = item.d > 0 ? 'Ø' + num(item.d) : '—';
+  var wall = item.t > 0 ? num(item.t) : '—';
+  var bad = item.bad > 0 ? item.bad : 0;
+  var good = item.q - bad;
+  return dia + '/' + wall + ' ×' + item.p + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (bad > 0 ? ', брак ' + bad : '');
+}
+
+function todayArchives(){
+  var now = new Date();
+  var key = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+  var list = [];
+  archives.forEach(function(item, idx){
+    if (dayKey(item.ts) === key) list.push({ item: item, idx: idx });
+  });
+  return list;
+}
+
+function currentAsItem(){
+  if (!S || !(S.q > 0)) return null;
+  return {
+    ts: Date.now(),
+    q: Number(S.q), p: Number(S.p), L: Number(S.L),
+    d: Number($('d').value) || 0, t: Number($('t').value) || 0,
+    n: Number(S.n), per: Number(S.per) || 0, rem: Number(S.rem) || 0,
+    wFull: Number(S.wFull) || 0, wLast: Number(S.wLast) || 0
+  };
+}
+
+var shareSel = {};
+
+function openShareSheet(){
+  var list = $('shareList');
+  shareSel = {};
+  var h = '';
+
+  if (!archives.length) {
+    list.innerHTML = '<p class="share-empty">Нет сохранённых раскроев.<br>Сначала нажмите «Сохранить раскрой».</p>';
+    $('shareSheet').removeAttribute('hidden');
+    $('shareSheetBg').removeAttribute('hidden');
+    return;
+  }
+
+  // group by day (archives already newest-first)
+  var groups = [];
+  var lastKey = null;
+  archives.forEach(function(item, idx){
+    var key = dayKey(item.ts);
+    if (key !== lastKey) {
+      groups.push({ key: key, label: dayLabel(item.ts), items: [], isToday: dayLabel(item.ts) === 'Сегодня' });
+      lastKey = key;
+    }
+    groups[groups.length - 1].items.push({ item: item, idx: idx });
+  });
+
+  groups.forEach(function(g){
+    h += '<div class="hist-day">' + g.label + '</div>';
+    g.items.forEach(function(entry){
+      var id = 'a' + entry.idx;
+      var on = g.isToday; // today pre-checked, older unchecked
+      shareSel[id] = on;
+      var item = entry.item;
+      h += '<div class="share-item' + (on ? ' on' : '') + '" data-id="' + id + '">' +
+        '<div class="share-check">✓</div>' +
+        '<div class="share-body"><p class="share-title">' + archiveLine(item) + '</p>' +
+        '<p class="share-sub">' + formatTime(item.ts) + '</p></div></div>';
+    });
+  });
+
+  list.innerHTML = h;
+  $('shareSheet').removeAttribute('hidden');
+  $('shareSheetBg').removeAttribute('hidden');
+}
+
+function closeShareSheet(){
+  $('shareSheet').setAttribute('hidden', '');
+  $('shareSheetBg').setAttribute('hidden', '');
+}
+
+function formatShareDate(ts){
+  var d = new Date(ts);
+  var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
+  return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear();
+}
+
+function pipeKey(item){
+  return (item.d || 0) + '|' + (item.t || 0);
+}
+
+function buildShareText(){
+  var selected = [];
+  archives.forEach(function(item, idx){
+    if (shareSel['a' + idx]) selected.push(item);
+  });
+  if (!selected.length) return '';
+
+  // group by calendar day
+  var dayGroups = [];
+  var lastDay = null;
+  selected.forEach(function(item){
+    var key = dayKey(item.ts);
+    if (key !== lastDay) {
+      dayGroups.push({ key: key, ts: item.ts, items: [] });
+      lastDay = key;
+    }
+    dayGroups[dayGroups.length - 1].items.push(item);
+  });
+
+  var out = [];
+  dayGroups.forEach(function(g, gi){
+    if (gi > 0) out.push('');
+    out.push(formatShareDate(g.ts));
+
+    // same Ø/wall together
+    g.items.sort(function(a, b){
+      var ka = pipeKey(a), kb = pipeKey(b);
+      if (ka < kb) return -1;
+      if (ka > kb) return 1;
+      return 0;
+    });
+
+    var lastPipe = null;
+    g.items.forEach(function(item){
+      var pk = pipeKey(item);
+      if (lastPipe !== null && pk !== lastPipe) {
+        out.push(''); // blank line when Ø or wall changes
+      }
+      out.push(archiveLine(item));
+      lastPipe = pk;
+    });
+  });
+
+  return out.join('\n');
+}
+
+$('shareBtn').addEventListener('click', function(){
+  openShareSheet();
+});
+
+$('shareList').addEventListener('click', function(e){
+  var row = e.target.closest ? e.target.closest('.share-item') : null;
+  if (!row) return;
+  var id = row.getAttribute('data-id');
+  shareSel[id] = !shareSel[id];
+  if (shareSel[id]) row.classList.add('on');
+  else row.classList.remove('on');
+});
+
+$('shareCancel').addEventListener('click', closeShareSheet);
+$('shareSheetBg').addEventListener('click', closeShareSheet);
+
+$('shareDo').addEventListener('click', function(){
+  var t = buildShareText();
+  if (!t) {
+    flashBtn('shareDo', 'Ничего не выбрано');
+    return;
+  }
+  closeShareSheet();
+  if (navigator.share) {
+    navigator.share({ title: 'Раскрой труб', text: t }).then(function(){
+      flashBtn('shareBtn', 'Отправлено');
+    }).catch(function(){
+      copyText(t).then(function(){ flashBtn('shareBtn', 'Скопировано'); });
+    });
+  } else {
+    copyText(t).then(function(){ flashBtn('shareBtn', 'Скопировано'); }, function(){ flashBtn('shareBtn', 'Ошибка'); });
+  }
+});
+
+/* ── History ── */
+var ARCH_KEY = 'pipecalc.arch.v1';
+var archives = [];
+try {
+  archives = JSON.parse(localStorage.getItem(ARCH_KEY)) || [];
+  // drop broken entries from older buggy saves
+  archives = archives.filter(function(item){
+    return item && item.ts && item.q > 0 && item.p > 0 && item.n > 0;
+  });
+} catch(e){ archives = []; }
+
+function saveArchives(){
+  try {
+    localStorage.setItem(ARCH_KEY, JSON.stringify(archives));
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function setStorageStatus(message, isWarning){
+  var el = $('storageStatus');
+  if (!el) return;
+  el.textContent = message;
+  el.style.color = isWarning ? 'var(--danger)' : 'var(--text2)';
+}
+
+function checkStorage(){
+  try {
+    var testKey = '__pipecalc_storage_test__';
+    localStorage.setItem(testKey, '1');
+    var ok = localStorage.getItem(testKey) === '1';
+    localStorage.removeItem(testKey);
+    if (ok) {
+      setStorageStatus('Автосохранение включено. Для надёжности периодически скачивайте резервную копию: локальные данные Safari могут быть удалены системой или настройками.', false);
+    } else {
+      setStorageStatus('Браузер не подтвердил сохранение. Скачайте резервную копию после важных изменений.', true);
+    }
+  } catch(e) {
+    setStorageStatus('Safari не разрешил локальное сохранение для этого способа открытия файла. После каждого изменения скачивайте копию истории.', true);
+  }
+}
+
+function exportHistory(){
+  var backup = {
+    app: 'Раскрой труб',
+    formatVersion: 1,
+    exportedAt: new Date().toISOString(),
+    archives: archives
+  };
+  try {
+    var blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var d = new Date();
+    var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
+    a.href = url;
+    a.download = 'raskroy-history-' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+    setStorageStatus('Резервная копия подготовлена. Сохраните JSON-файл в приложении «Файлы».', false);
+  } catch(e) {
+    setStorageStatus('Не удалось создать файл копии. Попробуйте открыть HTML в Safari.', true);
+  }
+}
+
+function importHistoryFile(file){
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try {
+      var data = JSON.parse(String(reader.result || ''));
+      var imported = Array.isArray(data) ? data : data && data.archives;
+      if (!Array.isArray(imported)) throw new Error('bad format');
+      imported = imported.filter(function(item){
+        return item && Number(item.ts) > 0 && Number(item.q) > 0 && Number(item.p) > 0 && Number(item.n) > 0;
+      }).map(function(item){
+        return {
+          ts:Number(item.ts), q:Number(item.q), p:Number(item.p), L:Number(item.L) || 0,
+          b:Number(item.b) || 1, k:Number(item.k) || 0, h:Number(item.h) || 0, bad:Number(item.bad) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0,
+          n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
+          rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0
+        };
+      }).sort(function(a,b){ return b.ts-a.ts; }).slice(0,30);
+      if (!imported.length) throw new Error('empty');
+      if (!confirm('Заменить текущую историю данными из резервной копии?')) return;
+      archives = imported;
+      var saved = saveArchives();
+      renderHist();
+      setStorageStatus(saved ? 'История восстановлена. Рекомендуем сразу скачать новую резервную копию.' : 'История загружена в эту сессию, но Safari не смог сохранить её автоматически. Скачайте резервную копию.', !saved);
+    } catch(e) {
+      alert('Не удалось прочитать копию. Выберите JSON-файл, созданный программой «Раскрой труб».');
+    }
+  };
+  reader.onerror = function(){ alert('Не удалось прочитать выбранный файл.'); };
+  reader.readAsText(file);
+}
+
+var MONTHS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+
+function dayKey(ts){
+  var d = new Date(ts);
+  return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+}
+
+function dayLabel(ts){
+  var d = new Date(ts);
+  var now = new Date();
+  if (d.toDateString() === now.toDateString()) return 'Сегодня';
+  var yest = new Date(now);
+  yest.setDate(now.getDate() - 1);
+  if (d.toDateString() === yest.toDateString()) return 'Вчера';
+  var label = d.getDate() + ' ' + MONTHS[d.getMonth()];
+  if (d.getFullYear() !== now.getFullYear()) label += ' ' + d.getFullYear();
+  return label;
+}
+
+function formatTime(ts){
+  var d = new Date(ts);
+  var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
+  return pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+function renderHist(){
+  var list = $('histList');
+  var clearBtn = $('histClearBtn');
+  if (!archives.length){
+    list.innerHTML = '<p class="hist-empty">Пока пусто. Нажмите «Сохранить раскрой», чтобы запомнить текущий.</p>';
+    clearBtn.hidden = true;
+    return;
+  }
+  clearBtn.hidden = false;
+
+  // group by day (archives is already newest-first)
+  var groups = [];
+  var lastKey = null;
+  archives.forEach(function(item, idx){
+    var key = dayKey(item.ts);
+    if (key !== lastKey){
+      groups.push({ key: key, label: dayLabel(item.ts), items: [] });
+      lastKey = key;
+    }
+    groups[groups.length - 1].items.push({ item: item, idx: idx });
+  });
+
+  var h = '';
+  groups.forEach(function(g){
+    h += '<div class="hist-day">' + g.label + '</div>';
+    g.items.forEach(function(entry){
+      var item = entry.item;
+      var idx = entry.idx;
+      var dia = item.d > 0 ? 'Ø' + num(item.d) : '—';
+      var wall = item.t > 0 ? num(item.t) : '—';
+      var title = archiveLine(item);
+      var rem = item.rem > 0 ? item.rem : 0;
+      var per = item.per > 0 ? item.per : 0;
+      var full = item.n - (rem > 0 ? 1 : 0);
+      var sub;
+      if (rem > 0) {
+        sub = full + ' × ' + per + ' шт + 1 × ' + rem + ' шт' +
+              (item.wLast > 0 ? ', остаток ' + fmt(item.wLast) + ' мм' : '');
+      } else {
+        sub = item.n + ' × ' + per + ' шт' +
+              (item.wFull >= 0 ? ', обрезок ' + fmt(item.wFull) + ' мм' : '');
+      }
+      h += '<div class="hist-item" data-idx="' + idx + '">' +
+        '<div class="hist-time">' + formatTime(item.ts) + '</div>' +
+        '<div class="hist-body"><p class="hist-title">' + title + '</p><p class="hist-sub">' + sub + '</p></div>' +
+        '<button type="button" class="hist-del" data-del="' + idx + '" aria-label="Удалить">×</button>' +
+      '</div>';
+    });
+  });
+  list.innerHTML = h;
+}
+
+function addToHist(){
+  var b2 = $('saveHistBtn2');
+  if (!S || !(S.q > 0) || !(S.p > 0) || !(S.L > 0) || !(S.n > 0)) {
+    if (b2) {
+      b2.textContent = 'Заполните поля';
+      setTimeout(function(){ b2.textContent = 'Сохранить раскрой'; }, 1800);
+    }
+    return;
+  }
+  var entry = {
+    ts: Date.now(),
+    q: Number(S.q),
+    p: Number(S.p),
+    L: Number(S.L),
+    k: Number(S.k) || 0,
+    h: Number(S.h) || 0,
+    bad: Number(S.bad) || 0,
+    b: Number($('b').value) || 1,
+    d: Number($('d').value) || 0,
+    t: Number($('t').value) || 0,
+    n: Number(S.n),
+    bn: Number(S.bn) || 0,
+    per: Number(S.per) || 0,
+    rem: Number(S.rem) || 0,
+    wFull: Number(S.wFull) || 0,
+    wLast: Number(S.wLast) || 0
+  };
+  // avoid exact duplicates of the last entry
+  if (archives.length && archives[0].q === entry.q && archives[0].p === entry.p && archives[0].L === entry.L &&
+      archives[0].d === entry.d && archives[0].t === entry.t && (archives[0].k || 0) === entry.k && (archives[0].h || 0) === entry.h) {
+    archives[0] = entry;
+  } else {
+    archives.unshift(entry);
+  }
+  if (archives.length > 30) archives = archives.slice(0, 30);
+  saveArchives();
+  renderHist();
+  if (b2) {
+    b2.textContent = 'Сохранено';
+    setTimeout(function(){ b2.textContent = 'Сохранить раскрой'; }, 1800);
+  }
+  feedback(false);
+}
+
+function restoreHist(idx){
+  var item = archives[idx];
+  if (!item) return;
+  $('q').value = item.q - (item.bad || 0) + (item.h || 0);
+  $('p').value = item.p;
+  $('L').value = item.L;
+  $('b').value = item.b;
+  $('k').value = item.k || 0;
+  $('h').value = item.h || 0;
+  $('d').value = item.d;
+  $('t').value = item.t;
+  update();
+  feedback(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ── Отмена удаления ── */
+var undoPending = null, undoTimer = null;
+
+function showUndo(removed){
+  if (!undoPending) undoPending = {list: []};
+  removed.forEach(function(r){ undoPending.list.push(r); });
+  var n = undoPending.list.length;
+  $('toastText').textContent = n === 1 ? 'Раскрой удалён' : 'Удалено: ' + n + ' ' + plural(n, 'раскрой', 'раскроя', 'раскроев');
+  $('toast').removeAttribute('hidden');
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(hideUndo, 7000);
+}
+
+function hideUndo(){
+  clearTimeout(undoTimer);
+  undoTimer = null;
+  undoPending = null;
+  $('toast').setAttribute('hidden', '');
+}
+
+function doUndo(){
+  if (!undoPending) return;
+  var back = undoPending.list.map(function(r){ return r.item; });
+  hideUndo();
+  archives = archives.concat(back).sort(function(a, b){ return b.ts - a.ts; }).slice(0, 30);
+  saveArchives();
+  renderHist();
+  feedback(false);
+}
+
+$('toastUndo').addEventListener('click', doUndo);
+
+$('saveHistBtn2').addEventListener('click', function(){ addToHist(); });
+$('exportHistBtn').addEventListener('click', exportHistory);
+$('importHistBtn').addEventListener('click', function(){ $('importHistFile').click(); });
+$('importHistFile').addEventListener('change', function(){
+  var file = this.files && this.files[0];
+  if (file) importHistoryFile(file);
+  this.value = '';
+});
+
+$('histList').addEventListener('click', function(e){
+  var del = e.target.closest ? e.target.closest('[data-del]') : null;
+  if (del){
+    e.stopPropagation();
+    var i = +del.getAttribute('data-del');
+    var gone = archives.splice(i, 1);
+    saveArchives();
+    renderHist();
+    if (gone.length) showUndo([{item: gone[0], idx: i}]);
+    return;
+  }
+  var item = e.target.closest ? e.target.closest('.hist-item') : null;
+  if (item){
+    restoreHist(+item.getAttribute('data-idx'));
+  }
+});
+
+$('histClearBtn').addEventListener('click', function(){
+  if (!archives.length) return;
+  if (!confirm('Очистить все сохранённые раскрои?')) return;
+  var all = archives.map(function(item, idx){ return {item: item, idx: idx}; });
+  archives = [];
+  saveArchives();
+  renderHist();
+  showUndo(all);
+});
+
+IDS.forEach(function(id){ $(id).addEventListener('input', update); });
+Array.prototype.forEach.call(document.querySelectorAll('.pset'), function(b){
+  b.addEventListener('click', function(){
+    $('t').value = b.getAttribute('data-v');
+    update();
+  });
+});
+safe(applyUI);
+safe(load);
+safe(renderHist);
+checkStorage();
+update();
+
+/* Офлайн-режим и защита данных от очистки (только на https) */
+try {
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+} catch(e){}
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
