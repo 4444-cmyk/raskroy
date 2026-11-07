@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.10">
+<meta name="app-build" content="2026-11-08.12">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2726,7 +2726,7 @@ $('shareDo').addEventListener('click', function(){
 function sendShareText(t, btnId){
   function flash(txt){ if (btnId) flashBtn(btnId, txt); }
   if (navigator.share) {
-    navigator.share({ title: 'Раскрой труб', text: t }).then(function(){
+    navigator.share({ text: t }).then(function(){
       flash('Отправлено');
     }).catch(function(){
       copyText(t).then(function(){ flash('Скопировано'); });
@@ -2902,7 +2902,7 @@ function schemeFileName(){
   var d = +$('d').value || 0, t = +$('t').value || 0;
   return formatShareDate(Date.now()) +
     (d > 0 ? ' · Ø' + num(d) + (t > 0 ? '×' + num(t) : '') : '') +
-    ' · ' + S.p + ' мм.png';
+    ' · ' + S.p + ' мм - ' + (+$('q').value || S.q) + '.png';
 }
 
 function dataUrlToBlob(u){
@@ -2930,7 +2930,7 @@ $('imgBtn').addEventListener('click', function(){
   var file = null;
   try { file = new File([blob], fname, {type: 'image/png'}); } catch(e){}
   if (file && navigator.share && navigator.canShare && navigator.canShare({files: [file]})) {
-    navigator.share({files: [file], title: 'Раскрой труб'}).then(function(){
+    navigator.share({files: [file]}).then(function(){
       flashBtn('imgBtn', 'Отправлено');
     }).catch(function(e){
       if (e && e.name === 'AbortError') return;
