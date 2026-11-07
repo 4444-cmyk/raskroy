@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="app-build" content="2026-11-08.2">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1366,11 +1367,51 @@ label {
 #listCard.big .nowS {
   font-size: 15px;
 }
+
+/* ── Weekly backup reminder ── */
+.bk-banner{
+  margin:0 0 12px;
+  padding:14px 16px;
+  border-radius:var(--radius-md);
+  background:var(--warn-bg);
+  color:var(--warn-fg);
+}
+.bk-banner[hidden]{display:none}
+.bk-banner p{margin:0 0 10px;font-size:15px;line-height:1.4;font-weight:600}
+.bk-act{display:grid;grid-template-columns:1.6fr 1fr;gap:8px}
+.bk-act .nbtn{height:46px;font-size:15px}
+.bk-act .nbtn.sec{height:46px;font-size:15px;color:var(--warn-fg);border-color:currentColor;opacity:.85}
+
+/* ── Update banner ── */
+.upd-banner{
+  margin:0 0 12px;
+  padding:14px 16px;
+  border-radius:var(--radius-md);
+  background:var(--acc-bg);
+  color:var(--acc-fg);
+}
+.upd-banner[hidden]{display:none}
+.upd-banner p{margin:0 0 10px;font-size:15px;line-height:1.4;font-weight:600}
+.upd-banner .bk-act .nbtn.sec{color:var(--acc-fg)}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="jsb" id="jsBanner" role="alert"></div>
+  <div class="bk-banner" id="bkBanner" hidden role="status">
+    <p id="bkText"></p>
+    <div class="bk-act">
+      <button type="button" class="nbtn main" id="bkSend">Отправить копию</button>
+      <button type="button" class="nbtn sec" id="bkLater">Позже</button>
+    </div>
+  </div>
+  <div class="upd-banner" id="updBanner" hidden role="status">
+    <p>Доступна новая версия приложения.</p>
+    <div class="bk-act">
+      <button type="button" class="nbtn main" id="updDo">Обновить</button>
+      <button type="button" class="nbtn sec" id="updLater">Позже</button>
+    </div>
+  </div>
   <div class="hero">
     <p class="big" id="hsMain">—</p>
     <p class="sub" id="hs"></p>
@@ -1558,8 +1599,9 @@ label {
     <h2>Сохранённые раскрои</h2>
     <div id="histList"></div>
     <button type="button" class="hist-clear" id="histClearBtn" hidden>Очистить всё</button>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-      <button type="button" class="nbtn sec" id="exportHistBtn" style="min-height:44px">Скачать копию</button>
+    <button type="button" class="nbtn main" id="sendHistBtn" style="width:100%;margin-top:12px;height:50px">Отправить копию</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <button type="button" class="nbtn sec" id="exportHistBtn" style="min-height:44px">Скачать файл</button>
       <button type="button" class="nbtn sec" id="importHistBtn" style="min-height:44px">Восстановить</button>
     </div>
     <input type="file" id="importHistFile" accept=".json,application/json" hidden>
@@ -2556,29 +2598,141 @@ function checkStorage(){
   }
 }
 
-function exportHistory(){
-  var backup = {
+/* ── Backup: file, share, weekly reminder ── */
+var BK_KEY = 'pipecalc.bk.v1';
+var bk = {last: 0, since: 0, snooze: ''};
+try {
+  var _bk = JSON.parse(localStorage.getItem(BK_KEY));
+  if (_bk) { bk.last = Number(_bk.last) || 0; bk.since = Number(_bk.since) || 0; bk.snooze = String(_bk.snooze || ''); }
+} catch(e){}
+
+function saveBk(){
+  try { localStorage.setItem(BK_KEY, JSON.stringify(bk)); } catch(e){}
+}
+if (!bk.since) { bk.since = Date.now(); saveBk(); }
+
+// Начало последней субботы (00:00 по местному времени); если сегодня суббота — сегодняшнего дня.
+function lastSaturday(ts){
+  var d = new Date(ts);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - ((d.getDay() + 1) % 7));
+  return d.getTime();
+}
+
+function bkHasData(){
+  return archives.length > 0 || Object.keys(doneAll).length > 0;
+}
+
+function bkDue(){
+  return bkHasData() && Math.max(bk.last, bk.since) < lastSaturday(Date.now());
+}
+
+function renderBk(){
+  var el = $('bkBanner');
+  if (!el) return;
+  var show = bkDue() && bk.snooze !== dayKey(Date.now());
+  el.hidden = !show;
+  if (!show) return;
+  var t;
+  if (bk.last) {
+    var days = Math.floor((Date.now() - bk.last) / 86400000);
+    t = 'Субботняя копия: пора сохранить данные. Последняя — ' +
+        (days < 1 ? 'меньше суток назад' : days + ' ' + plural(days, 'день', 'дня', 'дней') + ' назад') + '.';
+  } else {
+    t = 'Субботняя копия: пора сохранить данные. Копий ещё не было.';
+  }
+  $('bkText').textContent = t;
+}
+
+function markBackup(){
+  bk.last = Date.now();
+  bk.snooze = '';
+  saveBk();
+  renderBk();
+  var d = new Date();
+  setStorageStatus('Копия сохранена ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + '. Следующее напоминание — в субботу.', false);
+}
+
+function readJSON(key){
+  try { var r = localStorage.getItem(key); return r ? JSON.parse(r) : null; } catch(e){ return null; }
+}
+
+function buildBackup(){
+  try { save(); } catch(e){}
+  try { saveDone(); } catch(e){}
+  return {
     app: 'Раскрой труб',
-    formatVersion: 1,
+    formatVersion: 2,
     exportedAt: new Date().toISOString(),
-    archives: archives
+    archives: archives,
+    inputs: readJSON(KEY),
+    done: doneAll,
+    ui: ui
   };
+}
+
+function backupFile(){
+  var d = new Date();
+  var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
+  return {
+    json: JSON.stringify(buildBackup(), null, 2),
+    name: 'raskroy-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '.json'
+  };
+}
+
+function downloadBackup(f){
   try {
-    var blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+    var blob = new Blob([f.json], {type: 'application/json'});
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    var d = new Date();
-    var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
     a.href = url;
-    a.download = 'raskroy-history-' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '.json';
+    a.download = f.name;
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
-    setStorageStatus('Резервная копия подготовлена. Сохраните JSON-файл в приложении «Файлы».', false);
+    markBackup();
+    setStorageStatus('Файл копии подготовлен. Сохраните его в приложении «Файлы».', false);
   } catch(e) {
-    setStorageStatus('Не удалось создать файл копии. Попробуйте открыть HTML в Safari.', true);
+    setStorageStatus('Не удалось создать файл копии. Попробуйте открыть сайт в Safari.', true);
   }
+}
+
+function sendBackup(){
+  var f = backupFile();
+  var types = ['application/json', 'text/plain'];
+  var file = null, i;
+  if (navigator.share && navigator.canShare && typeof File === 'function') {
+    for (i = 0; i < types.length && !file; i++) {
+      try {
+        var cand = new File([f.json], f.name, {type: types[i]});
+        if (navigator.canShare({files: [cand]})) file = cand;
+      } catch(e){}
+    }
+  }
+  if (!file) { downloadBackup(f); return; }
+  navigator.share({files: [file], title: 'Раскрой труб — копия'}).then(function(){
+    markBackup();
+  }).catch(function(e){
+    if (e && e.name === 'AbortError') return;
+    downloadBackup(f);
+  });
+}
+
+function isObj(x){ return !!x && typeof x === 'object' && !(x instanceof Array); }
+
+function cleanArchives(list){
+  if (!(list instanceof Array)) return [];
+  return list.filter(function(item){
+    return item && Number(item.ts) > 0 && Number(item.q) > 0 && Number(item.p) > 0 && Number(item.n) > 0;
+  }).map(function(item){
+    return {
+      ts:Number(item.ts), q:Number(item.q), p:Number(item.p), L:Number(item.L) || 0,
+      b:Number(item.b) || 1, k:Number(item.k) || 0, h:Number(item.h) || 0, bad:Number(item.bad) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0,
+      n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
+      rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0
+    };
+  }).sort(function(a,b){ return b.ts-a.ts; }).slice(0,30);
 }
 
 function importHistoryFile(file){
@@ -2587,24 +2741,40 @@ function importHistoryFile(file){
   reader.onload = function(){
     try {
       var data = JSON.parse(String(reader.result || ''));
-      var imported = Array.isArray(data) ? data : data && data.archives;
-      if (!Array.isArray(imported)) throw new Error('bad format');
-      imported = imported.filter(function(item){
-        return item && Number(item.ts) > 0 && Number(item.q) > 0 && Number(item.p) > 0 && Number(item.n) > 0;
-      }).map(function(item){
-        return {
-          ts:Number(item.ts), q:Number(item.q), p:Number(item.p), L:Number(item.L) || 0,
-          b:Number(item.b) || 1, k:Number(item.k) || 0, h:Number(item.h) || 0, bad:Number(item.bad) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0,
-          n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
-          rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0
-        };
-      }).sort(function(a,b){ return b.ts-a.ts; }).slice(0,30);
-      if (!imported.length) throw new Error('empty');
-      if (!confirm('Заменить текущую историю данными из резервной копии?')) return;
-      archives = imported;
-      var saved = saveArchives();
-      renderHist();
-      setStorageStatus(saved ? 'История восстановлена. Рекомендуем сразу скачать новую резервную копию.' : 'История загружена в эту сессию, но Safari не смог сохранить её автоматически. Скачайте резервную копию.', !saved);
+      var full = isObj(data) && Number(data.formatVersion) >= 2;
+      var imported = cleanArchives(data instanceof Array ? data : (data && data.archives));
+      var inputs = full && isObj(data.inputs) ? data.inputs : null;
+      var done = full && isObj(data.done) ? data.done : null;
+      var uiB = full && isObj(data.ui) ? data.ui : null;
+      var nDone = done ? Object.keys(done).length : 0;
+      if (!imported.length && !inputs && !nDone && !uiB) throw new Error('empty');
+
+      if (!full) {
+        if (!confirm('Заменить текущую историю данными из резервной копии?')) return;
+        archives = imported;
+        var saved = saveArchives();
+        renderHist();
+        setStorageStatus(saved ? 'История восстановлена. Рекомендуем сразу сохранить новую копию.' : 'История загружена в эту сессию, но Safari не смог сохранить её автоматически. Сохраните копию.', !saved);
+        return;
+      }
+
+      var parts = ['раскроев: ' + imported.length];
+      if (nDone) parts.push('отметок о резке: ' + nDone);
+      if (inputs) parts.push('введённые значения');
+      if (uiB) parts.push('настройки');
+      if (!confirm('Заменить текущие данные копией?\n\nВ копии: ' + parts.join(', ') + '.')) return;
+
+      var ok = true;
+      var put = function(k, v){
+        try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){ ok = false; }
+      };
+      put(ARCH_KEY, imported);
+      if (inputs) put(KEY, inputs);
+      if (done) { put(DONE_KEY, done); try { localStorage.removeItem(OLD_DONE_KEY); } catch(e){} }
+      if (uiB) put(UI_KEY, uiB);
+      if (!ok) { alert('Не удалось записать часть данных. Попробуйте ещё раз.'); return; }
+      alert('Копия восстановлена. Приложение перезапустится.');
+      location.reload();
     } catch(e) {
       alert('Не удалось прочитать копию. Выберите JSON-файл, созданный программой «Раскрой труб».');
     }
@@ -2639,6 +2809,7 @@ function formatTime(ts){
 }
 
 function renderHist(){
+  try { renderBk(); } catch(e){}
   var list = $('histList');
   var clearBtn = $('histClearBtn');
   if (!archives.length){
@@ -2783,7 +2954,11 @@ function doUndo(){
 $('toastUndo').addEventListener('click', doUndo);
 
 $('saveHistBtn2').addEventListener('click', function(){ addToHist(); });
-$('exportHistBtn').addEventListener('click', exportHistory);
+$('exportHistBtn').addEventListener('click', function(){ downloadBackup(backupFile()); });
+$('sendHistBtn').addEventListener('click', sendBackup);
+$('bkSend').addEventListener('click', sendBackup);
+$('bkLater').addEventListener('click', function(){ bk.snooze = dayKey(Date.now()); saveBk(); renderBk(); });
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) renderBk(); });
 $('importHistBtn').addEventListener('click', function(){ $('importHistFile').click(); });
 $('importHistFile').addEventListener('change', function(){
   var file = this.files && this.files[0];
@@ -2840,6 +3015,41 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
 }
+
+/* Проверка новой версии: сравниваем номер сборки в запущенной и в свежей странице */
+var verLast = 0, verShown = false;
+function buildOf(html){
+  var m = /name="app-build"\s+content="([^"]+)"/.exec(html);
+  return m ? m[1] : null;
+}
+function checkVersion(force){
+  if (!/^https?:$/.test(location.protocol) || !window.fetch || navigator.onLine === false || verShown) return;
+  var now = Date.now();
+  if (!force && now - verLast < 600000) return;
+  verLast = now;
+  var meta = document.querySelector('meta[name="app-build"]');
+  var mine = meta ? meta.getAttribute('content') : null;
+  if (!mine) return;
+  fetch('index.html?chk=' + now, {cache: 'no-store'}).then(function(r){
+    return r.ok ? r.text() : Promise.reject();
+  }).then(function(t){
+    var theirs = buildOf(t);
+    if (theirs && theirs !== mine) {
+      verShown = true;
+      $('updBanner').hidden = false;
+    }
+  }).catch(function(){});
+  try {
+    navigator.serviceWorker.getRegistration().then(function(reg){ if (reg) reg.update(); });
+  } catch(e){}
+}
+$('updDo').addEventListener('click', function(){
+  try { save(); saveDone(); } catch(e){}
+  location.reload();
+});
+$('updLater').addEventListener('click', function(){ $('updBanner').hidden = true; });
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) checkVersion(false); });
+setTimeout(function(){ checkVersion(true); }, 4000);
 </script>
 </body>
 </html>
