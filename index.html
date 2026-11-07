@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.9">
+<meta name="app-build" content="2026-11-08.10">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2825,12 +2825,13 @@ function schemeCanvas(){
   if (full > 0) blocks.push({title: 'Целая труба × ' + full, cuts: S.per, off: S.wFull, word: 'обрезок'});
   if (S.rem > 0) blocks.push({title: full > 0 ? 'Последняя труба' : 'Труба', cuts: S.rem, off: S.wLast, word: 'остаток'});
 
+  var big = $('hsMain').textContent, sub = $('hs').textContent;
   var head = [
     'Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм',
-    'Заготовка ' + S.p + ' мм × ' + S.q + ' шт' + (S.k > 0 ? ', пропил ' + num(S.k) + ' мм' : ''),
-    'Нужно труб: ' + S.n + ' (' + S.bn + ' ' + plural(S.bn, 'пачка', 'пачки', 'пачек') + ')'
+    'Заготовка ' + S.p + ' мм × ' + S.q + ' шт' + (S.k > 0 ? ', пропил ' + num(S.k) + ' мм' : '')
   ];
-  var y0 = 320, BLK = 250, H = y0 + blocks.length * BLK + 96;
+  var yBig = P + 60, ySub = yBig + (sub ? 56 : 0), yHead = ySub + 62;
+  var y0 = yHead + (head.length - 1) * 48 + 48, BLK = 250, H = y0 + blocks.length * BLK + 96;
 
   var cv = document.createElement('canvas');
   cv.width = W; cv.height = H;
@@ -2838,10 +2839,14 @@ function schemeCanvas(){
   c.fillStyle = '#ffffff'; c.fillRect(0, 0, W, H);
   c.textBaseline = 'alphabetic'; c.textAlign = 'left';
 
-  c.fillStyle = '#000000'; c.font = '700 60px ' + FONT;
-  c.fillText('Раскрой труб', P, P + 56);
-  c.fillStyle = '#4a4a4f'; c.font = '500 36px ' + FONT;
-  head.forEach(function(line, i){ c.fillText(line, P, P + 56 + 56 + i * 52); });
+  c.fillStyle = '#000000'; c.font = '700 64px ' + FONT;
+  c.fillText(big, P, yBig);
+  if (sub){
+    c.fillStyle = '#4a4a4f'; c.font = '600 40px ' + FONT;
+    c.fillText(sub, P, ySub);
+  }
+  c.fillStyle = '#4a4a4f'; c.font = '500 34px ' + FONT;
+  head.forEach(function(line, i){ c.fillText(line, P, yHead + i * 48); });
 
   blocks.forEach(function(bk, bi){
     var y = y0 + bi * BLK;
@@ -2893,6 +2898,13 @@ function schemeCanvas(){
   return cv;
 }
 
+function schemeFileName(){
+  var d = +$('d').value || 0, t = +$('t').value || 0;
+  return formatShareDate(Date.now()) +
+    (d > 0 ? ' · Ø' + num(d) + (t > 0 ? '×' + num(t) : '') : '') +
+    ' · ' + S.p + ' мм.png';
+}
+
 function dataUrlToBlob(u){
   var bin = atob(u.split(',')[1]);
   var arr = new Uint8Array(bin.length);
@@ -2914,17 +2926,18 @@ $('imgBtn').addEventListener('click', function(){
   var blob;
   try { blob = dataUrlToBlob(schemeCanvas().toDataURL('image/png')); }
   catch(e){ flashBtn('imgBtn', 'Ошибка'); return; }
+  var fname = schemeFileName();
   var file = null;
-  try { file = new File([blob], 'raskroy.png', {type: 'image/png'}); } catch(e){}
+  try { file = new File([blob], fname, {type: 'image/png'}); } catch(e){}
   if (file && navigator.share && navigator.canShare && navigator.canShare({files: [file]})) {
     navigator.share({files: [file], title: 'Раскрой труб'}).then(function(){
       flashBtn('imgBtn', 'Отправлено');
     }).catch(function(e){
       if (e && e.name === 'AbortError') return;
-      saveBlobFile(blob, 'raskroy.png'); flashBtn('imgBtn', 'Скачано');
+      saveBlobFile(blob, fname); flashBtn('imgBtn', 'Скачано');
     });
   } else {
-    saveBlobFile(blob, 'raskroy.png');
+    saveBlobFile(blob, fname);
     flashBtn('imgBtn', 'Скачано');
   }
 });
