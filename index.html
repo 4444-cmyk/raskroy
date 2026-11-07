@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.4">
+<meta name="app-build" content="2026-11-08.7">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -146,7 +146,7 @@ body::before {
 .app {
   max-width: 480px;
   margin: 0 auto;
-  padding-block: max(12px, env(safe-area-inset-top)) 32px;
+  padding-block: max(12px, env(safe-area-inset-top)) calc(96px + env(safe-area-inset-bottom));
   padding-left: max(16px, env(safe-area-inset-left));
   padding-right: max(16px, env(safe-area-inset-right));
 }
@@ -444,7 +444,7 @@ body::before {
   position: fixed;
   left: max(16px, env(safe-area-inset-left));
   right: max(16px, env(safe-area-inset-right));
-  bottom: calc(16px + env(safe-area-inset-bottom));
+  bottom: calc(84px + env(safe-area-inset-bottom));
   z-index: 110;
   max-width: 448px;
   min-height: 56px;
@@ -920,7 +920,7 @@ label {
   padding: 12px 16px;
   border-radius: 16px;
   background: var(--warn-bg);
-  color: var(--danger);
+  color: var(--warn-fg);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
@@ -1393,6 +1393,59 @@ label {
 .upd-banner[hidden]{display:none}
 .upd-banner p{margin:0 0 10px;font-size:15px;line-height:1.4;font-weight:600}
 .upd-banner .bk-act .nbtn.sec{color:var(--acc-fg)}
+
+/* ── Settings ── */
+.set-card summary{
+  list-style:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:17px;
+  font-weight:600;
+  letter-spacing:-0.015em;
+  touch-action:manipulation;
+}
+.set-card summary::-webkit-details-marker{display:none}
+.set-card summary::after{
+  content:"›";
+  font-size:24px;
+  line-height:1;
+  color:var(--muted);
+  transform:rotate(90deg);
+  transition:transform .15s ease;
+}
+.set-card[open] summary::after{transform:rotate(-90deg)}
+.set-body{margin-top:16px;display:grid;gap:16px}
+.set-body .theme-row{margin:0}
+.set-l{margin:0 0 6px;font-size:15px;font-weight:600}
+.set-sw{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.set-sw .set-l{margin:0}
+.set-d{margin:2px 0 0;font-size:12px;line-height:1.35;color:var(--text2)}
+.set-sw .chip{min-width:76px;height:36px;background:var(--soft);flex:none}
+.set-sw .chip.on{background:var(--done-bg)}
+
+/* ── Tab bar ── */
+[data-off]{display:none !important}
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  display:flex;justify-content:center;
+  padding:6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(24px) saturate(1.6);
+  backdrop-filter:blur(24px) saturate(1.6);
+  border-top:1px solid var(--line);
+}
+.tabbar-in{display:grid;grid-template-columns:repeat(4,1fr);width:100%;max-width:480px}
+.tab{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 0 3px;border:0;background:transparent;
+  color:var(--text2);font:inherit;font-size:11px;font-weight:500;
+  cursor:pointer;touch-action:manipulation;
+}
+.tab svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--done-bg)}
+.tab:active{opacity:.7}
 </style>
 </head>
 <body>
@@ -1412,20 +1465,15 @@ label {
       <button type="button" class="nbtn sec" id="updLater">Позже</button>
     </div>
   </div>
-  <div class="hero">
+  <div class="hero" data-tab="calc">
     <p class="big" id="hsMain">—</p>
     <p class="sub" id="hs"></p>
   </div>
-  <div class="actions">
+  <div class="actions" data-tab="calc">
     <button type="button" class="act main" id="shareBtn">Поделиться</button>
   </div>
-  <div class="theme-row" id="themeRow">
-    <button type="button" class="theme-chip on" data-theme="auto">Авто</button>
-    <button type="button" class="theme-chip" data-theme="light">Светлая</button>
-    <button type="button" class="theme-chip" data-theme="dark">Тёмная</button>
-  </div>
 
-  <div class="card" id="diaCard">
+  <div class="card" id="diaCard" data-tab="calc">
     <button type="button" class="fold-head" id="foldDia" aria-expanded="false">
       <span class="fold-title">Сечение</span>
       <span class="fold-val" id="foldDiaVal">Ø50 × 1,2</span>
@@ -1476,7 +1524,7 @@ label {
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="calc">
     <h2>Параметры</h2>
     <div class="fields">
       <div>
@@ -1532,14 +1580,14 @@ label {
     <div class="err" id="err"></div>
   </div>
 
-  <div class="grid">
+  <div class="grid" data-tab="calc">
     <div class="m"><p class="l">Кусков из трубы</p><p class="v" id="per">—</p><p class="s" id="perS"></p></div>
     <div class="m"><p class="l">Пачек</p><p class="v" id="bn">—</p><p class="s" id="bs"></p></div>
     <div class="m"><p class="l">Общий остаток</p><p class="v" id="w">—</p><p class="s" id="ws2"></p></div>
     <div class="m"><p class="l">Всего заготовок</p><p class="v" id="tot">—</p><p class="s" id="ts"></p></div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="calc">
     <h2>Как резать</h2>
     <div class="legend">
       <span><i style="background:var(--acc-bg);border:1px solid var(--acc-line)"></i>заготовка</span>
@@ -1551,14 +1599,16 @@ label {
     <p class="cap" id="c2"></p>
   </div>
 
-  <div class="card" id="listCard">
+  <div class="card" id="listEmpty" data-tab="list" data-off>
+    <h2>Чек-лист резки</h2>
+    <p class="set-d" style="font-size:14px">Сначала заполните параметры на вкладке «Расчёт».</p>
+  </div>
+
+  <div class="card" id="listCard" data-tab="list">
     <div class="lhead">
       <h2>Чек-лист резки</h2>
       <div class="ltools">
         <button type="button" class="chip" id="bigBtn" aria-pressed="false">Крупно</button>
-        <button type="button" class="chip on" id="fbBtn" aria-pressed="true">Вибрация</button>
-        <button type="button" class="chip on" id="wakeBtn" aria-pressed="true">Экран</button>
-        <button type="button" class="chip on" id="guardBtn" aria-pressed="true">Защита</button>
       </div>
     </div>
 
@@ -1595,7 +1645,7 @@ label {
     <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:14px;height:50px">Сохранить раскрой</button>
   </div>
 
-  <div class="card" id="histCard">
+  <div class="card" id="histCard" data-tab="hist">
     <h2>Сохранённые раскрои</h2>
     <div id="histList"></div>
     <button type="button" class="hist-clear" id="histClearBtn" hidden>Очистить всё</button>
@@ -1607,7 +1657,64 @@ label {
     <input type="file" id="importHistFile" accept=".json,application/json" hidden>
     <p id="storageStatus" style="font-size:12px;line-height:1.45;color:var(--text2);margin:10px 2px 0">Проверка сохранения…</p>
   </div>
+
+  <div class="card set-card" id="setCard" data-tab="set">
+    <h2>Настройки</h2>
+    <div class="set-body">
+      <div>
+        <p class="set-l">Тема</p>
+        <div class="theme-row" id="themeRow">
+          <button type="button" class="theme-chip on" data-theme="auto">Авто</button>
+          <button type="button" class="theme-chip" data-theme="light">Светлая</button>
+          <button type="button" class="theme-chip" data-theme="dark">Тёмная</button>
+        </div>
+      </div>
+      <div class="set-sw">
+        <div>
+          <p class="set-l">Вибрация</p>
+          <p class="set-d">Лёгкий отклик при отметках</p>
+        </div>
+        <button type="button" class="chip on" id="fbBtn" aria-pressed="true">Вкл</button>
+      </div>
+      <div class="set-sw">
+        <div>
+          <p class="set-l">Экран не гаснет</p>
+          <p class="set-d">Пока открыт чек-лист</p>
+        </div>
+        <button type="button" class="chip on" id="wakeBtn" aria-pressed="true">Вкл</button>
+      </div>
+      <div class="set-sw">
+        <div>
+          <p class="set-l">Защита отметок</p>
+          <p class="set-d">Снять отметку можно только удержанием плитки</p>
+        </div>
+        <button type="button" class="chip on" id="guardBtn" aria-pressed="true">Вкл</button>
+      </div>
+    </div>
+    <p class="set-d" id="verTxt" style="margin-top:16px"></p>
+  </div>
 </div>
+
+<nav class="tabbar" id="tabbar" aria-label="Разделы">
+  <div class="tabbar-in">
+    <button type="button" class="tab on" data-go="calc" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg>
+      <span>Расчёт</span>
+    </button>
+    <button type="button" class="tab" data-go="list">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
+      <span>Чек-лист</span>
+    </button>
+    <button type="button" class="tab" data-go="hist">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span>История</span>
+    </button>
+    <button type="button" class="tab" data-go="set">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+      <span>Настройки</span>
+    </button>
+  </div>
+</nav>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden>
   <span id="toastText"></span>
@@ -1636,7 +1743,8 @@ window.onerror = function(msg, src, line){
   var b = document.getElementById('jsBanner');
   if (b){
     b.style.display = 'block';
-    b.textContent = 'Ошибка скрипта: ' + msg + (line ? ' (строка ' + line + ')' : '') + '. Пришлите этот текст.';
+    b.textContent = 'Что-то пошло не так. Перезапустите приложение.';
+    try { console.error('Ошибка скрипта: ' + msg + (line ? ' (строка ' + line + ')' : '')); } catch(e){}
   }
 };
 
@@ -1866,7 +1974,8 @@ try{
   if (d2){ for (var kk in d2){ doneAll[kk] = d2[kk]; } }
 }catch(e){}
 var curSig = null, cnt = {}, hist = [], nextIdx = -1, legacyDone = false;
-var ui = {big:false, fb:true, wake:true, guard:true, theme:'auto', foldDia:false};
+var TABS = ['calc','list','hist','set'];
+var ui = {big:false, fb:true, wake:true, guard:true, theme:'auto', foldDia:false, tab:'calc'};
 var leftTxt = '', hintTimer = null;
 try{
   var u = JSON.parse(localStorage.getItem(UI_KEY));
@@ -1874,6 +1983,7 @@ try{
     ui.big = !!u.big; ui.fb = u.fb !== false; ui.wake = u.wake !== false; ui.guard = u.guard !== false;
     if (u.theme === 'light' || u.theme === 'dark' || u.theme === 'auto') ui.theme = u.theme;
     ui.foldDia = !!u.foldDia;
+    if (TABS.indexOf(u.tab) >= 0) ui.tab = u.tab;
   }
 }catch(e){}
 
@@ -1914,13 +2024,31 @@ function applyUI(){
   $('bigBtn').setAttribute('aria-pressed', ui.big ? 'true' : 'false');
   $('fbBtn').className = 'chip' + (ui.fb ? ' on' : '');
   $('fbBtn').setAttribute('aria-pressed', ui.fb ? 'true' : 'false');
+  $('fbBtn').textContent = ui.fb ? 'Вкл' : 'Выкл';
   var wOn = ui.wake && wakeState !== 'fail';
   $('wakeBtn').className = 'chip' + (wOn ? ' on' : '');
   $('wakeBtn').setAttribute('aria-pressed', wOn ? 'true' : 'false');
+  $('wakeBtn').textContent = (ui.wake && wakeState === 'fail') ? 'Недоступно' : (ui.wake ? 'Вкл' : 'Выкл');
   $('guardBtn').className = 'chip' + (ui.guard ? ' on' : '');
   $('guardBtn').setAttribute('aria-pressed', ui.guard ? 'true' : 'false');
+  $('guardBtn').textContent = ui.guard ? 'Вкл' : 'Выкл';
   applyTheme();
   applyFold();
+  syncTabs();
+}
+
+function syncTabs(){
+  var listHidden = $('listCard').style.display === 'none';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-tab]'), function(el){
+    var on = el.getAttribute('data-tab') === ui.tab;
+    if (el.id === 'listEmpty') on = on && listHidden;
+    if (on) el.removeAttribute('data-off'); else el.setAttribute('data-off', '');
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b){
+    var cur = b.getAttribute('data-go') === ui.tab;
+    b.className = 'tab' + (cur ? ' on' : '');
+    if (cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
 }
 
 var hapEl = null;
@@ -2271,11 +2399,6 @@ function wakeSync(manual){
   wakeOn().then(function(ok){
     wakeState = ok ? 'ok' : 'fail';
     applyUI();
-    if (!ok && manual){
-      var b = $('wakeBtn');
-      b.textContent = 'Недоступно';
-      setTimeout(function(){ b.textContent = 'Экран'; }, 2200);
-    }
   });
 }
 document.addEventListener('visibilitychange', function(){ wakeSync(false); });
@@ -2292,7 +2415,8 @@ function safe(fn){
     var b = $('jsBanner');
     if (b){
       b.style.display = 'block';
-      b.textContent = 'Ошибка: ' + (e && e.message ? e.message : e) + '. Пришлите этот текст.';
+      b.textContent = 'Что-то пошло не так. Перезапустите приложение.';
+      try { console.error(e); } catch(e2){}
     }
   }
 }
@@ -3005,6 +3129,26 @@ safe(load);
 safe(renderHist);
 checkStorage();
 update();
+
+/* Вкладки */
+Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b){
+  b.addEventListener('click', function(){
+    var t = b.getAttribute('data-go');
+    if (t === ui.tab) { window.scrollTo(0, 0); return; }
+    ui.tab = t;
+    saveUI();
+    syncTabs();
+    window.scrollTo(0, 0);
+  });
+});
+try {
+  new MutationObserver(syncTabs).observe($('listCard'), {attributes: true, attributeFilter: ['style']});
+} catch(e){}
+syncTabs();
+try {
+  var _bm = document.querySelector('meta[name="app-build"]');
+  if (_bm) $('verTxt').textContent = 'Версия ' + _bm.getAttribute('content');
+} catch(e){}
 
 /* Офлайн-режим и защита данных от очистки (только на https) */
 try {
