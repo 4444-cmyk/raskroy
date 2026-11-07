@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.8">
+<meta name="app-build" content="2026-11-08.9">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -549,6 +549,29 @@ body::before {
   color: var(--text2);
   margin: 0 0 14px;
   text-align: center;
+}
+
+.sheet-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin: -8px 0 4px;
+}
+
+.share-all {
+  border: 0;
+  background: transparent;
+  color: var(--done-bg);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0 4px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.share-all[hidden] {
+  display: none;
 }
 
 .sheet-list {
@@ -1594,6 +1617,7 @@ label {
     <p class="cap" id="c1"></p>
     <div class="pipe" id="bar2"></div>
     <p class="cap" id="c2"></p>
+    <button type="button" class="nbtn sec" id="imgBtn" style="width:100%;margin-top:0;min-height:44px">Отправить картинкой</button>
   </div>
 
   <div class="card" id="listEmpty" data-tab="list" data-off>
@@ -1639,7 +1663,8 @@ label {
       <button type="button" class="nbtn" id="rBtn">Готовы</button>
     </div>
 
-    <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:14px;height:50px">Сохранить раскрой</button>
+    <button type="button" class="nbtn sec" id="leftShareBtn" style="width:100%;margin-top:14px;min-height:44px">Отправить остаток</button>
+    <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:8px;height:50px">Сохранить раскрой</button>
   </div>
 
   <div class="card" id="histCard" data-tab="hist">
@@ -1719,11 +1744,17 @@ label {
   <button type="button" id="toastUndo">Отменить</button>
 </div>
 
+<div class="toast" id="shareToast" role="status" aria-live="polite" hidden>
+  <span>Раскрой сохранён</span>
+  <button type="button" id="shareToastBtn">Поделиться</button>
+</div>
+
 <div class="sheet-bg" id="shareSheetBg" hidden></div>
 <div class="sheet" id="shareSheet" hidden>
   <div class="sheet-handle"></div>
   <h3 class="sheet-title">Поделиться</h3>
   <p class="sheet-sub">Сегодня отмечены · можно выбрать любые</p>
+  <div class="sheet-tools"><button type="button" class="share-all" id="shareAll">Выбрать все</button></div>
   <div class="sheet-list" id="shareList"></div>
   <div class="sheet-actions">
     <button type="button" class="nbtn sec" id="shareCancel">Отмена</button>
@@ -2543,6 +2574,7 @@ function openShareSheet(){
   var list = $('shareList');
   shareSel = {};
   var h = '';
+  syncShareAll();
 
   if (!archives.length) {
     list.innerHTML = '<p class="share-empty">Нет сохранённых раскроев.<br>Сначала нажмите «Сохранить раскрой».</p>';
@@ -2578,8 +2610,17 @@ function openShareSheet(){
   });
 
   list.innerHTML = h;
+  syncShareAll();
   $('shareSheet').removeAttribute('hidden');
   $('shareSheetBg').removeAttribute('hidden');
+}
+
+function syncShareAll(){
+  var b = $('shareAll');
+  var ids = Object.keys(shareSel);
+  b.hidden = !ids.length;
+  var all = ids.length > 0 && ids.every(function(k){ return shareSel[k]; });
+  b.textContent = all ? 'Снять все' : 'Выбрать все';
 }
 
 function closeShareSheet(){
@@ -2597,9 +2638,10 @@ function pipeKey(item){
   return (item.d || 0) + '|' + (item.t || 0);
 }
 
-function buildShareText(){
+function buildShareText(items){
   var selected = [];
-  archives.forEach(function(item, idx){
+  if (items) selected = items.slice();
+  else archives.forEach(function(item, idx){
     if (shareSel['a' + idx]) selected.push(item);
   });
   if (!selected.length) return '';
@@ -2654,6 +2696,17 @@ $('shareList').addEventListener('click', function(e){
   shareSel[id] = !shareSel[id];
   if (shareSel[id]) row.classList.add('on');
   else row.classList.remove('on');
+  syncShareAll();
+});
+
+$('shareAll').addEventListener('click', function(){
+  var ids = Object.keys(shareSel);
+  var v = !ids.every(function(k){ return shareSel[k]; });
+  ids.forEach(function(k){ shareSel[k] = v; });
+  Array.prototype.forEach.call($('shareList').querySelectorAll('.share-item'), function(r){
+    if (v) r.classList.add('on'); else r.classList.remove('on');
+  });
+  syncShareAll();
 });
 
 $('shareCancel').addEventListener('click', closeShareSheet);
@@ -2666,14 +2719,213 @@ $('shareDo').addEventListener('click', function(){
     return;
   }
   closeShareSheet();
+  sendShareText(t, 'shareBtn');
+});
+
+/* Отправка текста: системное меню «Поделиться», иначе копирование */
+function sendShareText(t, btnId){
+  function flash(txt){ if (btnId) flashBtn(btnId, txt); }
   if (navigator.share) {
     navigator.share({ title: 'Раскрой труб', text: t }).then(function(){
-      flashBtn('shareBtn', 'Отправлено');
+      flash('Отправлено');
     }).catch(function(){
-      copyText(t).then(function(){ flashBtn('shareBtn', 'Скопировано'); });
+      copyText(t).then(function(){ flash('Скопировано'); });
     });
   } else {
-    copyText(t).then(function(){ flashBtn('shareBtn', 'Скопировано'); }, function(){ flashBtn('shareBtn', 'Ошибка'); });
+    copyText(t).then(function(){ flash('Скопировано'); }, function(){ flash('Ошибка'); });
+  }
+}
+
+/* Тост «Раскрой сохранён · Поделиться» */
+var shareToastTimer = null, shareToastItem = null;
+function showShareToast(item){
+  shareToastItem = item;
+  var el = $('shareToast');
+  // если сейчас виден тост «Отменить», поднимаем этот выше
+  el.style.bottom = $('toast').hasAttribute('hidden') ? '' : 'calc(148px + env(safe-area-inset-bottom))';
+  el.removeAttribute('hidden');
+  clearTimeout(shareToastTimer);
+  shareToastTimer = setTimeout(hideShareToast, 6000);
+}
+function hideShareToast(){
+  clearTimeout(shareToastTimer);
+  shareToastTimer = null;
+  shareToastItem = null;
+  $('shareToast').setAttribute('hidden', '');
+}
+$('shareToastBtn').addEventListener('click', function(){
+  var it = shareToastItem;
+  hideShareToast();
+  if (!it) return;
+  var t = buildShareText([it]);
+  if (t) sendShareText(t, null);
+});
+
+/* Остаток работы по чек-листу */
+function rangesOf(a){
+  var parts = [], i = 0;
+  while (i < a.length){
+    var j = i;
+    while (j + 1 < a.length && a[j + 1] === a[j] + 1) j++;
+    parts.push(j > i ? a[i] + '–' + a[j] : '' + a[i]);
+    i = j + 1;
+  }
+  return parts.join(', ');
+}
+
+function remainText(){
+  if (!S) return '';
+  var d = +$('d').value || 0, t = +$('t').value || 0;
+  var cd = 0, left = [], i;
+  for (i = 0; i < S.n; i++){
+    var pc = pcOf(i), c = Math.min(cnt[i] || 0, pc);
+    cd += c;
+    if (c < pc) left.push(i + 1);
+  }
+  var head = 'Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', заготовка ' + S.p + ' мм';
+  var out = [];
+  if (!left.length){
+    out.push('Всё распилено');
+    out.push(head);
+    out.push('Труб: ' + S.n + ', заготовок: ' + S.q);
+  } else {
+    var cl = S.q - cd;
+    out.push('Осталось распилить');
+    out.push(head);
+    out.push('Труб: ' + left.length + ' из ' + S.n + ' (№' + rangesOf(left) + ')');
+    out.push('Заготовок: ' + cl + ' из ' + S.q + ' (' + num(cl * S.p / 1000) + ' м)');
+  }
+  if (S.bad > 0) out.push('Брак: ' + S.bad);
+  return out.join('\n');
+}
+
+$('leftShareBtn').addEventListener('click', function(){
+  var t = remainText();
+  if (!t){ flashBtn('leftShareBtn', 'Заполните поля'); return; }
+  sendShareText(t, 'leftShareBtn');
+});
+
+/* Картинка со схемой раскроя */
+function rrPath(c, x, y, w, h, r){
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.lineTo(x + w - r, y); c.arcTo(x + w, y, x + w, y + r, r);
+  c.lineTo(x + w, y + h - r); c.arcTo(x + w, y + h, x + w - r, y + h, r);
+  c.lineTo(x + r, y + h); c.arcTo(x, y + h, x, y + h - r, r);
+  c.lineTo(x, y + r); c.arcTo(x, y, x + r, y, r);
+  c.closePath();
+}
+
+function schemeCanvas(){
+  var W = 1080, P = 56, BW = W - 2 * P, BH = 120;
+  var FONT = '-apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
+  var d = +$('d').value || 0, t = +$('t').value || 0;
+  var full = S.rem > 0 ? S.n - 1 : S.n;
+  var blocks = [];
+  if (full > 0) blocks.push({title: 'Целая труба × ' + full, cuts: S.per, off: S.wFull, word: 'обрезок'});
+  if (S.rem > 0) blocks.push({title: full > 0 ? 'Последняя труба' : 'Труба', cuts: S.rem, off: S.wLast, word: 'остаток'});
+
+  var head = [
+    'Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм',
+    'Заготовка ' + S.p + ' мм × ' + S.q + ' шт' + (S.k > 0 ? ', пропил ' + num(S.k) + ' мм' : ''),
+    'Нужно труб: ' + S.n + ' (' + S.bn + ' ' + plural(S.bn, 'пачка', 'пачки', 'пачек') + ')'
+  ];
+  var y0 = 320, BLK = 250, H = y0 + blocks.length * BLK + 96;
+
+  var cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  var c = cv.getContext('2d');
+  c.fillStyle = '#ffffff'; c.fillRect(0, 0, W, H);
+  c.textBaseline = 'alphabetic'; c.textAlign = 'left';
+
+  c.fillStyle = '#000000'; c.font = '700 60px ' + FONT;
+  c.fillText('Раскрой труб', P, P + 56);
+  c.fillStyle = '#4a4a4f'; c.font = '500 36px ' + FONT;
+  head.forEach(function(line, i){ c.fillText(line, P, P + 56 + 56 + i * 52); });
+
+  blocks.forEach(function(bk, bi){
+    var y = y0 + bi * BLK;
+    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    c.fillStyle = '#000000'; c.font = '700 36px ' + FONT;
+    c.fillText(bk.title, P, y + 36);
+
+    var by = y + 60, pw = S.p / S.L * BW;
+    c.save();
+    rrPath(c, P, by, BW, BH, 30); c.clip();
+    c.fillStyle = '#ffffff'; c.fillRect(P, by, BW, BH);
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = '700 32px ' + FONT;
+    var showNum = c.measureText(String(S.p)).width + 16 < pw;
+    for (var i = 0; i < bk.cuts; i++){
+      var x = P + i * pw;
+      c.fillStyle = '#d6e8ff'; c.fillRect(x, by, pw, BH);
+      if (pw > 6){ c.fillStyle = '#ffffff'; c.fillRect(x + pw - 3, by, 3, BH); }
+      if (showNum){ c.fillStyle = '#0051c7'; c.fillText(String(S.p), x + pw / 2, by + BH / 2 + 1); }
+    }
+    var rest = Math.max(S.L - bk.cuts * S.p, 0);
+    if (rest > 0){
+      var rx = P + bk.cuts * pw, rw = rest / S.L * BW;
+      c.fillStyle = '#ffe9c4'; c.fillRect(rx, by, rw, BH);
+      if (rest / S.L > 0.08){
+        c.font = '600 32px ' + FONT; c.fillStyle = '#8a4a00';
+        c.fillText(String(fmt(bk.off)), rx + rw / 2, by + BH / 2 + 1);
+      }
+    }
+    c.restore();
+    rrPath(c, P, by, BW, BH, 30);
+    c.strokeStyle = '#c7c7cc'; c.lineWidth = 2; c.stroke();
+
+    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    c.fillStyle = '#4a4a4f'; c.font = '500 32px ' + FONT;
+    c.fillText(bk.cuts + ' × ' + S.p + ' мм, ' + bk.word + ' ' + fmt(bk.off) + ' мм', P, by + BH + 46);
+  });
+
+  // легенда и дата
+  var ly = H - 48;
+  c.fillStyle = '#d6e8ff'; rrPath(c, P, ly - 22, 28, 28, 8); c.fill();
+  c.fillStyle = '#4a4a4f'; c.font = '500 28px ' + FONT; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+  c.fillText('заготовка', P + 42, ly + 2);
+  var lx = P + 42 + c.measureText('заготовка').width + 40;
+  c.fillStyle = '#ffe9c4'; rrPath(c, lx, ly - 22, 28, 28, 8); c.fill();
+  c.fillStyle = '#4a4a4f'; c.fillText('остаток', lx + 42, ly + 2);
+  c.textAlign = 'right';
+  c.fillText(formatShareDate(Date.now()), W - P, ly + 2);
+  return cv;
+}
+
+function dataUrlToBlob(u){
+  var bin = atob(u.split(',')[1]);
+  var arr = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type: 'image/png'});
+}
+
+function saveBlobFile(blob, name){
+  var a = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+}
+
+$('imgBtn').addEventListener('click', function(){
+  if (!S){ flashBtn('imgBtn', 'Заполните поля'); return; }
+  var blob;
+  try { blob = dataUrlToBlob(schemeCanvas().toDataURL('image/png')); }
+  catch(e){ flashBtn('imgBtn', 'Ошибка'); return; }
+  var file = null;
+  try { file = new File([blob], 'raskroy.png', {type: 'image/png'}); } catch(e){}
+  if (file && navigator.share && navigator.canShare && navigator.canShare({files: [file]})) {
+    navigator.share({files: [file], title: 'Раскрой труб'}).then(function(){
+      flashBtn('imgBtn', 'Отправлено');
+    }).catch(function(e){
+      if (e && e.name === 'AbortError') return;
+      saveBlobFile(blob, 'raskroy.png'); flashBtn('imgBtn', 'Скачано');
+    });
+  } else {
+    saveBlobFile(blob, 'raskroy.png');
+    flashBtn('imgBtn', 'Скачано');
   }
 });
 
@@ -3027,6 +3279,7 @@ function addToHist(){
     setTimeout(function(){ b2.textContent = 'Сохранить раскрой'; }, 1800);
   }
   feedback(false);
+  showShareToast(entry);
 }
 
 function restoreHist(idx){
@@ -3049,6 +3302,7 @@ function restoreHist(idx){
 var undoPending = null, undoTimer = null;
 
 function showUndo(removed){
+  hideShareToast();
   if (!undoPending) undoPending = {list: []};
   removed.forEach(function(r){ undoPending.list.push(r); });
   var n = undoPending.list.length;
