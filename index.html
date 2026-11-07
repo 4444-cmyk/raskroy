@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.12">
+<meta name="app-build" content="2026-11-08.13">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2773,30 +2773,30 @@ function rangesOf(a){
   return parts.join(', ');
 }
 
+function pieceWord(r, prep){
+  var m10 = r % 10, m100 = r % 100;
+  if (m10 === 1 && m100 !== 11) return prep === 'на' ? 'заготовку' : 'заготовке';
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return 'заготовки';
+  return 'заготовок';
+}
+
 function remainText(){
   if (!S) return '';
   var d = +$('d').value || 0, t = +$('t').value || 0;
-  var cd = 0, left = [], i;
+  var cd = 0, groups = {}, any = false, i;
   for (i = 0; i < S.n; i++){
     var pc = pcOf(i), c = Math.min(cnt[i] || 0, pc);
     cd += c;
-    if (c < pc) left.push(i + 1);
+    if (c < pc){ var r = pc - c; groups[r] = (groups[r] || 0) + 1; any = true; }
   }
-  var head = 'Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', заготовка ' + S.p + ' мм';
-  var out = [];
-  if (!left.length){
-    out.push('Всё распилено');
-    out.push(head);
-    out.push('Труб: ' + S.n + ', заготовок: ' + S.q);
-  } else {
-    var cl = S.q - cd;
-    out.push('Осталось распилить');
-    out.push(head);
-    out.push('Труб: ' + left.length + ' из ' + S.n + ' (№' + rangesOf(left) + ')');
-    out.push('Заготовок: ' + cl + ' из ' + S.q + ' (' + num(cl * S.p / 1000) + ' м)');
-  }
-  if (S.bad > 0) out.push('Брак: ' + S.bad);
-  return out.join('\n');
+  var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + '×' + S.p;
+  if (!any) return 'Всё нарезано\n' + head + ' - ' + S.q + ' шт';
+  var parts = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; }).map(function(r){
+    var n = groups[r], whole = r === S.per;   // целая труба: ещё ничего не отрезано
+    var pipe = (whole ? plural(n, 'целая', 'целых', 'целых') + ' ' : '') + plural(n, 'труба', 'трубы', 'труб');
+    return n + ' ' + pipe + (whole ? ' по ' : ' на ') + r + ' ' + pieceWord(r, whole ? 'по' : 'на');
+  });
+  return 'Осталось нарезать\n' + head + ' - ' + (S.q - cd) + ' шт\n' + parts.join(' + ');
 }
 
 $('leftShareBtn').addEventListener('click', function(){
