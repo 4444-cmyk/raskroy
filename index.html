@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.24">
+<meta name="app-build" content="2026-11-08.25">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -26,6 +26,7 @@
   --line: rgba(60, 60, 67, 0.14);
   --line2: rgba(60, 60, 67, 0.28);
   --glass: rgba(255, 255, 255, 0.72);
+  --glass-bar: rgba(255, 255, 255, 0.94);
   --glass-line: rgba(255, 255, 255, 0.85);
   --tile: rgba(255, 255, 255, 0.78);
   --acc-bg: #d6e8ff;
@@ -60,6 +61,7 @@
     --line: rgba(235, 235, 245, 0.16);
     --line2: rgba(235, 235, 245, 0.3);
     --glass: rgba(38, 38, 42, 0.72);
+    --glass-bar: rgba(28, 28, 30, 0.95);
     --glass-line: rgba(255, 255, 255, 0.12);
     --tile: rgba(255, 255, 255, 0.08);
     --acc-bg: #0a2f5c;
@@ -90,6 +92,7 @@
   --line: rgba(235, 235, 245, 0.16);
   --line2: rgba(235, 235, 245, 0.3);
   --glass: rgba(38, 38, 42, 0.72);
+  --glass-bar: rgba(28, 28, 30, 0.95);
   --glass-line: rgba(255, 255, 255, 0.12);
   --tile: rgba(255, 255, 255, 0.08);
   --acc-bg: #0a2f5c;
@@ -292,6 +295,7 @@ body::before {
   margin: 0;
   font-variant-numeric: tabular-nums;
   position: relative;
+  text-wrap: balance;
 }
 
 .hero .sub {
@@ -424,19 +428,9 @@ body::before {
   padding: 20px 0 8px;
 }
 
-.hist-clear {
-  display: block;
-  width: 100%;
-  height: 42px;
-  margin-top: 14px;
-  border-radius: 21px;
-  border: 0.5px solid var(--line);
-  background: transparent;
-  color: var(--text2);
-  font-size: 14px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
+#histClearBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 /* Undo toast */
@@ -1160,6 +1154,12 @@ label {
   margin: 10px 0 16px;
 }
 
+.lshare:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
 .tleg {
   margin: 10px 2px 0;
   font-size: 12px;
@@ -1217,6 +1217,82 @@ label {
 .nbtn:active {
   transform: scale(0.97);
   opacity: 0.88;
+}
+
+.badctl {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  height: 44px;
+  border-radius: 999px;
+  border: 0.5px solid var(--line);
+  overflow: hidden;
+}
+
+.badb {
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--done-bg);
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.badb:active {
+  background: var(--soft);
+}
+
+.badb:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.badv {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.badv b {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.badctl.has-bad .badv b {
+  display: inline-block;
+  min-width: 26px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+#undoBtn {
+  color: var(--text);
+}
+
+.nowB {
+  margin: 8px 2px 0;
+  min-height: 16px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text2);
+}
+
+.nbtn:disabled,
+.nbtn.main:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  box-shadow: none;
 }
 
 .nbtn.main {
@@ -1297,8 +1373,9 @@ label {
 }
 
 .tile span {
-  font-size: 11px;
-  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
 }
 
 .tile.last {
@@ -1417,6 +1494,34 @@ label {
   font-size: 16px;
 }
 
+#listCard.big .badctl {
+  height: 52px;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+}
+
+#listCard.big .badb {
+  font-size: 28px;
+}
+
+#listCard.big .badv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1.05;
+}
+
+#listCard.big .badv b {
+  min-width: 0;
+  padding: 0 6px;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+#listCard.big .nowB {
+  font-size: 14px;
+}
+
 #listCard.big .nowT {
   font-size: 22px;
 }
@@ -1488,7 +1593,7 @@ label {
   position:fixed;left:0;right:0;bottom:0;z-index:60;
   display:flex;justify-content:center;
   padding:6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
-  background:var(--glass);
+  background:var(--glass-bar);
   -webkit-backdrop-filter:blur(24px) saturate(1.6);
   backdrop-filter:blur(24px) saturate(1.6);
   border-top:1px solid var(--line);
@@ -1632,7 +1737,7 @@ label {
           <button type="button" class="sb" data-t="h" data-s="1" aria-label="Больше">+</button>
         </div>
       </div>
-      <p class="fhint">Пропил — толщина пилы или круга (0 — не учитывать). «Уже есть» — заготовки, которые уже нарезаны или лежат на складе: их вычтем из заказа.</p>
+      <p class="fhint">Пропил — толщина пилы. «Уже есть» вычтем из заказа.</p>
     </div>
     <div class="err" id="err"></div>
   </div>
@@ -1685,8 +1790,13 @@ label {
       </div>
       <div class="nrow" style="margin-top:10px">
         <button type="button" class="nbtn sec" id="undoBtn">Назад</button>
-        <button type="button" class="nbtn sec" id="badBtn" style="color:var(--warn-fg)">Брак +1</button>
+        <div class="badctl" role="group" aria-label="Брак">
+          <button type="button" class="badb" id="badMinus" aria-label="Брак меньше">−</button>
+          <span class="badv">Брак <b id="badVal">0</b></span>
+          <button type="button" class="badb" id="badBtn" aria-label="Брак больше">+</button>
+        </div>
       </div>
+      <p class="nowB" id="badNote"></p>
     </div>
 
     <div class="tiles" id="tiles"></div>
@@ -1707,7 +1817,6 @@ label {
   <div class="card" id="histCard" data-tab="hist">
     <h2>Сохранённые раскрои</h2>
     <div id="histList"></div>
-    <button type="button" class="hist-clear" id="histClearBtn" hidden>Очистить всё</button>
     <button type="button" class="nbtn main" id="shareBtn" style="width:100%;margin-top:12px;height:50px">Поделиться раскроем</button>
     <button type="button" class="nbtn sec" id="sendHistBtn" style="width:100%;margin-top:8px;min-height:44px">Отправить резервную копию</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
@@ -1776,7 +1885,11 @@ label {
         <button type="button" class="chip" id="updChkBtn">Проверить</button>
       </div>
       <div>
-        <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--warn-fg)">Очистить все данные</button>
+        <button type="button" class="nbtn sec" id="histClearBtn" style="width:100%;min-height:44px;color:var(--danger)">Очистить историю</button>
+        <p class="set-d" style="margin-top:6px">Все сохранённые раскрои. Сразу после очистки можно отменить.</p>
+      </div>
+      <div>
+        <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--danger)">Очистить все данные</button>
         <p class="set-d" style="margin-top:6px">Поля расчёта, отметки в чек-листе и история. Настройки останутся.</p>
       </div>
     </div>
@@ -2219,7 +2332,7 @@ function leftBreakdown(groups){
 // Верхний итог на «Расчёте»: «44 трубы × 9 заготовок» / «1 труба × 4 заготовки · всего 45 труб»
 function heroTexts(n, full, rem, per, have, bad){
   function pipes(k){ return k + ' ' + plural(k, 'труба', 'трубы', 'труб'); }
-  function pieces(k){ return k + ' ' + plural(k, 'заготовка', 'заготовки', 'заготовок'); }
+  function pieces(k){ return k + '\u00a0' + plural(k, 'заготовка', 'заготовки', 'заготовок'); }
   var main, sub = '';
   if (rem > 0 && full === 0) {
     main = '1 труба × ' + pieces(rem);
@@ -2273,23 +2386,37 @@ function renderList(){
   $('left').textContent = leftTxt;
   $('left').style.color = '';
   $('left2').textContent = all ? '' : leftBreakdown(lg);
+  $('leftShareBtn').disabled = all;   // отправлять нечего, когда всё отмечено
 
   var lg2 = ['×' + S.per + ' — резать из трубы'];
   if (S.per >= 2) lg2.push(Math.min(S.per - 1, 4) + '/' + S.per + ' — уже отрезано');
   lg2.push('✓ — готово');
   $('tleg').textContent = lg2.join(' · ');
 
+  // Панель всегда одной высоты: при «Всё распилено» кнопки остаются, но неактивны,
+  // чтобы «Брак +1» в конце не сдвигал плитки вниз.
   if (nextIdx < 0){
     $('nowT').textContent = 'Всё распилено';
-    $('nowS').textContent = '';
-    $('actRow').style.display = 'none';
+    $('nowS').textContent = 'Отрезано заготовок: ' + cd + ' из ' + S.q;
+    $('nextBtn').textContent = 'Готово';
+    $('pieceBtn').disabled = true;
+    $('nextBtn').disabled = true;
   } else {
     var pcn = pcOf(nextIdx), cn = Math.min(cnt[nextIdx] || 0, pcn);
-    $('nowT').textContent = 'Следующая: труба №' + (nextIdx + 1) + (S.rem > 0 && nextIdx === S.n - 1 ? ' (последняя)' : '');
+    var isLastPipe = S.rem > 0 && nextIdx === S.n - 1;
+    $('nowT').textContent = isLastPipe ? 'Последняя труба №' + (nextIdx + 1) : 'Следующая: труба №' + (nextIdx + 1);
     $('nowS').textContent = 'Отрезано заготовок: ' + cn + ' из ' + pcn + ' по ' + S.p + ' мм';
-    $('actRow').style.display = '';
     $('nextBtn').textContent = 'Готово №' + (nextIdx + 1);
+    $('pieceBtn').disabled = false;
+    $('nextBtn').disabled = false;
   }
+
+  $('badVal').textContent = S.bad;
+  $('badVal').parentNode.parentNode.classList.toggle('has-bad', S.bad > 0);
+  $('badMinus').disabled = !(S.bad > 0);
+  $('badNote').textContent = S.bad > 0
+    ? 'Брак ' + S.bad + ' · заказ увеличен на ' + S.bad
+    : 'Испортили заготовку? Нажмите «+»';
 
   $('undoBtn').style.opacity = hist.length ? '1' : '0.45';
   var f = +$('rFrom').value, t = +$('rTo').value;
@@ -2448,6 +2575,16 @@ $('badBtn').addEventListener('click', function(){
   saveDone();
   update();
   feedback(true);
+});
+
+$('badMinus').addEventListener('click', function(){
+  if (!S || !curSig || getBad(curSig) < 1) return;
+  putBad(curSig, getBad(curSig) - 1);
+  hist.push([[-1, -1]]);   // для «Назад»: вернуть брак на 1
+  if (hist.length > 50) hist.shift();
+  saveDone();
+  update();
+  feedback(false);
 });
 
 var rangeTimer = null;
@@ -3372,11 +3509,11 @@ function renderHist(){
   var clearBtn = $('histClearBtn');
   if (!archives.length){
     list.innerHTML = '<p class="hist-empty">Пока пусто. Нажмите «Сохранить раскрой», чтобы запомнить текущий.</p>';
-    clearBtn.hidden = true;
+    clearBtn.disabled = true;
     $('shareBtn').hidden = true;
     return;
   }
-  clearBtn.hidden = false;
+  clearBtn.disabled = false;
   $('shareBtn').hidden = false;
 
   // group by day (archives is already newest-first)
