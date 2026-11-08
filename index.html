@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.21">
+<meta name="app-build" content="2026-11-08.24">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1128,9 +1128,43 @@ label {
 .left {
   font-size: 13px;
   color: var(--text2);
-  margin: 0 0 16px;
+  margin: 0 0 2px;
   min-height: 18px;
   font-weight: 450;
+}
+
+.left2 {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text2);
+  margin: 0;
+  font-weight: 450;
+}
+
+.left2:empty {
+  display: none;
+}
+
+.lshare {
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--done-bg);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  margin: 10px 0 16px;
+}
+
+.tleg {
+  margin: 10px 2px 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text2);
 }
 
 .now {
@@ -1461,6 +1495,7 @@ label {
 }
 .tabbar-in{display:grid;grid-template-columns:repeat(4,1fr);width:100%;max-width:480px}
 .tab{
+  position:relative;
   display:flex;flex-direction:column;align-items:center;gap:2px;
   padding:6px 0 3px;border:0;background:transparent;
   color:var(--text2);font:inherit;font-size:11px;font-weight:500;
@@ -1469,12 +1504,14 @@ label {
 .tab svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tab.on{color:var(--done-bg)}
 .tab:active{opacity:.7}
+.tab-dot{position:absolute;top:5px;left:calc(50% + 7px);width:10px;height:10px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--bg)}
+.tab-dot[hidden]{display:none}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="jsb" id="jsBanner" role="alert"></div>
-  <div class="bk-banner" id="bkBanner" hidden role="status">
+  <div class="bk-banner" id="bkBanner" data-tab="hist" hidden role="status">
     <p id="bkText"></p>
     <div class="bk-act">
       <button type="button" class="nbtn main" id="bkSend">Отправить резервную копию</button>
@@ -1636,6 +1673,8 @@ label {
     <div class="ptxt"><span id="pt1"></span><span id="pt2"></span></div>
     <div class="prog"><i id="pfill"></i></div>
     <p class="left" id="left"></p>
+    <p class="left2" id="left2"></p>
+    <button type="button" class="lshare" id="leftShareBtn">Отправить остаток</button>
 
     <div class="now">
       <p class="nowT" id="nowT"></p>
@@ -1648,22 +1687,20 @@ label {
         <button type="button" class="nbtn sec" id="undoBtn">Назад</button>
         <button type="button" class="nbtn sec" id="badBtn" style="color:var(--warn-fg)">Брак +1</button>
       </div>
-      <div class="nrow" style="margin-top:10px;grid-template-columns:1fr">
-        <button type="button" class="nbtn sec" id="resetDone">Сбросить отметки</button>
-      </div>
     </div>
 
     <div class="tiles" id="tiles"></div>
+    <p class="tleg" id="tleg"></p>
 
     <div class="range">
       <span>Трубы с</span>
       <input id="rFrom" type="number" inputmode="numeric" value="1" min="1" aria-label="С трубы номер">
       <span>по</span>
       <input id="rTo" type="number" inputmode="numeric" value="1" min="1" aria-label="По трубу номер">
-      <button type="button" class="nbtn" id="rBtn">Готовы</button>
+      <button type="button" class="nbtn" id="rBtn">Отметить</button>
     </div>
 
-    <button type="button" class="nbtn sec" id="leftShareBtn" style="width:100%;margin-top:14px;min-height:44px">Отправить остаток</button>
+    <button type="button" class="nbtn sec" id="resetDone" style="width:100%;margin-top:14px;min-height:44px">Сбросить отметки</button>
     <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:8px;height:50px">Сохранить раскрой</button>
   </div>
 
@@ -1713,13 +1750,6 @@ label {
         </div>
         <button type="button" class="chip on" id="guardBtn" aria-pressed="true">Вкл</button>
       </div>
-      <div class="set-sw">
-        <div>
-          <p class="set-l">Крупный чек-лист</p>
-          <p class="set-d">Плитки и цифры крупнее</p>
-        </div>
-        <button type="button" class="chip" id="bigSetBtn" aria-pressed="false">Выкл</button>
-      </div>
       <div>
         <p class="set-l">Напоминание о копии</p>
         <div class="theme-row" id="bkRow" style="margin-bottom:6px">
@@ -1763,9 +1793,10 @@ label {
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
       <span>Чек-лист</span>
     </button>
-    <button type="button" class="tab" data-go="hist">
+    <button type="button" class="tab" data-go="hist" id="tabHist">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
       <span>История</span>
+      <i class="tab-dot" id="bkDot" hidden aria-hidden="true"></i>
     </button>
     <button type="button" class="tab" data-go="set">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
@@ -2105,9 +2136,6 @@ function applyUI(){
   $('guardBtn').className = 'chip' + (ui.guard ? ' on' : '');
   $('guardBtn').setAttribute('aria-pressed', ui.guard ? 'true' : 'false');
   $('guardBtn').textContent = ui.guard ? 'Вкл' : 'Выкл';
-  $('bigSetBtn').className = 'chip' + (ui.big ? ' on' : '');
-  $('bigSetBtn').setAttribute('aria-pressed', ui.big ? 'true' : 'false');
-  $('bigSetBtn').textContent = ui.big ? 'Вкл' : 'Выкл';
   applyOpts();
   applyTheme();
   applyFold();
@@ -2181,11 +2209,11 @@ function saveDone(){
 function leftBreakdown(groups){
   var keys = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; });
   if (keys.length < 2) return '';
-  return ' (' + keys.map(function(r){
+  return keys.map(function(r){
     var n = groups[r];
     return r === S.per ? n + ' ' + plural(n, 'целая', 'целых', 'целых')
                        : n + ' на ' + r + ' ' + pieceWord(r, 'на');
-  }).join(' + ') + ')';
+  }).join(' + ');
 }
 
 // Верхний итог на «Расчёте»: «44 трубы × 9 заготовок» / «1 труба × 4 заготовки · всего 45 труб»
@@ -2240,10 +2268,16 @@ function renderList(){
   var pl = S.n - pd, cl = S.q - cd;
   var badTxt = S.bad > 0 ? 'Брак: ' + S.bad : '';
   leftTxt = all ? badTxt :
-    'Осталось: ' + pl + ' ' + plural(pl, 'труба', 'трубы', 'труб') + leftBreakdown(lg) + ', ' +
+    'Осталось: ' + pl + ' ' + plural(pl, 'труба', 'трубы', 'труб') + ', ' +
     cl + ' ' + plural(cl, 'заготовка', 'заготовки', 'заготовок') + (badTxt ? ' · ' + badTxt : '');
   $('left').textContent = leftTxt;
   $('left').style.color = '';
+  $('left2').textContent = all ? '' : leftBreakdown(lg);
+
+  var lg2 = ['×' + S.per + ' — резать из трубы'];
+  if (S.per >= 2) lg2.push(Math.min(S.per - 1, 4) + '/' + S.per + ' — уже отрезано');
+  lg2.push('✓ — готово');
+  $('tleg').textContent = lg2.join(' · ');
 
   if (nextIdx < 0){
     $('nowT').textContent = 'Всё распилено';
@@ -2416,6 +2450,24 @@ $('badBtn').addEventListener('click', function(){
   feedback(true);
 });
 
+var rangeTimer = null;
+function rangeArm(on, n, key){
+  var b = $('rBtn');
+  clearTimeout(rangeTimer);
+  if (on){
+    b.textContent = 'Ещё раз: ' + n + ' ' + plural(n, 'труба', 'трубы', 'труб');
+    b.setAttribute('data-armed', key);
+    b.style.background = 'var(--danger)';
+    rangeTimer = setTimeout(function(){ rangeArm(false); }, 3000);
+  } else {
+    b.textContent = 'Отметить';
+    b.removeAttribute('data-armed');
+    b.style.background = '';
+  }
+}
+$('rFrom').addEventListener('input', function(){ rangeArm(false); });
+$('rTo').addEventListener('input', function(){ rangeArm(false); });
+
 $('rBtn').addEventListener('click', function(){
   if (!S) return;
   var f = Math.round(+$('rFrom').value), t = Math.round(+$('rTo').value);
@@ -2425,6 +2477,9 @@ $('rBtn').addEventListener('click', function(){
   if (t > S.n) t = S.n;
   $('rFrom').value = f;
   $('rTo').value = t;
+  var key = f + '-' + t, cntPipes = t - f + 1;
+  if (cntPipes > 1 && this.getAttribute('data-armed') !== key){ rangeArm(true, cntPipes, key); return; }
+  rangeArm(false);
   var ch = [];
   for (var i = f - 1; i < t; i++){ ch.push([i, pcOf(i)]); }
   apply(ch);
@@ -3113,7 +3168,11 @@ function bkDue(){
 function renderBk(){
   var el = $('bkBanner');
   if (!el) return;
-  var show = bkDue() && bk.snooze !== dayKey(Date.now());
+  var due = bkDue();
+  var dot = $('bkDot'), tab = $('tabHist');
+  if (dot) dot.hidden = !due;
+  if (tab) tab.setAttribute('aria-label', due ? 'История, пора сохранить копию' : 'История');
+  var show = due && bk.snooze !== dayKey(Date.now());
   el.hidden = !show;
   if (!show) return;
   var t, pre = ui.bk === 'month' ? 'Ежемесячная копия' : 'Субботняя копия';
@@ -3205,7 +3264,14 @@ function sendBackup(){
 
 function isObj(x){ return !!x && typeof x === 'object' && !(x instanceof Array); }
 
-function cleanArchives(list){
+// Лимит истории из настроек (30 / 100 / 0 = без лимита) или null, если значение некорректно
+function limitOf(u){
+  var v = u && u.histMax;
+  if (v === null || v === undefined || v === '') return null;
+  return [30, 100, 0].indexOf(Number(v)) >= 0 ? Number(v) : null;
+}
+
+function cleanArchives(list, limit){
   if (!(list instanceof Array)) return [];
   return list.filter(function(item){
     return item && Number(item.ts) > 0 && Number(item.q) > 0 && Number(item.p) > 0 && Number(item.n) > 0;
@@ -3216,7 +3282,7 @@ function cleanArchives(list){
       n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
       rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0
     };
-  }).sort(function(a,b){ return b.ts-a.ts; }).slice(0, histMax());
+  }).sort(function(a,b){ return b.ts-a.ts; }).slice(0, limit === undefined ? histMax() : limit);
 }
 
 function importHistoryFile(file){
@@ -3226,7 +3292,7 @@ function importHistoryFile(file){
     try {
       var data = JSON.parse(String(reader.result || ''));
       var full = isObj(data) && Number(data.formatVersion) >= 2;
-      var imported = cleanArchives(data instanceof Array ? data : (data && data.archives));
+      var imported = cleanArchives(data instanceof Array ? data : (data && data.archives), Infinity);
       var inputs = full && isObj(data.inputs) ? data.inputs : null;
       var done = full && isObj(data.done) ? data.done : null;
       var uiB = full && isObj(data.ui) ? data.ui : null;
@@ -3234,7 +3300,9 @@ function importHistoryFile(file){
       if (!imported.length && !inputs && !nDone && !uiB) throw new Error('empty');
 
       if (!full) {
-        if (!confirm('Заменить текущую историю данными из резервной копии?')) return;
+        var widenOld = imported.length > histMax();
+        if (!confirm('Заменить текущую историю данными из резервной копии?' + (widenOld ? '\n\nЛимит истории будет увеличен, чтобы ничего не потерять.' : ''))) return;
+        if (widenOld){ ui.histMax = imported.length <= 100 ? 100 : 0; saveUI(); }
         archives = imported;
         var saved = saveArchives();
         renderHist();
@@ -3246,7 +3314,10 @@ function importHistoryFile(file){
       if (nDone) parts.push('отметок о резке: ' + nDone);
       if (inputs) parts.push('введённые значения');
       if (uiB) parts.push('настройки');
-      if (!confirm('Заменить текущие данные копией?\n\nВ копии: ' + parts.join(', ') + '.')) return;
+      // После перезапуска действует лимит из копии (если его там нет — 30 по умолчанию)
+      var effMax = uiB ? (limitOf(uiB) !== null ? limitOf(uiB) : 30) : ui.histMax;
+      var widen = imported.length > (effMax > 0 ? effMax : Infinity);
+      if (!confirm('Заменить текущие данные копией?\n\nВ копии: ' + parts.join(', ') + '.' + (widen ? '\n\nЛимит истории будет увеличен, чтобы ничего не потерять.' : ''))) return;
 
       var ok = true;
       var put = function(k, v){
@@ -3255,7 +3326,9 @@ function importHistoryFile(file){
       put(ARCH_KEY, imported);
       if (inputs) put(KEY, inputs);
       if (done) { put(DONE_KEY, done); try { localStorage.removeItem(OLD_DONE_KEY); } catch(e){} }
-      if (uiB) put(UI_KEY, uiB);
+      var uiOut = uiB;
+      if (widen){ uiOut = JSON.parse(JSON.stringify(uiB || ui)); uiOut.histMax = imported.length <= 100 ? 100 : 0; }
+      if (uiOut) put(UI_KEY, uiOut);
       if (!ok) { alert('Не удалось записать часть данных. Попробуйте ещё раз.'); return; }
       alert('Копия восстановлена. Приложение перезапустится.');
       location.reload();
@@ -3406,6 +3479,9 @@ function restoreHist(idx){
   $('t').value = item.t;
   update();
   feedback(false);
+  ui.tab = 'calc';
+  saveUI();
+  syncTabs();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -3582,8 +3658,6 @@ $('updChkBtn').addEventListener('click', function(){
     navigator.serviceWorker.getRegistration().then(function(reg){ if (reg) reg.update(); });
   } catch(e){}
 });
-
-$('bigSetBtn').addEventListener('click', function(){ ui.big = !ui.big; saveUI(); applyUI(); });
 
 Array.prototype.forEach.call(document.querySelectorAll('[data-bk]'), function(b){
   b.addEventListener('click', function(){
