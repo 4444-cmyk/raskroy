@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.25">
+<meta name="app-build" content="2026-11-08.26">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1889,8 +1889,8 @@ label {
         <p class="set-d" style="margin-top:6px">Все сохранённые раскрои. Сразу после очистки можно отменить.</p>
       </div>
       <div>
-        <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--danger)">Очистить все данные</button>
-        <p class="set-d" style="margin-top:6px">Поля расчёта, отметки в чек-листе и история. Настройки останутся.</p>
+        <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--danger)">Стереть расчёт, отметки и историю</button>
+        <p class="set-d" style="margin-top:6px">Настройки останутся. Вернуть нельзя.</p>
       </div>
     </div>
   </div>
@@ -3687,7 +3687,6 @@ $('histList').addEventListener('click', function(e){
 
 $('histClearBtn').addEventListener('click', function(){
   if (!archives.length) return;
-  if (!confirm('Очистить все сохранённые раскрои?')) return;
   var all = archives.map(function(item, idx){ return {item: item, idx: idx}; });
   archives = [];
   saveArchives();
@@ -3818,7 +3817,7 @@ Array.prototype.forEach.call(document.querySelectorAll('[data-hist]'), function(
 });
 
 $('wipeBtn').addEventListener('click', function(){
-  if (!confirm('Очистить все данные?\n\nБудут удалены поля расчёта, отметки в чек-листе и вся история. Настройки останутся. Это нельзя отменить.')) return;
+  if (!confirm('Стереть расчёт, отметки и историю?\n\nБудут удалены поля расчёта, отметки в чек-листе и вся история. Настройки останутся. Это нельзя отменить.')) return;
   try {
     [KEY, DONE_KEY, OLD_DONE_KEY, ARCH_KEY].forEach(function(k){ localStorage.removeItem(k); });
   } catch(e){}
