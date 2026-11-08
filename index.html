@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.17">
+<meta name="app-build" content="2026-11-08.20">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1600,13 +1600,6 @@ label {
     <div class="err" id="err"></div>
   </div>
 
-  <div class="grid" data-tab="calc">
-    <div class="m"><p class="l">Труб</p><p class="v" id="pipesV">—</p><p class="s" id="pipesS"></p></div>
-    <div class="m"><p class="l">Заготовок из трубы</p><p class="v" id="per">—</p><p class="s" id="perS"></p></div>
-    <div class="m"><p class="l">Обрезки</p><p class="v" id="wasteV">—</p><p class="s" id="wasteS"></p></div>
-    <div class="m"><p class="l">Резов</p><p class="v" id="cutsV">—</p><p class="s" id="cutsS"></p></div>
-  </div>
-
   <div class="card" data-tab="calc">
     <h2>Как резать</h2>
     <div class="legend">
@@ -1618,6 +1611,13 @@ label {
     <div class="pipe" id="bar2"></div>
     <p class="cap" id="c2"></p>
     <button type="button" class="nbtn sec" id="imgBtn" style="width:100%;margin-top:0;min-height:44px">Отправить картинкой</button>
+  </div>
+
+  <div class="grid" data-tab="calc">
+    <div class="m"><p class="l">Пачек</p><p class="v" id="pipesV">—</p><p class="s" id="pipesS"></p></div>
+    <div class="m"><p class="l">Заготовок из трубы</p><p class="v" id="per">—</p><p class="s" id="perS"></p></div>
+    <div class="m"><p class="l">Обрезки</p><p class="v" id="wasteV">—</p><p class="s" id="wasteS"></p></div>
+    <div class="m"><p class="l">Резов</p><p class="v" id="cutsV">—</p><p class="s" id="cutsS"></p></div>
   </div>
 
   <div class="card" id="listEmpty" data-tab="list" data-off>
@@ -1782,7 +1782,7 @@ var KEY = 'pipecalc.v1';
 var S = null;
 
 function $(id){ return document.getElementById(id); }
-function fmt(x){ return Math.round(x * 10) / 10; }
+function fmt(x){ return String(Math.round(x * 10) / 10).replace('.', ','); }
 function plural(n, a, b, c){
   var m10 = n % 10, m100 = n % 100;
   if (m10 === 1 && m100 !== 11) return a;
@@ -1884,22 +1884,13 @@ function calc(){
 
   S = {L:L, p:p, q:q, q0:q0, bad:bad, sig:jobSig, h:have, k:kerf, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, cuts:cuts};
 
-  if (rem > 0 && full === 0) {
-    $('hsMain').textContent = '1 труба × ' + rem + ' шт';
-    $('hs').textContent = '';
-  } else if (rem > 0) {
-    $('hsMain').textContent = full + ' ' + plural(full, 'труба', 'трубы', 'труб') + ' × ' + per + ' шт';
-    $('hs').textContent = '1 труба × ' + rem + ' шт';
-  } else {
-    $('hsMain').textContent = n + ' ' + plural(n, 'труба', 'трубы', 'труб') + ' × ' + per + ' шт';
-    $('hs').textContent = '';
-  }
-  if (have > 0) $('hs').textContent = ($('hs').textContent ? $('hs').textContent + ' · ' : '') + 'уже есть ' + have + ' шт';
-  if (bad > 0) $('hs').textContent = ($('hs').textContent ? $('hs').textContent + ' · ' : '') + 'брак ' + bad + ' шт';
-  $('pipesV').textContent = n;
-  $('pipesS').textContent = bn + ' ' + plural(bn, 'пачка', 'пачки', 'пачек') + ' (' + (bn > 1 ? 'по ' : '') + b + ')' + (bn * b - n > 0 ? ', останется ' + (bn * b - n) : '');
+  var hero = heroTexts(n, full, rem, per, have, bad);
+  $('hsMain').textContent = hero.main;
+  $('hs').textContent = hero.sub;
+  $('pipesV').textContent = bn;
+  $('pipesS').textContent = 'в пачке ' + b + (bn * b - n > 0 ? ', останется ' + (bn * b - n) : '');
   $('per').textContent = per;
-  $('perS').textContent = 'обрезок ' + num(fmt(wFull)) + ' мм';
+  $('perS').textContent = 'обрезок ' + fmt(wFull) + ' мм';
   $('wasteV').textContent = num(Math.round(waste / (n * L) * 1000) / 10) + '%';
   $('wasteS').textContent = num(Math.round(waste / 100) / 10) + ' м';
   $('cutsV').textContent = cuts;
@@ -1908,11 +1899,11 @@ function calc(){
   $('bar1').style.display = full > 0 ? '' : 'none';
   $('c1').style.display = full > 0 ? '' : 'none';
   if (full > 0) draw($('bar1'), per, p, L, wFull);
-  $('c1').textContent = 'Целая труба ×' + full + ': ' + per + ' × ' + p + ' мм, обрезок ' + fmt(wFull) + ' мм' + (kerf > 0 ? ', пропил ' + num(kerf) + ' мм' : '');
+  $('c1').textContent = 'Целая труба ×' + full + ': ' + per + ' × ' + num(p) + ' мм, обрезок ' + fmt(wFull) + ' мм' + (kerf > 0 ? ', пропил ' + num(kerf) + ' мм' : '');
   if (rem > 0){
     $('bar2').style.display = '';
     draw($('bar2'), rem, p, L, wLast);
-    $('c2').textContent = 'Последняя труба: ' + rem + ' × ' + p + ' мм, остаток ' + fmt(wLast) + ' мм в запас';
+    $('c2').textContent = 'Последняя труба: ' + rem + ' × ' + num(p) + ' мм, остаток ' + fmt(wLast) + ' мм в запас';
   } else {
     $('bar2').style.display = 'none';
     $('c2').textContent = 'Все трубы режутся одинаково';
@@ -2138,6 +2129,24 @@ function leftBreakdown(groups){
     return r === S.per ? n + ' ' + plural(n, 'целая', 'целых', 'целых')
                        : n + ' на ' + r + ' ' + pieceWord(r, 'на');
   }).join(' + ') + ')';
+}
+
+// Верхний итог на «Расчёте»: «44 трубы × 9 заготовок» / «1 труба × 4 заготовки · всего 45 труб»
+function heroTexts(n, full, rem, per, have, bad){
+  function pipes(k){ return k + ' ' + plural(k, 'труба', 'трубы', 'труб'); }
+  function pieces(k){ return k + ' ' + plural(k, 'заготовка', 'заготовки', 'заготовок'); }
+  var main, sub = '';
+  if (rem > 0 && full === 0) {
+    main = '1 труба × ' + pieces(rem);
+  } else if (rem > 0) {
+    main = pipes(full) + ' × ' + pieces(per);
+    sub = '1 труба × ' + pieces(rem) + ' · всего ' + pipes(n);
+  } else {
+    main = pipes(n) + ' × ' + pieces(per);
+  }
+  if (have > 0) sub += (sub ? ' · ' : '') + 'уже есть ' + pieces(have);
+  if (bad > 0) sub += (sub ? ' · ' : '') + 'брак ' + pieces(bad);
+  return {main: main, sub: sub};
 }
 
 function renderList(){
@@ -2515,10 +2524,10 @@ function summaryText(){
   lines.push('Раскрой труб');
   lines.push('────────────');
   lines.push('Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм');
-  lines.push('Нужно труб: ' + S.n + ' шт (' + S.bn + ' ' + plural(S.bn, 'пачка', 'пачки', 'пачек') + ')');
-  lines.push('Заготовок: ' + S.q + ' шт по ' + S.p + ' мм');
-  lines.push('Из целой трубы: ' + S.per + ' шт, обрезок ' + fmt(S.wFull) + ' мм');
-  if (S.rem > 0) lines.push('Последняя труба: ' + S.rem + ' шт, остаток ' + fmt(S.wLast) + ' мм');
+  lines.push('Нужно труб: ' + S.n + ' (' + S.bn + ' ' + plural(S.bn, 'пачка', 'пачки', 'пачек') + ')');
+  lines.push('Заготовок: ' + S.q + ' по ' + num(S.p) + ' мм');
+  lines.push('Из целой трубы: ' + S.per + ' ' + plural(S.per, 'заготовка', 'заготовки', 'заготовок') + ', обрезок ' + fmt(S.wFull) + ' мм');
+  if (S.rem > 0) lines.push('Последняя труба: ' + S.rem + ' ' + plural(S.rem, 'заготовка', 'заготовки', 'заготовок') + ', остаток ' + fmt(S.wLast) + ' мм');
   return lines.join('\n');
 }
 
@@ -2558,7 +2567,7 @@ function archiveLine(item){
   var wall = item.t > 0 ? num(item.t) : '—';
   var bad = item.bad > 0 ? item.bad : 0;
   var good = item.q - bad;
-  return dia + '/' + wall + ' ×' + item.p + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (bad > 0 ? ', брак ' + bad : '');
+  return dia + '/' + wall + ' ×' + num(item.p) + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (bad > 0 ? ', брак ' + bad : '');
 }
 
 function todayArchives(){
@@ -2803,7 +2812,7 @@ function remainText(){
     cd += c;
     if (c < pc){ var r = pc - c; groups[r] = (groups[r] || 0) + 1; any = true; }
   }
-  var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + '×' + S.p;
+  var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + '×' + num(S.p);
   if (!any) return 'Всё нарезано\n' + head + ' - ' + S.q + ' шт';
   var parts = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; }).map(function(r){
     var n = groups[r], whole = r === S.per;   // целая труба: ещё ничего не отрезано
@@ -2840,9 +2849,11 @@ function schemeCanvas(){
   if (S.rem > 0) blocks.push({title: full > 0 ? 'Последняя труба' : 'Труба', cuts: S.rem, off: S.wLast, word: 'остаток'});
 
   var big = $('hsMain').textContent, sub = $('hs').textContent;
+  var bsz = Number($('b').value) || 1, spare = S.bn * bsz - S.n;
   var head = [
     'Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм',
-    'Заготовка ' + S.p + ' мм × ' + S.q + ' шт' + (S.k > 0 ? ', пропил ' + num(S.k) + ' мм' : '')
+    S.q + ' ' + plural(S.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(S.p) + ' мм' + (S.k > 0 ? ', пропил ' + num(S.k) + ' мм' : ''),
+    'Пачек: ' + S.bn + ', в пачке ' + bsz + (spare > 0 ? ', останется ' + spare : '')
   ];
   var yBig = P + 60, ySub = yBig + (sub ? 56 : 0), yHead = ySub + 62;
   var y0 = yHead + (head.length - 1) * 48 + 48, BLK = 250, H = y0 + blocks.length * BLK + 96;
@@ -2853,10 +2864,15 @@ function schemeCanvas(){
   c.fillStyle = '#ffffff'; c.fillRect(0, 0, W, H);
   c.textBaseline = 'alphabetic'; c.textAlign = 'left';
 
-  c.fillStyle = '#000000'; c.font = '700 64px ' + FONT;
+  function fitFont(txt, weight, size){
+    var f = size;
+    c.font = weight + ' ' + f + 'px ' + FONT;
+    while (f > 22 && c.measureText(txt).width > BW){ f -= 2; c.font = weight + ' ' + f + 'px ' + FONT; }
+  }
+  c.fillStyle = '#000000'; fitFont(big, 700, 64);
   c.fillText(big, P, yBig);
   if (sub){
-    c.fillStyle = '#4a4a4f'; c.font = '600 40px ' + FONT;
+    c.fillStyle = '#4a4a4f'; fitFont(sub, 600, 40);
     c.fillText(sub, P, ySub);
   }
   c.fillStyle = '#4a4a4f'; c.font = '500 34px ' + FONT;
@@ -2874,12 +2890,12 @@ function schemeCanvas(){
     c.fillStyle = '#ffffff'; c.fillRect(P, by, BW, BH);
     c.textAlign = 'center'; c.textBaseline = 'middle';
     c.font = '700 32px ' + FONT;
-    var showNum = c.measureText(String(S.p)).width + 16 < pw;
+    var showNum = c.measureText(num(S.p)).width + 16 < pw;
     for (var i = 0; i < bk.cuts; i++){
       var x = P + i * pw;
       c.fillStyle = '#d6e8ff'; c.fillRect(x, by, pw, BH);
       if (pw > 6){ c.fillStyle = '#ffffff'; c.fillRect(x + pw - 3, by, 3, BH); }
-      if (showNum){ c.fillStyle = '#0051c7'; c.fillText(String(S.p), x + pw / 2, by + BH / 2 + 1); }
+      if (showNum){ c.fillStyle = '#0051c7'; c.fillText(num(S.p), x + pw / 2, by + BH / 2 + 1); }
     }
     var rest = Math.max(S.L - bk.cuts * S.p, 0);
     if (rest > 0){
@@ -2896,7 +2912,7 @@ function schemeCanvas(){
 
     c.textAlign = 'left'; c.textBaseline = 'alphabetic';
     c.fillStyle = '#4a4a4f'; c.font = '500 32px ' + FONT;
-    c.fillText(bk.cuts + ' × ' + S.p + ' мм, ' + bk.word + ' ' + fmt(bk.off) + ' мм', P, by + BH + 46);
+    c.fillText(bk.cuts + ' × ' + num(S.p) + ' мм, ' + bk.word + ' ' + fmt(bk.off) + ' мм', P, by + BH + 46);
   });
 
   // легенда и дата
@@ -2916,7 +2932,7 @@ function schemeFileName(){
   var d = +$('d').value || 0, t = +$('t').value || 0;
   return formatShareDate(Date.now()) +
     (d > 0 ? ' · Ø' + num(d) + (t > 0 ? '×' + num(t) : '') : '') +
-    ' · ' + S.p + ' мм - ' + (+$('q').value || S.q) + '.png';
+    ' · ' + num(S.p) + ' мм - ' + (+$('q').value || S.q) + '.png';
 }
 
 function dataUrlToBlob(u){
