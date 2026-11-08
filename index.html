@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.20">
+<meta name="app-build" content="2026-11-08.21">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -162,7 +162,7 @@ body::before {
   background: var(--soft);
 }
 
-.theme-chip {
+.theme-chip, .opt-chip {
   flex: 1;
   height: 34px;
   border: 0;
@@ -176,7 +176,7 @@ body::before {
   touch-action: manipulation;
 }
 
-.theme-chip.on {
+.theme-chip.on, .opt-chip.on {
   background: var(--done-bg);
   color: var(--done-fg);
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
@@ -1713,8 +1713,43 @@ label {
         </div>
         <button type="button" class="chip on" id="guardBtn" aria-pressed="true">Вкл</button>
       </div>
+      <div class="set-sw">
+        <div>
+          <p class="set-l">Крупный чек-лист</p>
+          <p class="set-d">Плитки и цифры крупнее</p>
+        </div>
+        <button type="button" class="chip" id="bigSetBtn" aria-pressed="false">Выкл</button>
+      </div>
+      <div>
+        <p class="set-l">Напоминание о копии</p>
+        <div class="theme-row" id="bkRow" style="margin-bottom:6px">
+          <button type="button" class="opt-chip on" data-bk="week">Суббота</button>
+          <button type="button" class="opt-chip" data-bk="month">Месяц</button>
+          <button type="button" class="opt-chip" data-bk="off">Выкл</button>
+        </div>
+        <p class="set-d" id="bkDesc"></p>
+      </div>
+      <div>
+        <p class="set-l">Хранить в истории</p>
+        <div class="theme-row" id="histRow" style="margin-bottom:6px">
+          <button type="button" class="opt-chip on" data-hist="30">30</button>
+          <button type="button" class="opt-chip" data-hist="100">100</button>
+          <button type="button" class="opt-chip" data-hist="0">Без лимита</button>
+        </div>
+        <p class="set-d" id="histDesc"></p>
+      </div>
+      <div class="set-sw">
+        <div>
+          <p class="set-l">Обновление</p>
+          <p class="set-d" id="verTxt"></p>
+        </div>
+        <button type="button" class="chip" id="updChkBtn">Проверить</button>
+      </div>
+      <div>
+        <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--warn-fg)">Очистить все данные</button>
+        <p class="set-d" style="margin-top:6px">Поля расчёта, отметки в чек-листе и история. Настройки останутся.</p>
+      </div>
     </div>
-    <p class="set-d" id="verTxt" style="margin-top:16px"></p>
   </div>
 </div>
 
@@ -1995,7 +2030,7 @@ try{
 }catch(e){}
 var curSig = null, cnt = {}, hist = [], nextIdx = -1, legacyDone = false;
 var TABS = ['calc','list','hist','set'];
-var ui = {big:false, fb:true, wake:true, guard:true, theme:'auto', foldDia:false, tab:'calc'};
+var ui = {big:false, fb:true, wake:true, guard:true, theme:'auto', foldDia:false, tab:'calc', bk:'week', histMax:30};
 var leftTxt = '', hintTimer = null;
 try{
   var u = JSON.parse(localStorage.getItem(UI_KEY));
@@ -2003,6 +2038,8 @@ try{
     ui.big = !!u.big; ui.fb = u.fb !== false; ui.wake = u.wake !== false; ui.guard = u.guard !== false;
     if (u.theme === 'light' || u.theme === 'dark' || u.theme === 'auto') ui.theme = u.theme;
     ui.foldDia = !!u.foldDia;
+    if (u.bk === 'month' || u.bk === 'off') ui.bk = u.bk;
+    if ([30, 100, 0].indexOf(Number(u.histMax)) >= 0 && u.histMax !== null && u.histMax !== '') ui.histMax = Number(u.histMax);
     if (TABS.indexOf(u.tab) >= 0) ui.tab = u.tab;
   }
 }catch(e){}
@@ -2038,6 +2075,22 @@ function applyFold(){
   else body.setAttribute('hidden', '');
 }
 
+function histMax(){ return ui.histMax > 0 ? ui.histMax : Infinity; }
+
+function applyOpts(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-bk]'), function(b){
+    b.className = 'opt-chip' + (b.getAttribute('data-bk') === ui.bk ? ' on' : '');
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-hist]'), function(b){
+    b.className = 'opt-chip' + (Number(b.getAttribute('data-hist')) === ui.histMax ? ' on' : '');
+  });
+  var d = $('bkDesc');
+  if (d) d.textContent = ui.bk === 'week' ? 'По субботам, если копии ещё не было'
+    : ui.bk === 'month' ? 'В начале месяца, если копии ещё не было' : 'Баннер не показывается';
+  var h = $('histDesc');
+  if (h) h.textContent = 'Сейчас сохранено: ' + (archives || []).length;
+}
+
 function applyUI(){
   $('listCard').className = 'card' + (ui.big ? ' big' : '');
   $('bigBtn').className = 'chip' + (ui.big ? ' on' : '');
@@ -2052,6 +2105,10 @@ function applyUI(){
   $('guardBtn').className = 'chip' + (ui.guard ? ' on' : '');
   $('guardBtn').setAttribute('aria-pressed', ui.guard ? 'true' : 'false');
   $('guardBtn').textContent = ui.guard ? 'Вкл' : 'Выкл';
+  $('bigSetBtn').className = 'chip' + (ui.big ? ' on' : '');
+  $('bigSetBtn').setAttribute('aria-pressed', ui.big ? 'true' : 'false');
+  $('bigSetBtn').textContent = ui.big ? 'Вкл' : 'Выкл';
+  applyOpts();
   applyTheme();
   applyFold();
   syncTabs();
@@ -3040,8 +3097,17 @@ function bkHasData(){
   return archives.length > 0 || Object.keys(doneAll).length > 0;
 }
 
+function monthStart(ts){
+  var d = new Date(ts);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(1);
+  return d.getTime();
+}
+
 function bkDue(){
-  return bkHasData() && Math.max(bk.last, bk.since) < lastSaturday(Date.now());
+  if (ui.bk === 'off' || !bkHasData()) return false;
+  var ref = Math.max(bk.last, bk.since);
+  return ref < (ui.bk === 'month' ? monthStart(Date.now()) : lastSaturday(Date.now()));
 }
 
 function renderBk(){
@@ -3050,13 +3116,13 @@ function renderBk(){
   var show = bkDue() && bk.snooze !== dayKey(Date.now());
   el.hidden = !show;
   if (!show) return;
-  var t;
+  var t, pre = ui.bk === 'month' ? 'Ежемесячная копия' : 'Субботняя копия';
   if (bk.last) {
     var days = Math.floor((Date.now() - bk.last) / 86400000);
-    t = 'Субботняя копия: пора сохранить данные. Последняя — ' +
+    t = pre + ': пора сохранить данные. Последняя — ' +
         (days < 1 ? 'меньше суток назад' : days + ' ' + plural(days, 'день', 'дня', 'дней') + ' назад') + '.';
   } else {
-    t = 'Субботняя копия: пора сохранить данные. Копий ещё не было.';
+    t = pre + ': пора сохранить данные. Копий ещё не было.';
   }
   $('bkText').textContent = t;
 }
@@ -3067,7 +3133,8 @@ function markBackup(){
   saveBk();
   renderBk();
   var d = new Date();
-  setStorageStatus('Копия сохранена ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + '. Следующее напоминание — в субботу.', false);
+  setStorageStatus('Копия сохранена ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + '.' +
+    (ui.bk === 'week' ? ' Следующее напоминание — в субботу.' : ui.bk === 'month' ? ' Следующее напоминание — в начале месяца.' : ''), false);
 }
 
 function readJSON(key){
@@ -3149,7 +3216,7 @@ function cleanArchives(list){
       n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
       rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0
     };
-  }).sort(function(a,b){ return b.ts-a.ts; }).slice(0,30);
+  }).sort(function(a,b){ return b.ts-a.ts; }).slice(0, histMax());
 }
 
 function importHistoryFile(file){
@@ -3226,6 +3293,7 @@ function formatTime(ts){
 }
 
 function renderHist(){
+  applyOpts();
   try { renderBk(); } catch(e){}
   var list = $('histList');
   var clearBtn = $('histClearBtn');
@@ -3314,7 +3382,7 @@ function addToHist(){
   } else {
     archives.unshift(entry);
   }
-  if (archives.length > 30) archives = archives.slice(0, 30);
+  if (archives.length > histMax()) archives = archives.slice(0, histMax());
   saveArchives();
   renderHist();
   if (b2) {
@@ -3366,7 +3434,7 @@ function doUndo(){
   if (!undoPending) return;
   var back = undoPending.list.map(function(r){ return r.item; });
   hideUndo();
-  archives = archives.concat(back).sort(function(a, b){ return b.ts - a.ts; }).slice(0, 30);
+  archives = archives.concat(back).sort(function(a, b){ return b.ts - a.ts; }).slice(0, histMax());
   saveArchives();
   renderHist();
   feedback(false);
@@ -3484,6 +3552,68 @@ function checkVersion(force){
     navigator.serviceWorker.getRegistration().then(function(reg){ if (reg) reg.update(); });
   } catch(e){}
 }
+function setVerStatus(txt){
+  var meta = document.querySelector('meta[name="app-build"]');
+  $('verTxt').textContent = 'Версия ' + (meta ? meta.getAttribute('content') : '?') + (txt ? ' · ' + txt : '');
+}
+$('updChkBtn').addEventListener('click', function(){
+  var btn = $('updChkBtn');
+  var meta = document.querySelector('meta[name="app-build"]');
+  var mine = meta ? meta.getAttribute('content') : null;
+  if (verShown) { $('updBanner').hidden = false; setVerStatus('доступна новая'); return; }
+  if (!/^https?:$/.test(location.protocol) || !window.fetch || !mine) { setVerStatus('проверка работает только на сайте'); return; }
+  if (navigator.onLine === false) { setVerStatus('нет сети'); return; }
+  btn.textContent = '…';
+  fetch('index.html?chk=' + Date.now(), {cache: 'no-store'}).then(function(r){
+    return r.ok ? r.text() : Promise.reject();
+  }).then(function(t){
+    var theirs = buildOf(t);
+    if (theirs && theirs !== mine) {
+      verShown = true;
+      $('updBanner').hidden = false;
+      setVerStatus('доступна новая');
+    } else {
+      setVerStatus('последняя версия');
+    }
+  }).catch(function(){
+    setVerStatus('не удалось проверить');
+  }).then(function(){ btn.textContent = 'Проверить'; });
+  try {
+    navigator.serviceWorker.getRegistration().then(function(reg){ if (reg) reg.update(); });
+  } catch(e){}
+});
+
+$('bigSetBtn').addEventListener('click', function(){ ui.big = !ui.big; saveUI(); applyUI(); });
+
+Array.prototype.forEach.call(document.querySelectorAll('[data-bk]'), function(b){
+  b.addEventListener('click', function(){
+    ui.bk = b.getAttribute('data-bk');
+    saveUI(); applyOpts(); renderBk();
+  });
+});
+
+Array.prototype.forEach.call(document.querySelectorAll('[data-hist]'), function(b){
+  b.addEventListener('click', function(){
+    var v = Number(b.getAttribute('data-hist'));
+    var lim = v > 0 ? v : Infinity;
+    if (archives.length > lim &&
+        !confirm('В истории ' + archives.length + ' ' + plural(archives.length, 'раскрой', 'раскроя', 'раскроев') +
+                 '. Останутся только последние ' + v + '. Продолжить?')) return;
+    ui.histMax = v;
+    saveUI();
+    if (archives.length > lim) { archives = archives.slice(0, v); saveArchives(); renderHist(); }
+    applyOpts();
+  });
+});
+
+$('wipeBtn').addEventListener('click', function(){
+  if (!confirm('Очистить все данные?\n\nБудут удалены поля расчёта, отметки в чек-листе и вся история. Настройки останутся. Это нельзя отменить.')) return;
+  try {
+    [KEY, DONE_KEY, OLD_DONE_KEY, ARCH_KEY].forEach(function(k){ localStorage.removeItem(k); });
+  } catch(e){}
+  location.reload();
+});
+
 $('updDo').addEventListener('click', function(){
   try { save(); saveDone(); } catch(e){}
   location.reload();
