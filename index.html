@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-08.26">
+<meta name="app-build" content="2026-11-09.27">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1276,6 +1276,25 @@ label {
   color: var(--warn-fg);
 }
 
+.badctl.has-x .badv b {
+  display: inline-block;
+  min-width: 26px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--acc-bg);
+  color: var(--acc-fg);
+}
+
+button.badv {
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
 #undoBtn {
   color: var(--text);
 }
@@ -1797,6 +1816,12 @@ label {
         </div>
       </div>
       <p class="nowB" id="badNote"></p>
+      <div class="badctl" id="xCtl" role="group" aria-label="Из остатков, сверх задания" style="margin-top:10px">
+        <button type="button" class="badb" id="xMinus" aria-label="Из остатков меньше">−</button>
+        <button type="button" class="badv" id="xMid" aria-label="Ввести число из остатков">Из остатков <b id="xVal">0</b></button>
+        <button type="button" class="badb" id="xBtn" aria-label="Из остатков больше">+</button>
+      </div>
+      <p class="nowB" id="xNote"></p>
     </div>
 
     <div class="tiles" id="tiles"></div>
@@ -2035,6 +2060,7 @@ function calc(){
   var q0 = q;      // план без учёта брака
   var jobSig = [q0, p, L, +$('d').value || 0, +$('t').value || 0, kerf].join('|');
   var bad = getBad(jobSig);
+  var extra = getExtra(jobSig);   // сверх задания, из остатков: трубы и пачки не меняет
   q = q0 + bad;    // плюс заготовки взамен брака
   if (p > L){
     $('err').textContent = 'Заготовка длиннее трубы';
@@ -2061,7 +2087,7 @@ function calc(){
   var waste = n * L - q * p;
   var cuts  = full * iFull.cuts + iLast.cuts;
 
-  S = {L:L, p:p, q:q, q0:q0, bad:bad, sig:jobSig, h:have, k:kerf, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, cuts:cuts};
+  S = {L:L, p:p, q:q, q0:q0, bad:bad, x:extra, sig:jobSig, h:have, k:kerf, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, cuts:cuts};
 
   var hero = heroTexts(n, full, rem, per, have, bad);
   $('hsMain').textContent = hero.main;
@@ -2302,6 +2328,17 @@ function getBad(sig){
   return (r && !(r instanceof Array) && r.bad > 0) ? r.bad : 0;
 }
 
+function getExtra(sig){
+  var r = doneAll[sig];
+  return (r && !(r instanceof Array) && r.x > 0) ? r.x : 0;
+}
+
+function putExtra(sig, v){
+  var r = doneAll[sig];
+  if (!r || r instanceof Array){ r = {c: {}, h: []}; doneAll[sig] = r; }
+  r.x = v;
+}
+
 function putBad(sig, v){
   var r = doneAll[sig];
   if (!r || r instanceof Array){ r = {c: {}, h: []}; doneAll[sig] = r; }
@@ -2311,8 +2348,9 @@ function putBad(sig, v){
 function saveDone(){
   if (!curSig) return;
   var bad = getBad(curSig);
+  var xtra = getExtra(curSig);
   delete doneAll[curSig];
-  doneAll[curSig] = {c: cnt, h: hist, bad: bad};
+  doneAll[curSig] = {c: cnt, h: hist, bad: bad, x: xtra};
   var keys = Object.keys(doneAll);
   while (keys.length > 20){ delete doneAll[keys.shift()]; }
   try{ localStorage.setItem(DONE_KEY, JSON.stringify(doneAll)); }catch(e){}
@@ -2380,9 +2418,11 @@ function renderList(){
 
   var pl = S.n - pd, cl = S.q - cd;
   var badTxt = S.bad > 0 ? 'Брак: ' + S.bad : '';
-  leftTxt = all ? badTxt :
+  var xTxt = S.x > 0 ? 'Из остатков: ' + S.x : '';
+  var tailTxt = [badTxt, xTxt].filter(Boolean).join(' · ');
+  leftTxt = all ? tailTxt :
     'Осталось: ' + pl + ' ' + plural(pl, 'труба', 'трубы', 'труб') + ', ' +
-    cl + ' ' + plural(cl, 'заготовка', 'заготовки', 'заготовок') + (badTxt ? ' · ' + badTxt : '');
+    cl + ' ' + plural(cl, 'заготовка', 'заготовки', 'заготовок') + (tailTxt ? ' · ' + tailTxt : '');
   $('left').textContent = leftTxt;
   $('left').style.color = '';
   $('left2').textContent = all ? '' : leftBreakdown(lg);
@@ -2417,6 +2457,13 @@ function renderList(){
   $('badNote').textContent = S.bad > 0
     ? 'Брак ' + S.bad + ' · заказ увеличен на ' + S.bad
     : 'Испортили заготовку? Нажмите «+»';
+
+  $('xVal').textContent = S.x;
+  $('xCtl').classList.toggle('has-x', S.x > 0);
+  $('xMinus').disabled = !(S.x > 0);
+  $('xNote').textContent = S.x > 0
+    ? 'Сверх задания · всего ' + (S.q0 + S.x) + ' шт'
+    : 'Нарезали из остатков сверх задания? «+» или нажмите на число';
 
   $('undoBtn').style.opacity = hist.length ? '1' : '0.45';
   var f = +$('rFrom').value, t = +$('rTo').value;
@@ -2555,6 +2602,11 @@ $('undoBtn').addEventListener('click', function(){
   var g = hist.pop();
   var badChanged = false;
   g.forEach(function(pair){
+    if (pair[0] === -2){   // запись «из остатков»: [-2, на сколько увеличили]
+      putExtra(curSig, Math.max(getExtra(curSig) - pair[1], 0));
+      badChanged = true;
+      return;
+    }
     if (pair[0] === -1){   // запись о браке: [-1, на сколько увеличили]
       putBad(curSig, Math.max(getBad(curSig) - pair[1], 0));
       badChanged = true;
@@ -2585,6 +2637,37 @@ $('badMinus').addEventListener('click', function(){
   saveDone();
   update();
   feedback(false);
+});
+
+function changeExtra(v, feedbackStrong){
+  var cur = getExtra(curSig);
+  if (v === cur) return;
+  putExtra(curSig, v);
+  hist.push([[-2, v - cur]]);
+  if (hist.length > 50) hist.shift();
+  saveDone();
+  update();
+  feedback(!!feedbackStrong);
+}
+
+$('xBtn').addEventListener('click', function(){
+  if (!S || !curSig) return;
+  changeExtra(getExtra(curSig) + 1, false);
+});
+
+$('xMinus').addEventListener('click', function(){
+  if (!S || !curSig || getExtra(curSig) < 1) return;
+  changeExtra(getExtra(curSig) - 1, false);
+});
+
+$('xMid').addEventListener('click', function(){
+  if (!S || !curSig) return;
+  var cur = getExtra(curSig);
+  var v = prompt('Сколько заготовок нарезано из остатков сверх задания?', cur || '');
+  if (v === null) return;
+  v = Math.floor(Number(String(v).replace(',', '.')));
+  if (!(v >= 0) || v > 100000) return;
+  changeExtra(v, true);
 });
 
 var rangeTimer = null;
@@ -2645,6 +2728,7 @@ $('resetDone').addEventListener('click', function(){
     cnt = {};
     hist = [];
     putBad(curSig, 0);
+    putExtra(curSig, 0);
     saveDone();
     update();
     resetArm(false);
@@ -2777,6 +2861,7 @@ function summaryText(){
   lines.push('Заготовок: ' + S.q + ' по ' + num(S.p) + ' мм');
   lines.push('Из целой трубы: ' + S.per + ' ' + plural(S.per, 'заготовка', 'заготовки', 'заготовок') + ', обрезок ' + fmt(S.wFull) + ' мм');
   if (S.rem > 0) lines.push('Последняя труба: ' + S.rem + ' ' + plural(S.rem, 'заготовка', 'заготовки', 'заготовок') + ', остаток ' + fmt(S.wLast) + ' мм');
+  if (S.x > 0) lines.push('Из остатков сверх задания: ' + S.x + ' шт (всего ' + (S.q0 + S.x) + ')');
   return lines.join('\n');
 }
 
@@ -2816,7 +2901,8 @@ function archiveLine(item){
   var wall = item.t > 0 ? num(item.t) : '—';
   var bad = item.bad > 0 ? item.bad : 0;
   var good = item.q - bad;
-  return dia + '/' + wall + ' ×' + num(item.p) + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (bad > 0 ? ', брак ' + bad : '');
+  var xs = item.x > 0 ? item.x : 0;
+  return dia + '/' + wall + ' ×' + num(item.p) + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (xs > 0 ? ' + ' + xs + ' из остатков = ' + (good + xs) : '') + (bad > 0 ? ', брак ' + bad : '');
 }
 
 function todayArchives(){
@@ -3062,7 +3148,7 @@ function remainText(){
     if (c < pc){ var r = pc - c; groups[r] = (groups[r] || 0) + 1; any = true; }
   }
   var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + '×' + num(S.p);
-  if (!any) return 'Всё нарезано\n' + head + ' - ' + S.q + ' шт';
+  if (!any) return 'Всё нарезано\n' + head + ' - ' + S.q + ' шт' + (S.x > 0 ? ' + ' + S.x + ' из остатков = ' + (S.q + S.x) : '');
   var parts = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; }).map(function(r){
     var n = groups[r], whole = r === S.per;   // целая труба: ещё ничего не отрезано
     var pipe = (whole ? plural(n, 'целая', 'целых', 'целых') + ' ' : '') + plural(n, 'труба', 'трубы', 'труб');
@@ -3415,7 +3501,7 @@ function cleanArchives(list, limit){
   }).map(function(item){
     return {
       ts:Number(item.ts), q:Number(item.q), p:Number(item.p), L:Number(item.L) || 0,
-      b:Number(item.b) || 1, k:Number(item.k) || 0, h:Number(item.h) || 0, bad:Number(item.bad) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0,
+      b:Number(item.b) || 1, k:Number(item.k) || 0, h:Number(item.h) || 0, bad:Number(item.bad) || 0, x:Number(item.x) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0,
       n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
       rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0
     };
@@ -3575,6 +3661,7 @@ function addToHist(){
     k: Number(S.k) || 0,
     h: Number(S.h) || 0,
     bad: Number(S.bad) || 0,
+    x: Number(S.x) || 0,
     b: Number($('b').value) || 1,
     d: Number($('d').value) || 0,
     t: Number($('t').value) || 0,
@@ -3615,6 +3702,7 @@ function restoreHist(idx){
   $('d').value = item.d;
   $('t').value = item.t;
   update();
+  if (S && curSig && item.x > 0 && !getExtra(curSig)){ putExtra(curSig, item.x); saveDone(); update(); }
   feedback(false);
   ui.tab = 'calc';
   saveUI();
