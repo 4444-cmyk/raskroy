@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-09.27">
+<meta name="app-build" content="2026-11-13.2">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1602,9 +1602,26 @@ button.badv {
 .set-l{margin:0 0 6px;font-size:15px;font-weight:600}
 .set-sw{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .set-sw .set-l{margin:0}
-.set-d{margin:2px 0 0;font-size:12px;line-height:1.35;color:var(--text2)}
+.set-d{margin:2px 0 0;font-size:12px;line-height:1.35;color:var(--text2);overflow-wrap:anywhere;word-break:break-word}
 .set-sw .chip{min-width:76px;height:36px;background:var(--soft);flex:none}
 .set-sw .chip.on{background:var(--done-bg)}
+.set-body > div{min-width:0;max-width:100%}
+.shop-row{display:flex;gap:8px;margin-top:10px;align-items:stretch;min-width:0}
+.shop-input{
+  flex:1;min-width:0;width:0;height:48px;border:0;border-radius:24px;
+  background:var(--soft);color:var(--text);font-size:16px;font-weight:600;
+  font-family:inherit;text-align:center;letter-spacing:0.08em;padding:0 10px;
+  -webkit-appearance:none;appearance:none;
+}
+.shop-btn{flex:none;height:48px;padding:0 14px;width:auto;max-width:42%}
+.shop-field{
+  display:block;width:100%;max-width:100%;height:44px;border:0;border-radius:12px;
+  background:var(--soft);color:var(--text);font-size:16px;font-family:inherit;
+  padding:0 12px;margin:0 0 8px;box-sizing:border-box;
+  -webkit-appearance:none;appearance:none;
+}
+#shopCfgBox{margin-top:12px;min-width:0;max-width:100%;overflow:hidden}
+#setCard{overflow-x:hidden}
 
 /* ── Tab bar ── */
 [data-off]{display:none !important}
@@ -1617,7 +1634,29 @@ button.badv {
   backdrop-filter:blur(24px) saturate(1.6);
   border-top:1px solid var(--line);
 }
-.tabbar-in{display:grid;grid-template-columns:repeat(4,1fr);width:100%;max-width:480px}
+.tabbar-in{display:grid;grid-template-columns:repeat(5,1fr);width:100%;max-width:480px}
+.bend-job{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 0;border-bottom:0.5px solid var(--line);
+  cursor:pointer;touch-action:manipulation;text-align:left;width:100%;
+  background:transparent;border-left:0;border-right:0;border-top:0;
+  color:var(--text);font-family:inherit;
+}
+.bend-job:last-child{border-bottom:0}
+.bend-job:active{opacity:.7}
+.bend-job.on{background:var(--soft);margin:0 -12px;padding-left:12px;padding-right:12px;border-radius:16px;border-bottom-color:transparent}
+.bend-job .bj-title{font-size:15px;font-weight:600;margin:0;font-variant-numeric:tabular-nums}
+.bend-job .bj-sub{font-size:13px;color:var(--text2);margin:2px 0 0}
+.bend-job .bj-prog{flex:none;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--done-bg);min-width:64px;text-align:right}
+.bend-empty{font-size:14px;color:var(--muted);text-align:center;padding:24px 8px}
+.bend-cnt{font-size:56px;font-weight:700;letter-spacing:-.04em;line-height:1.05;margin:4px 0 0;text-align:center;font-variant-numeric:tabular-nums}
+.bend-cnt small{font-size:22px;font-weight:500;opacity:.55;margin-left:6px}
+.bend-sub{text-align:center;font-size:14px;color:var(--text2);margin:6px 0 16px;min-height:20px}
+.bend-row{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px}
+.bend-row .nbtn{height:64px;font-size:22px;font-weight:700}
+.bend-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.bend-row2 .nbtn{height:48px;font-size:15px}
+.bend-back{border:0;background:transparent;color:var(--done-bg);font:inherit;font-size:15px;font-weight:600;padding:0;margin:0 0 12px;cursor:pointer}
 .tab{
   position:relative;
   display:flex;flex-direction:column;align-items:center;gap:2px;
@@ -1807,8 +1846,11 @@ button.badv {
         <button type="button" class="nbtn" id="pieceBtn">+1 заготовка</button>
         <button type="button" class="nbtn main" id="nextBtn">Готово</button>
       </div>
-      <div class="nrow" style="margin-top:10px">
+      <div class="nrow" style="margin-top:10px" id="actRow2">
+        <button type="button" class="nbtn" id="plus10Btn">+10 труб</button>
         <button type="button" class="nbtn sec" id="undoBtn">Назад</button>
+      </div>
+      <div class="nrow" style="margin-top:10px">
         <div class="badctl" role="group" aria-label="Брак">
           <button type="button" class="badb" id="badMinus" aria-label="Брак меньше">−</button>
           <span class="badv">Брак <b id="badVal">0</b></span>
@@ -1839,6 +1881,30 @@ button.badv {
     <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:8px;height:50px">Сохранить раскрой</button>
   </div>
 
+  <div class="card" id="bendCard" data-tab="bend">
+    <div id="bendListWrap">
+      <h2>Гибка</h2>
+      <p class="cap" style="margin-top:-8px">Выберите раскрой из истории — и считайте согнутые</p>
+      <div id="bendList"></div>
+    </div>
+    <div id="bendWork" hidden>
+      <button type="button" class="bend-back" id="bendBack">‹ К списку</button>
+      <h2 id="bendTitle">—</h2>
+      <p class="cap" id="bendMeta" style="margin-top:-8px"></p>
+      <p class="bend-cnt"><span id="bendN">0</span><small id="bendOf">/ 0</small></p>
+      <p class="bend-sub" id="bendSub"></p>
+      <div class="bend-row">
+        <button type="button" class="nbtn" id="bendM1">−1</button>
+        <button type="button" class="nbtn main" id="bendP10">+10</button>
+        <button type="button" class="nbtn" id="bendP1">+1</button>
+      </div>
+      <div class="bend-row2">
+        <button type="button" class="nbtn sec" id="bendUndo">Назад</button>
+        <button type="button" class="nbtn sec" id="bendReset">Сброс</button>
+      </div>
+    </div>
+  </div>
+
   <div class="card" id="histCard" data-tab="hist">
     <h2>Сохранённые раскрои</h2>
     <div id="histList"></div>
@@ -1855,6 +1921,25 @@ button.badv {
   <div class="card set-card" id="setCard" data-tab="set">
     <h2>Настройки</h2>
     <div class="set-body">
+      <div>
+        <p class="set-l">Общий цех</p>
+        <p class="set-d" id="shopStatus">Выкл · данные только на этом телефоне</p>
+        <div class="shop-row">
+          <input class="shop-input" id="shopCode" type="text" inputmode="numeric" maxlength="6" placeholder="Код" aria-label="Код цеха" autocomplete="off">
+          <button type="button" class="nbtn main shop-btn" id="shopConnectBtn">Включить</button>
+        </div>
+        <p class="set-d" style="margin-top:10px">Одинаковый код на двух телефонах — общая история и гибка. Нужен интернет.</p>
+        <button type="button" class="nbtn sec" id="shopCfgBtn" style="width:100%;margin-top:10px;min-height:44px">Настроить облако</button>
+        <div id="shopCfgBox" hidden>
+          <p class="set-d" style="margin-bottom:8px">1) console.firebase.google.com — создать проект<br>
+          2) Realtime Database — создать (test mode)<br>
+          3) Project settings → Web — скопировать apiKey и databaseURL</p>
+          <input class="shop-field" id="fbApiKey" type="text" placeholder="apiKey" autocomplete="off" spellcheck="false">
+          <input class="shop-field" id="fbDbUrl" type="text" placeholder="databaseURL" autocomplete="off" spellcheck="false">
+          <input class="shop-field" id="fbProjectId" type="text" placeholder="projectId (необязательно)" autocomplete="off" spellcheck="false">
+          <button type="button" class="nbtn main" id="shopCfgSave" style="width:100%;height:48px">Сохранить ключи</button>
+        </div>
+      </div>
       <div>
         <p class="set-l">Тема</p>
         <div class="theme-row" id="themeRow">
@@ -1930,6 +2015,10 @@ button.badv {
     <button type="button" class="tab" data-go="list">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
       <span>Чек-лист</span>
+    </button>
+    <button type="button" class="tab" data-go="bend">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16c4-8 8-8 12 0"/><path d="M4 16h2M16 16h4"/><circle cx="7" cy="16" r="1.5"/><circle cx="17" cy="16" r="1.5"/></svg>
+      <span>Гибка</span>
     </button>
     <button type="button" class="tab" data-go="hist" id="tabHist">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -2199,7 +2288,7 @@ try{
   if (d2){ for (var kk in d2){ doneAll[kk] = d2[kk]; } }
 }catch(e){}
 var curSig = null, cnt = {}, hist = [], nextIdx = -1, legacyDone = false;
-var TABS = ['calc','list','hist','set'];
+var TABS = ['calc','list','bend','hist','set'];
 var ui = {big:false, fb:true, wake:true, guard:true, theme:'auto', foldDia:false, tab:'calc', bk:'week', histMax:30};
 var leftTxt = '', hintTimer = null;
 try{
@@ -2441,6 +2530,7 @@ function renderList(){
     $('nextBtn').textContent = 'Готово';
     $('pieceBtn').disabled = true;
     $('nextBtn').disabled = true;
+    $('plus10Btn').disabled = true;
   } else {
     var pcn = pcOf(nextIdx), cn = Math.min(cnt[nextIdx] || 0, pcn);
     var isLastPipe = S.rem > 0 && nextIdx === S.n - 1;
@@ -2449,6 +2539,7 @@ function renderList(){
     $('nextBtn').textContent = 'Готово №' + (nextIdx + 1);
     $('pieceBtn').disabled = false;
     $('nextBtn').disabled = false;
+    $('plus10Btn').disabled = false;
   }
 
   $('badVal').textContent = S.bad;
@@ -2595,6 +2686,20 @@ $('pieceBtn').addEventListener('click', function(){
 $('nextBtn').addEventListener('click', function(){
   if (!S || nextIdx < 0) return;
   apply([[nextIdx, pcOf(nextIdx)]]);
+});
+
+$('plus10Btn').addEventListener('click', function(){
+  if (!S || nextIdx < 0) return;
+  var ch = [], marked = 0;
+  for (var i = nextIdx; i < S.n && marked < 10; i++){
+    var pc = pcOf(i);
+    var c = Math.min(cnt[i] || 0, pc);
+    if (c < pc){
+      ch.push([i, pc]);
+      marked++;
+    }
+  }
+  if (ch.length) apply(ch);
 });
 
 $('undoBtn').addEventListener('click', function(){
@@ -3321,11 +3426,170 @@ try {
 function saveArchives(){
   try {
     localStorage.setItem(ARCH_KEY, JSON.stringify(archives));
+    try { renderBend(); } catch(e){}
+    try { shopPush(); } catch(e){}
     return true;
   } catch(e) {
     return false;
   }
 }
+
+/* ── Bend mode (гибка) ── */
+var BEND_KEY = 'pipecalc.bend.v1';
+var bendMap = {};
+var bendIdx = -1, bendCnt = 0, bendStack = [];
+try { bendMap = JSON.parse(localStorage.getItem(BEND_KEY)) || {}; } catch(e){ bendMap = {}; }
+
+function bendKeyOf(item){
+  return [item.ts, item.q, item.p, item.L, item.d || 0, item.t || 0].join('|');
+}
+
+function saveBendMap(){
+  try { localStorage.setItem(BEND_KEY, JSON.stringify(bendMap)); } catch(e){}
+  try { shopPush(); } catch(e){}
+}
+
+function getBendCnt(item){
+  var k = bendKeyOf(item);
+  var v = bendMap[k];
+  return (v && typeof v.n === 'number') ? v.n : 0;
+}
+
+function setBendCnt(item, n){
+  var k = bendKeyOf(item);
+  n = Math.max(0, Math.floor(n));
+  if (n <= 0) delete bendMap[k];
+  else bendMap[k] = { n: n, ts: Date.now() };
+  // prune
+  var keys = Object.keys(bendMap);
+  if (keys.length > 80){
+    keys.sort(function(a, b){ return (bendMap[a].ts || 0) - (bendMap[b].ts || 0); });
+    while (keys.length > 60){ delete bendMap[keys.shift()]; }
+  }
+  saveBendMap();
+}
+
+function renderBendList(){
+  var list = $('bendList');
+  if (!list) return;
+  if (!archives.length){
+    list.innerHTML = '<p class="bend-empty">Нет сохранённых раскроев.<br>Сначала сохраните раскрой во вкладке «История» или после расчёта.</p>';
+    return;
+  }
+  var groups = [];
+  var lastKey = null;
+  archives.forEach(function(item, idx){
+    var key = dayKey(item.ts);
+    if (key !== lastKey){
+      groups.push({ label: dayLabel(item.ts), items: [] });
+      lastKey = key;
+    }
+    groups[groups.length - 1].items.push({ item: item, idx: idx });
+  });
+  var h = '';
+  groups.forEach(function(g){
+    h += '<div class="hist-day">' + g.label + '</div>';
+    g.items.forEach(function(entry){
+      var item = entry.item;
+      var n = getBendCnt(item);
+      var left = item.q - n;
+      var prog = n + '/' + item.q;
+      var sub = left > 0 ? ('осталось ' + left) : (left === 0 ? 'готово' : ('+' + (-left)));
+      h += '<button type="button" class="bend-job" data-bidx="' + entry.idx + '">' +
+        '<div style="flex:1;min-width:0"><p class="bj-title">' + archiveLine(item) + '</p>' +
+        '<p class="bj-sub">' + sub + '</p></div>' +
+        '<div class="bj-prog">' + prog + '</div></button>';
+    });
+  });
+  list.innerHTML = h;
+}
+
+function showBendWork(idx){
+  var item = archives[idx];
+  if (!item) return;
+  bendIdx = idx;
+  bendCnt = getBendCnt(item);
+  bendStack = [];
+  $('bendListWrap').hidden = true;
+  $('bendWork').hidden = false;
+  $('bendTitle').textContent = archiveLine(item);
+  var dia = item.d > 0 ? 'Ø' + num(item.d) : '';
+  var wall = item.t > 0 ? ('×' + num(item.t)) : '';
+  $('bendMeta').textContent = (dia || wall ? (dia + wall + ' · ') : '') + formatTime(item.ts) + ' · ' + dayLabel(item.ts);
+  renderBendWork();
+}
+
+function hideBendWork(){
+  bendIdx = -1;
+  $('bendWork').hidden = true;
+  $('bendListWrap').hidden = false;
+  renderBendList();
+}
+
+function renderBendWork(){
+  if (bendIdx < 0 || !archives[bendIdx]) return;
+  var item = archives[bendIdx];
+  var target = item.q;
+  $('bendN').textContent = bendCnt;
+  $('bendOf').textContent = '/ ' + target;
+  var left = target - bendCnt;
+  if (left > 0) {
+    $('bendSub').textContent = 'осталось ' + left + ' ' + plural(left, 'заготовка', 'заготовки', 'заготовок') +
+      (left >= 10 ? ' · ' + Math.floor(left / 10) + ' пач. по 10' : '');
+  } else if (left === 0) {
+    $('bendSub').textContent = 'всё согнуто';
+  } else {
+    $('bendSub').textContent = 'сверх плана: ' + (-left) + ' шт';
+  }
+  $('bendUndo').style.opacity = bendStack.length ? '1' : '0.45';
+}
+
+function bumpBend(delta){
+  if (bendIdx < 0 || !archives[bendIdx]) return;
+  var prev = bendCnt;
+  bendCnt = Math.max(0, bendCnt + delta);
+  if (bendCnt === prev) return;
+  bendStack.push(prev);
+  if (bendStack.length > 40) bendStack.shift();
+  setBendCnt(archives[bendIdx], bendCnt);
+  renderBendWork();
+  feedback(delta >= 10 || bendCnt >= archives[bendIdx].q);
+}
+
+function renderBend(){
+  if (bendIdx >= 0 && archives[bendIdx]) {
+    // keep work view in sync if archives changed
+    renderBendWork();
+  } else {
+    hideBendWork();
+  }
+  if ($('bendWork').hidden) renderBendList();
+}
+
+$('bendList').addEventListener('click', function(e){
+  var row = e.target.closest ? e.target.closest('[data-bidx]') : null;
+  if (!row) return;
+  showBendWork(+row.getAttribute('data-bidx'));
+});
+$('bendBack').addEventListener('click', hideBendWork);
+$('bendP10').addEventListener('click', function(){ bumpBend(10); });
+$('bendP1').addEventListener('click', function(){ bumpBend(1); });
+$('bendM1').addEventListener('click', function(){ bumpBend(-1); });
+$('bendUndo').addEventListener('click', function(){
+  if (!bendStack.length || bendIdx < 0) return;
+  bendCnt = bendStack.pop();
+  setBendCnt(archives[bendIdx], bendCnt);
+  renderBendWork();
+  feedback(false);
+});
+$('bendReset').addEventListener('click', function(){
+  if (bendIdx < 0 || !bendCnt) return;
+  if (!confirm('Сбросить счётчик гибки по этой позиции?')) return;
+  bendStack.push(bendCnt);
+  bendCnt = 0;
+  setBendCnt(archives[bendIdx], 0);
+  renderBendWork();
+});
 
 function setStorageStatus(message, isWarning){
   var el = $('storageStatus');
@@ -3591,6 +3855,7 @@ function formatTime(ts){
 function renderHist(){
   applyOpts();
   try { renderBk(); } catch(e){}
+  try { renderBend(); } catch(e){}
   var list = $('histList');
   var clearBtn = $('histClearBtn');
   if (!archives.length){
@@ -3789,9 +4054,197 @@ Array.prototype.forEach.call(document.querySelectorAll('.pset'), function(b){
     update();
   });
 });
+/* ── Shared workshop (Firebase RTDB) ── */
+var SHOP_KEY = 'pipecalc.shop.v1';
+var shop = { code: '', on: false, apiKey: '', dbUrl: '', projectId: '' };
+var shopDb = null, shopRef = null, shopUnsub = null, shopReady = false, shopApplying = false, shopTimer = null;
+
+try {
+  var _sh = JSON.parse(localStorage.getItem(SHOP_KEY));
+  if (_sh) {
+    shop.code = String(_sh.code || '').replace(/\D/g, '').slice(0, 6);
+    shop.on = !!_sh.on && shop.code.length >= 4;
+    shop.apiKey = _sh.apiKey || '';
+    shop.dbUrl = _sh.dbUrl || '';
+    shop.projectId = _sh.projectId || '';
+  }
+} catch(e){}
+
+function saveShop(){
+  try { localStorage.setItem(SHOP_KEY, JSON.stringify(shop)); } catch(e){}
+}
+
+function shopStatus(text){
+  var el = $('shopStatus');
+  if (el) el.textContent = text;
+}
+
+function shopConfigured(){
+  return !!(shop.apiKey && shop.dbUrl);
+}
+
+function loadFirebase(cb){
+  if (window.firebase && firebase.database) { cb(true); return; }
+  var s1 = document.createElement('script');
+  s1.src = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js';
+  s1.onload = function(){
+    var s2 = document.createElement('script');
+    s2.src = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js';
+    s2.onload = function(){ cb(!!(window.firebase && firebase.database)); };
+    s2.onerror = function(){ cb(false); };
+    document.head.appendChild(s2);
+  };
+  s1.onerror = function(){ cb(false); };
+  document.head.appendChild(s1);
+}
+
+function shopDisconnect(){
+  if (shopUnsub) { try { shopUnsub(); } catch(e){} shopUnsub = null; }
+  shopRef = null;
+  shopDb = null;
+  shopReady = false;
+}
+
+function shopConnect(manual){
+  if (!shop.on || shop.code.length < 4) {
+    shopDisconnect();
+    shopStatus('Выкл · данные только на этом телефоне');
+    return;
+  }
+  if (!shopConfigured()) {
+    shopStatus('Нужна настройка облака (кнопка ниже)');
+    if (manual) {
+      $('shopCfgBox').hidden = false;
+      alert('Сначала нажмите «Настроить облако (Firebase)» и вставьте ключи.\nЭто один раз на 5 минут.');
+    }
+    return;
+  }
+  shopStatus('Подключение…');
+  loadFirebase(function(ok){
+    if (!ok) { shopStatus('Не удалось загрузить Firebase'); return; }
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp({
+          apiKey: shop.apiKey,
+          databaseURL: shop.dbUrl,
+          projectId: shop.projectId || undefined
+        });
+      }
+      shopDb = firebase.database();
+      if (shopUnsub) { try { shopUnsub(); } catch(e){} }
+      shopRef = shopDb.ref('workshops/' + shop.code);
+      shopUnsub = shopRef.on('value', function(snap){
+        var data = snap.val();
+        if (!data) {
+          shopReady = true;
+          shopStatus('Цех ' + shop.code + ' · онлайн (пусто, ждём данные)');
+          shopPush(true);
+          return;
+        }
+        shopApplying = true;
+        try {
+          if (Array.isArray(data.archives)) {
+            archives = data.archives.filter(function(item){
+              return item && item.ts && item.q > 0 && item.p > 0 && item.n > 0;
+            });
+            try { localStorage.setItem(ARCH_KEY, JSON.stringify(archives)); } catch(e){}
+          }
+          if (data.bend && typeof data.bend === 'object') {
+            bendMap = data.bend;
+            try { localStorage.setItem(BEND_KEY, JSON.stringify(bendMap)); } catch(e){}
+          }
+          renderHist();
+          renderBend();
+        } finally {
+          shopApplying = false;
+        }
+        shopReady = true;
+        var n = (archives || []).length;
+        shopStatus('Цех ' + shop.code + ' · онлайн · раскроев: ' + n);
+      }, function(err){
+        shopStatus('Ошибка: ' + (err && err.message ? err.message : 'нет доступа'));
+      });
+    } catch(e) {
+      shopStatus('Ошибка конфигурации Firebase');
+    }
+  });
+}
+
+function shopPush(force){
+  if (shopApplying || !shop.on || !shopReady || !shopRef) return;
+  clearTimeout(shopTimer);
+  var run = function(){
+    if (!shopRef || shopApplying) return;
+    shopRef.update({
+      archives: archives,
+      bend: bendMap,
+      updatedAt: Date.now()
+    }).catch(function(e){
+      shopStatus('Не отправилось · ' + (e && e.message ? e.message : 'сеть'));
+    });
+  };
+  if (force) run(); else shopTimer = setTimeout(run, 400);
+}
+
+function applyShopUi(){
+  $('shopCode').value = shop.code || '';
+  $('fbApiKey').value = shop.apiKey || '';
+  $('fbDbUrl').value = shop.dbUrl || '';
+  $('fbProjectId').value = shop.projectId || '';
+  $('shopConnectBtn').textContent = shop.on ? 'Выключить' : 'Включить';
+  if (!shop.on) shopStatus('Выкл · данные только на этом телефоне');
+}
+
+$('shopCfgBtn').addEventListener('click', function(){
+  $('shopCfgBox').hidden = !$('shopCfgBox').hidden;
+});
+
+$('shopCfgSave').addEventListener('click', function(){
+  shop.apiKey = ($('fbApiKey').value || '').trim();
+  shop.dbUrl = ($('fbDbUrl').value || '').trim().replace(/\/$/, '');
+  shop.projectId = ($('fbProjectId').value || '').trim();
+  saveShop();
+  shopDisconnect();
+  try { if (window.firebase && firebase.apps && firebase.apps.length) { /* keep */ } } catch(e){}
+  // re-init requires reload if app already initialized with wrong keys
+  if (shop.on) {
+    alert('Ключи сохранены. Страница перезагрузится для подключения.');
+    location.reload();
+    return;
+  }
+  $('shopCfgBox').hidden = true;
+  alert('Ключи сохранены. Теперь введите код цеха и нажмите «Включить».');
+});
+
+$('shopConnectBtn').addEventListener('click', function(){
+  if (shop.on) {
+    shop.on = false;
+    saveShop();
+    shopDisconnect();
+    applyShopUi();
+    return;
+  }
+  var code = ($('shopCode').value || '').replace(/\D/g, '').slice(0, 6);
+  if (code.length < 4) {
+    alert('Введите код цеха (минимум 4 цифры). Одинаковый на обоих телефонах.');
+    return;
+  }
+  shop.code = code;
+  shop.on = true;
+  saveShop();
+  applyShopUi();
+  shopConnect(true);
+});
+
+$('shopCode').addEventListener('input', function(){
+  this.value = this.value.replace(/\D/g, '').slice(0, 6);
+});
+
 safe(applyUI);
 safe(load);
 safe(renderHist);
+safe(applyShopUi);
+safe(function(){ if (shop.on) shopConnect(false); });
 checkStorage();
 update();
 
@@ -3803,6 +4256,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b){
     ui.tab = t;
     saveUI();
     syncTabs();
+    if (t === 'bend') { try { renderBend(); } catch(e){} }
     window.scrollTo(0, 0);
   });
 });
