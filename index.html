@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-13.2">
+<meta name="app-build" content="2026-11-21.23">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -287,6 +287,15 @@ body::before {
   pointer-events: none;
 }
 
+.hero .cap-top {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0 0 6px;
+  opacity: 0.8;
+  position: relative;
+}
+
 .hero .big {
   font-size: 28px;
   font-weight: 700;
@@ -299,11 +308,26 @@ body::before {
 }
 
 .hero .sub {
-  font-size: 15px;
-  margin: 8px 0 0;
-  opacity: 0.9;
-  font-weight: 450;
+  font-size: 17px;
+  margin: 6px 0 0;
+  opacity: 0.95;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   position: relative;
+}
+
+.hero .sub2 {
+  font-size: 13px;
+  margin: 8px 0 0;
+  opacity: 0.75;
+  font-weight: 500;
+  line-height: 1.35;
+  position: relative;
+}
+
+.hero .sub:empty,
+.hero .sub2:empty {
+  display: none;
 }
 
 /* Copy button */
@@ -645,6 +669,10 @@ body::before {
 }
 
 /* Fields */
+.fields .wide {
+  grid-column: 1 / -1;
+}
+
 .fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -729,7 +757,9 @@ label {
   font-size: 16px;
 }
 
-.pset {
+.pset,
+.pf-opt,
+.lenset {
   flex: none;
   height: 32px;
   padding: 0 14px;
@@ -746,14 +776,100 @@ label {
   transition: transform 0.12s ease, background 0.15s ease;
 }
 
-.pset:active {
+.pset:active,
+.pf-opt:active,
+.lenset:active {
   transform: scale(0.94);
 }
 
-.pset.on {
+.pset.on,
+.pf-opt.on {
   background: var(--done-bg);
   color: var(--done-fg);
   box-shadow: 0 3px 10px rgba(0, 122, 255, 0.35);
+}
+
+#pfRow {
+  margin: 0;
+}
+
+#pfRow .pf-opt {
+  height: 42px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+#pfRow .pf-opt.on {
+  background: var(--done-bg);
+  color: var(--done-fg);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.size-fields {
+  margin-top: 16px;
+}
+
+.fold-body:not([hidden]) + .size-fields {
+  margin-top: 0;
+}
+
+.lbl-row {
+  position: relative;
+}
+
+.lbl-row .lenset {
+  position: absolute;
+  right: 4px;
+  top: -5px;
+  height: 24px;
+  padding: 0 10px;
+  font-size: 12px;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  box-shadow: none;
+}
+
+.have-l {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+  margin: 0 0 7px;
+}
+
+.have-l label {
+  margin: 0 0 0 4px;
+}
+
+.qm {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--text2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.qm[aria-expanded="true"] {
+  background: var(--done-bg);
+  color: var(--done-fg);
+}
+
+.pf-opt {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+  white-space: nowrap;
 }
 
 /* Stage / SVG */
@@ -945,7 +1061,7 @@ label {
 
 .fhint {
   grid-column: 1 / -1;
-  margin: -6px 4px 0;
+  margin: 6px 4px 0;
   font-size: 12px;
   line-height: 1.35;
   color: var(--text2);
@@ -983,6 +1099,11 @@ label {
   font-size: 13px;
   color: var(--muted);
   margin: 3px 0 0;
+}
+
+#packNote:empty,
+#cutsNote:empty {
+  display: none;
 }
 
 /* How to cut */
@@ -1092,47 +1213,79 @@ label {
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.32);
 }
 
-.ptxt {
+.stats {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
+  justify-content: center;
+  gap: 36px;
+  margin: 0 0 12px;
+}
+
+.stat {
+  background: transparent;
+  padding: 0;
+  text-align: center;
+  min-width: 96px;
+}
+
+.stat-v {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.stat-l {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  margin: 3px 0 0;
+}
+
+.stat.done .stat-v {
+  color: var(--done-bg);
 }
 
 .prog {
-  height: 10px;
-  border-radius: 5px;
+  height: 6px;
+  border-radius: 3px;
   background: var(--soft);
   overflow: hidden;
-  margin: 12px 0 10px;
+  margin: 0 0 12px;
 }
 
 .prog i {
   display: block;
   height: 100%;
   width: 0;
-  border-radius: 5px;
+  border-radius: 3px;
   background: var(--done-bg);
   transition: width 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .left {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text2);
   margin: 0 0 2px;
-  min-height: 18px;
-  font-weight: 450;
+  min-height: 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.left:empty {
+  display: none;
 }
 
 .left2 {
-  font-size: 12px;
-  line-height: 1.35;
+  font-size: 14px;
+  line-height: 1.4;
   color: var(--text2);
-  margin: 0;
-  font-weight: 450;
+  margin: 0 0 6px;
+  font-weight: 500;
+  padding: 0;
+  background: transparent;
+  text-align: left;
 }
 
 .left2:empty {
@@ -1140,22 +1293,25 @@ label {
 }
 
 .lshare {
-  height: 34px;
-  padding: 0 14px;
+  display: block;
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 22px;
   background: var(--soft);
-  color: var(--done-bg);
-  font-size: 13px;
+  color: var(--text);
+  font-size: 15px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   touch-action: manipulation;
-  margin: 10px 0 16px;
+  margin: 4px 0 18px;
+  text-align: center;
 }
 
 .lshare:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: default;
   pointer-events: none;
 }
@@ -1296,7 +1452,58 @@ button.badv {
 }
 
 #undoBtn {
+  height: 52px;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text);
+}
+
+#nextBtn {
+  height: 64px;
+  font-size: 19px;
+}
+
+.more {
+  margin-top: 6px;
+}
+
+.more summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 6px;
+  list-style: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.more summary::-webkit-details-marker { display: none; }
+
+.more summary::after {
+  content: "›";
+  font-size: 22px;
+  line-height: 1;
+  color: var(--muted);
+  transform: rotate(90deg);
+  transition: transform 0.15s ease;
+}
+
+.more[open] summary::after { transform: rotate(-90deg); }
+
+.more-b {
+  flex: 1;
+  margin-left: 12px;
+  margin-right: 8px;
+  text-align: right;
+  font-weight: 500;
+  color: var(--warn-fg);
+}
+
+.more .badctl {
+  margin-top: 8px;
 }
 
 .nowB {
@@ -1451,7 +1658,7 @@ button.badv {
 }
 
 .range input {
-  width: 64px;
+  width: 54px;
   height: 44px;
   text-align: center;
   border: 0;
@@ -1560,8 +1767,9 @@ button.badv {
 .bk-banner[hidden]{display:none}
 .bk-banner p{margin:0 0 10px;font-size:15px;line-height:1.4;font-weight:600}
 .bk-act{display:grid;grid-template-columns:1.6fr 1fr;gap:8px}
-.bk-act .nbtn{height:46px;font-size:15px}
-.bk-act .nbtn.sec{height:46px;font-size:15px;color:var(--warn-fg);border-color:currentColor;opacity:.85}
+.bk-act{grid-template-columns:2fr 1fr}
+.bk-act .nbtn{height:auto;min-height:46px;padding:6px 8px;font-size:14px;line-height:1.15;white-space:normal}
+.bk-act .nbtn.sec{height:auto;min-height:46px;font-size:14px;color:var(--warn-fg);border-color:currentColor;opacity:.85}
 
 /* ── Update banner ── */
 .upd-banner{
@@ -1606,25 +1814,108 @@ button.badv {
 .set-sw .chip{min-width:76px;height:36px;background:var(--soft);flex:none}
 .set-sw .chip.on{background:var(--done-bg)}
 .set-body > div{min-width:0;max-width:100%}
-.shop-row{display:flex;gap:8px;margin-top:10px;align-items:stretch;min-width:0}
-.shop-input{
-  flex:1;min-width:0;width:0;height:48px;border:0;border-radius:24px;
-  background:var(--soft);color:var(--text);font-size:16px;font-weight:600;
-  font-family:inherit;text-align:center;letter-spacing:0.08em;padding:0 10px;
-  -webkit-appearance:none;appearance:none;
-}
-.shop-btn{flex:none;height:48px;padding:0 14px;width:auto;max-width:42%}
-.shop-field{
-  display:block;width:100%;max-width:100%;height:44px;border:0;border-radius:12px;
-  background:var(--soft);color:var(--text);font-size:16px;font-family:inherit;
-  padding:0 12px;margin:0 0 8px;box-sizing:border-box;
-  -webkit-appearance:none;appearance:none;
-}
-#shopCfgBox{margin-top:12px;min-width:0;max-width:100%;overflow:hidden}
 #setCard{overflow-x:hidden}
+
+/* Settings v3: one consistent control language */
+#setCard .set-body{gap:0}
+#setCard .set-body > div{
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+}
+#setCard .set-body > div:first-child{padding-top:2px}
+#setCard .set-body > div:last-child{border-bottom:0;padding-bottom:2px}
+#setCard .set-l{font-size:14px;line-height:1.3;letter-spacing:-.01em;margin:0 0 9px}
+#setCard .set-d{font-size:12px;line-height:1.45}
+#setCard .theme-row{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;
+  padding:4px;margin:0;border:1px solid var(--line);border-radius:15px;
+  background:var(--soft);
+}
+#setCard .theme-chip,#setCard .opt-chip{
+  min-width:0;height:40px;padding:0 8px;border-radius:11px;
+  font-size:13px;font-weight:650;transition:background .16s ease,color .16s ease,box-shadow .16s ease;
+}
+#setCard .theme-chip.on,#setCard .opt-chip.on{
+  background:var(--card);color:var(--acc);
+  box-shadow:0 1px 4px rgba(0,0,0,.12);
+}
+#setCard .set-sw{
+  min-height:66px;padding:14px 0;border-bottom:1px solid var(--line);
+}
+#setCard .set-sw:last-of-type{border-bottom:0}
+#setCard .set-sw .chip{
+  min-width:82px;height:38px;padding:0 14px;border:1px solid var(--line);
+  border-radius:12px;background:var(--soft);font-size:13px;font-weight:700;
+}
+#setCard .set-sw .chip.on{background:var(--done-bg);color:var(--done-fg);border-color:var(--acc-line);box-shadow:none}
+#setCard #updChkBtn{min-width:94px;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--soft);font-weight:650}
+#setCard .nbtn.sec{border-radius:13px;min-height:44px;font-weight:650}
+#histCard #sendHistBtn,#histCard #exportHistBtn,#histCard #importHistBtn{
+  border:1px solid var(--line);border-radius:13px;background:var(--soft);
+  color:var(--text);font-weight:650;box-shadow:none;
+}
+#histCard #sendHistBtn{background:var(--done-bg);color:var(--done-fg);border-color:var(--acc-line)}
+#histCard #exportHistBtn,#histCard #importHistBtn{min-height:44px}
+#storageStatus{padding:10px 12px;border-radius:12px;background:var(--soft)}
+@media (max-width:360px){
+  #setCard .theme-chip,#setCard .opt-chip{font-size:12px;padding:0 4px}
+  #setCard .set-sw{gap:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  #setCard .theme-chip,#setCard .opt-chip{transition:none}
+}
+
+/* iOS-inspired glass controls + user scale */
+:root{--ui-scale:1;--ios-blue:#0a84ff;--ios-glass:rgba(255,255,255,.58)}
+@supports (zoom:1){
+  .app{zoom:var(--ui-scale);max-width:calc(480px / var(--ui-scale))}
+  .tabbar{zoom:var(--ui-scale)}
+  .toast,.sheet,.sheet-bg{zoom:var(--ui-scale)}
+}
+#setCard{
+  border:1px solid color-mix(in srgb,var(--line) 72%,transparent);
+  background:color-mix(in srgb,var(--card) 88%,transparent);
+  box-shadow:0 18px 48px rgba(20,30,60,.09),inset 0 1px 0 rgba(255,255,255,.52);
+  -webkit-backdrop-filter:blur(24px) saturate(1.45);backdrop-filter:blur(24px) saturate(1.45);
+}
+#setCard .theme-row{border-radius:17px;padding:4px;background:color-mix(in srgb,var(--soft) 86%,transparent);border-color:color-mix(in srgb,var(--line) 65%,transparent)}
+#setCard .theme-chip,#setCard .opt-chip{border-radius:13px}
+#setCard .theme-chip.on,#setCard .opt-chip.on{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--card) 98%,white),var(--card));
+  box-shadow:0 2px 7px rgba(0,0,0,.10),inset 0 1px 0 rgba(255,255,255,.75);
+}
+#setCard .set-sw .chip{border-radius:999px;min-width:78px;background:color-mix(in srgb,var(--soft) 78%,transparent)}
+#setCard .set-sw .chip.on{background:linear-gradient(135deg,#34c759,#28b956);border-color:transparent;color:#fff;box-shadow:0 3px 10px rgba(52,199,89,.2)}
+.scale-setting{padding:14px 0;border-bottom:1px solid var(--line)}
+.scale-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.scale-head .set-l{margin-bottom:3px}
+#scaleValue,#panelVal,#dimVal{font-size:14px;font-weight:750;font-variant-numeric:tabular-nums;color:var(--acc-fg);background:var(--acc-bg);border-radius:999px;padding:6px 11px;min-width:54px;text-align:center}
+.scale-range{appearance:none;-webkit-appearance:none;width:100%;height:30px;margin:10px 0 0;background:transparent;cursor:pointer;touch-action:pan-y}
+.scale-range::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--ios-blue) var(--p,50%),var(--soft) var(--p,50%))}
+.scale-range::-moz-range-track{height:6px;border-radius:999px;background:var(--soft)}
+.scale-range::-moz-range-progress{height:6px;border-radius:999px;background:var(--ios-blue)}
+.scale-range::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-9px;border-radius:50%;background:linear-gradient(145deg,#fff,#e9edf5);border:1px solid rgba(0,0,0,.08);box-shadow:0 2px 8px rgba(0,0,0,.22)}
+.scale-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.1);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.scale-range:focus-visible{outline:2px solid var(--ios-blue);outline-offset:3px;border-radius:12px}
+.scale-ends{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:0}
+.scale-ends button{border:0;background:transparent;color:var(--acc-fg);font:inherit;font-weight:700;padding:5px 10px;border-radius:999px}
+.scale-ends button:active{background:var(--soft)}
+button,.chip,.nbtn,.tab{ -webkit-tap-highlight-color:transparent }
+button:active{filter:brightness(.97)}
+@media(prefers-reduced-motion:no-preference){
+  #setCard .theme-chip,#setCard .opt-chip,#setCard .set-sw .chip{transition:background .22s ease,box-shadow .22s ease,transform .18s ease}
+  #setCard .theme-chip:active,#setCard .opt-chip:active,#setCard .set-sw .chip:active{transform:scale(.97)}
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ios-glass:rgba(35,35,39,.68)}}
+@media(max-width:360px){.scale-ends{font-size:10px}}
 
 /* ── Tab bar ── */
 [data-off]{display:none !important}
+body.is-scrap .pipe-only{display:none !important}
+body:not(.is-scrap) .scrap-only{display:none !important}
+body.is-scrap .scrap-only{display:block}
+body.is-scrap .nrow.scrap-only{display:grid}
+body.is-scrap .fields > div:not(.pipe-only){grid-column:1/-1}
 .tabbar{
   position:fixed;left:0;right:0;bottom:0;z-index:60;
   display:flex;justify-content:center;
@@ -1634,29 +1925,7 @@ button.badv {
   backdrop-filter:blur(24px) saturate(1.6);
   border-top:1px solid var(--line);
 }
-.tabbar-in{display:grid;grid-template-columns:repeat(5,1fr);width:100%;max-width:480px}
-.bend-job{
-  display:flex;align-items:center;gap:12px;
-  padding:14px 0;border-bottom:0.5px solid var(--line);
-  cursor:pointer;touch-action:manipulation;text-align:left;width:100%;
-  background:transparent;border-left:0;border-right:0;border-top:0;
-  color:var(--text);font-family:inherit;
-}
-.bend-job:last-child{border-bottom:0}
-.bend-job:active{opacity:.7}
-.bend-job.on{background:var(--soft);margin:0 -12px;padding-left:12px;padding-right:12px;border-radius:16px;border-bottom-color:transparent}
-.bend-job .bj-title{font-size:15px;font-weight:600;margin:0;font-variant-numeric:tabular-nums}
-.bend-job .bj-sub{font-size:13px;color:var(--text2);margin:2px 0 0}
-.bend-job .bj-prog{flex:none;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--done-bg);min-width:64px;text-align:right}
-.bend-empty{font-size:14px;color:var(--muted);text-align:center;padding:24px 8px}
-.bend-cnt{font-size:56px;font-weight:700;letter-spacing:-.04em;line-height:1.05;margin:4px 0 0;text-align:center;font-variant-numeric:tabular-nums}
-.bend-cnt small{font-size:22px;font-weight:500;opacity:.55;margin-left:6px}
-.bend-sub{text-align:center;font-size:14px;color:var(--text2);margin:6px 0 16px;min-height:20px}
-.bend-row{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px}
-.bend-row .nbtn{height:64px;font-size:22px;font-weight:700}
-.bend-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.bend-row2 .nbtn{height:48px;font-size:15px}
-.bend-back{border:0;background:transparent;color:var(--done-bg);font:inherit;font-size:15px;font-weight:600;padding:0;margin:0 0 12px;cursor:pointer}
+.tabbar-in{display:grid;grid-template-columns:repeat(4,1fr);width:100%;max-width:480px}
 .tab{
   position:relative;
   display:flex;flex-direction:column;align-items:center;gap:2px;
@@ -1669,9 +1938,469 @@ button.badv {
 .tab:active{opacity:.7}
 .tab-dot{position:absolute;top:5px;left:calc(50% + 7px);width:10px;height:10px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--bg)}
 .tab-dot[hidden]{display:none}
+
+
+/* Hybrid Liquid Glass + Industrial Pro refresh */
+:root {
+  --radius-xl: 28px;
+  --radius-lg: 23px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 14px 34px rgba(18, 34, 58, .10), 0 2px 7px rgba(18, 34, 58, .045);
+  --shadow-sm: 0 5px 16px rgba(18, 34, 58, .075);
+}
+.app { max-width: 520px; padding-top: max(16px, env(safe-area-inset-top)); }
+.card {
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  backdrop-filter: blur(28px) saturate(165%);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.22);
+  padding: 20px;
+}
+.card h2 { font-size: 18px; letter-spacing: -.025em; margin-bottom: 17px; }
+.hero {
+  border-radius: 30px; padding: 25px 23px 23px;
+  background: linear-gradient(145deg, rgba(255,255,255,.24), transparent 55%), linear-gradient(125deg, #087cff, #0758c9);
+  box-shadow: 0 15px 34px rgba(0,105,230,.24), inset 0 1px 0 rgba(255,255,255,.42);
+}
+.hero .big { font-size: 22px; line-height: 1.22; }
+.hero .sub { font-size: 15px; }
+.hero .sub2 { font-size: 12px; }
+.hero .cap-top { text-transform: uppercase; letter-spacing: .09em; font-size: 11px; opacity: .82; }
+.step, .range input { border: 1px solid var(--line); background: var(--soft); }
+.step { border-radius: 16px; }
+.step input { font-weight: 650; }
+.sb { font-weight: 500; }
+.stage { border: 1px solid var(--line); border-radius: 19px; }
+.act, .nbtn, .range .nbtn { border-radius: 16px; font-weight: 700; letter-spacing: -.01em; }
+.act { min-height: 50px; }
+.chip, .opt-chip, .theme-chip { font-weight: 650; }
+.ltools { padding: 4px; }
+.chip { height: 34px; }
+.stats { gap: clamp(20px, 7vw, 42px); align-items: flex-start; margin: 3px 0 16px; }
+.stat { min-width: 0; flex: 1; padding: 13px 9px 12px; border-radius: 17px; background: var(--soft); border: 1px solid var(--line); }
+.stat-v { font-size: clamp(24px, 6vw, 30px); letter-spacing: -.045em; white-space: nowrap; }
+.stat-num { color: var(--done-bg); }
+.stat-sep, .stat-total { color: var(--text2); font-weight: 600; }
+.stat-complete { color: #30b566; }
+.stat.done .stat-v { color: inherit; }
+.stat.done .stat-num, .stat.done .stat-complete { color: #30b566; }
+.stat-l { font-size: 11px; text-transform: uppercase; letter-spacing: .065em; font-weight: 700; margin-top: 6px; }
+.prog { height: 8px; border-radius: 99px; }
+.prog i { border-radius: 99px; background: linear-gradient(90deg, #1686ff, #30b566); }
+.tile { border: 1px solid var(--line) !important; }
+.tabbar { border-top: 1px solid var(--line); box-shadow: 0 -8px 28px rgba(20,30,50,.07); }
+.tab { min-height: 52px; font-weight: 650; }
+.tab svg { width: 24px; height: 24px; }
+.toast, .sheet { border: 1px solid var(--line); }
+button, input { touch-action: manipulation; }
+button:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb, var(--done-bg) 65%, transparent); outline-offset: 2px; }
+/* Checklist progress and touch-first refinements */
+.progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -5px 2px 12px;
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .015em;
+}
+.progress-meta span:first-child { color: var(--done-bg); }
+#listCard .stat.done .stat-v { color: #30b566; }
+#listCard .tile { min-height: 58px; }
+#listCard .tile:focus-visible { outline: 3px solid var(--done-bg); outline-offset: 2px; }
+#listCard .tile.on { box-shadow: 0 5px 16px rgba(0,122,255,.22), inset 0 1px 0 rgba(255,255,255,.22); }
+#listCard .now { border: 1px solid var(--line); background: linear-gradient(145deg, var(--glass), var(--soft)); }
+#listCard .lshare { border: 1px solid var(--line); font-weight: 650; }
+@media (prefers-reduced-motion: no-preference) {
+  #listCard .prog i { transition: width .32s cubic-bezier(.2,.8,.2,1); }
+  #listCard .tile { transition: transform .14s ease, background .18s ease, box-shadow .18s ease; }
+}
+@media (min-width: 560px) { .app { padding-inline: 20px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .card, .act, .nbtn, .tile { transition: box-shadow .18s ease, transform .18s ease, background .18s ease; }
+  .tile:active, .nbtn:active { transform: scale(.975); }
+}
+
+
+/* ── Навигация v2: плавающая панель и плавное появление разделов ── */
+.tabbar{
+  left:50%;
+  right:auto;
+  bottom:max(9px, env(safe-area-inset-bottom));
+  width:min(calc(100% - 24px), 496px);
+  transform:translateX(-50%);
+  padding:6px;
+  border:1px solid color-mix(in srgb, var(--line) 75%, transparent);
+  border-radius:25px;
+  background:color-mix(in srgb, var(--glass-bar) 92%, transparent);
+  box-shadow:0 12px 36px rgba(15,25,45,.16), 0 2px 8px rgba(15,25,45,.06), inset 0 1px 0 rgba(255,255,255,.55);
+}
+.tabbar-in{gap:4px}
+.tab{
+  isolation:isolate;
+  min-height:58px;
+  justify-content:center;
+  gap:4px;
+  padding:6px 2px 5px;
+  border-radius:19px;
+  font-size:11px;
+  font-weight:650;
+  letter-spacing:-.01em;
+  transition:color .2s ease, transform .2s ease, background .2s ease;
+}
+.tab::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:2px 1px;
+  border-radius:17px;
+  background:transparent;
+  transform:scale(.88);
+  opacity:0;
+  transition:transform .24s cubic-bezier(.2,.8,.2,1), opacity .18s ease, background .18s ease;
+}
+.tab svg{
+  width:23px;
+  height:23px;
+  transition:transform .24s cubic-bezier(.2,.8,.2,1), stroke-width .18s ease;
+}
+.tab.on{
+  color:var(--acc-fg);
+}
+.tab.on::before{
+  background:var(--acc-bg);
+  transform:scale(1);
+  opacity:1;
+}
+.tab.on svg{transform:translateY(-1px) scale(1.06);stroke-width:2}
+.tab:active{transform:scale(.95);opacity:1}
+.tab-dot{
+  top:5px;
+  left:calc(50% + 8px);
+  width:9px;
+  height:9px;
+  border:1.5px solid var(--glass-bar);
+  box-shadow:0 0 0 1px var(--danger);
+}
+@media (prefers-reduced-motion:no-preference){
+  [data-tab]:not([data-off]){
+    animation:section-enter .24s cubic-bezier(.2,.75,.25,1) both;
+  }
+  @keyframes section-enter{
+    from{opacity:0;transform:translateY(7px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .tab,.tab::before,.tab svg{transition:none}
+}
+@media (max-width:360px){
+  .tab{font-size:10px;min-height:55px}
+  .tab svg{width:21px;height:21px}
+  .tabbar{width:calc(100% - 16px);padding:5px}
+}
+
+
+/* Расчёт: более читаемые значения и удобные сенсорные поля */
+.hero[data-tab="calc"] {
+  padding: 28px 24px 26px;
+  border-radius: 30px;
+  margin-bottom: 16px;
+}
+.hero[data-tab="calc"] .cap-top {
+  font-size: 12px;
+  letter-spacing: .11em;
+  margin-bottom: 10px;
+}
+.hero[data-tab="calc"] .big {
+  font-size: clamp(32px, 8vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -.035em;
+  font-weight: 780;
+}
+.hero[data-tab="calc"] .sub {
+  font-size: 19px;
+  line-height: 1.3;
+  margin-top: 9px;
+}
+.hero[data-tab="calc"] .sub2 {
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 10px;
+  opacity: .88;
+}
+.card[data-tab="calc"] {
+  padding: 22px;
+}
+.card[data-tab="calc"] h2 {
+  font-size: 19px;
+  margin-bottom: 18px;
+}
+.card[data-tab="calc"] label {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -.01em;
+  color: var(--text2);
+  margin: 0 0 9px 4px;
+}
+.card[data-tab="calc"] .fields {
+  gap: 20px 12px;
+}
+.card[data-tab="calc"] .step {
+  height: 60px;
+  border-radius: 19px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  transition: box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+.card[data-tab="calc"] .step:focus-within {
+  border-color: var(--done-bg);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--done-bg) 18%, transparent);
+}
+.card[data-tab="calc"] .step input {
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+.card[data-tab="calc"] .step .sb {
+  width: 44px;
+  font-size: 25px;
+  font-weight: 500;
+  color: var(--done-bg);
+  background: color-mix(in srgb, var(--done-bg) 6%, transparent);
+}
+.card[data-tab="calc"] .step .sb:active {
+  background: color-mix(in srgb, var(--done-bg) 17%, transparent);
+}
+.card[data-tab="calc"] .fhint {
+  font-size: 13px;
+  line-height: 1.45;
+  margin-top: 0;
+}
+#diaCard .fold-head {
+  min-height: 32px;
+}
+#diaCard .fold-title {
+  font-size: 18px;
+}
+#diaCard .fold-val {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--done-bg);
+}
+#diaCard .stage {
+  margin-top: 14px;
+  margin-bottom: 18px;
+  border-radius: 22px;
+  padding: 8px 10px;
+  background-color: var(--stage);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+#diaCard .stage svg {
+  max-height: 190px;
+}
+#cutCard h2 {
+  margin-bottom: 14px;
+}
+#cutCard .legend {
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  font-size: 13px;
+}
+#cutCard .pipe {
+  height: 58px;
+  border-radius: 17px;
+  border: 1px solid var(--line2);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.08);
+  background: var(--soft);
+}
+#cutCard .pc, #cutCard .ws {
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: -.01em;
+  text-shadow: 0 1px 0 rgba(255,255,255,.12);
+}
+#cutCard .pc {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--acc-bg) 82%, white), var(--acc-bg));
+  border-right: 2px solid var(--glass-line);
+}
+#cutCard .ws {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--warn-bg) 84%, white), var(--warn-bg));
+}
+#cutCard .cap {
+  font-size: 14px;
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+@media (max-width: 360px) {
+  .card[data-tab="calc"] { padding: 18px; }
+  .card[data-tab="calc"] .step { height: 56px; }
+  .card[data-tab="calc"] .step .sb { width: 38px; }
+  .card[data-tab="calc"] .step input { font-size: 19px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card[data-tab="calc"] .step,
+  #cutCard .pipe { transition: box-shadow .18s ease, border-color .18s ease; }
+}
+
+
+
+/* ── Полировка v4: микроанимации, доступность, пустые и ожидающие состояния ── */
+:root { scroll-behavior: smooth; }
+button, .tab, .tile, .step, .stage, .card { -webkit-tap-highlight-color: transparent; }
+button { position: relative; overflow: hidden; }
+button:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--acc-fg, var(--done-bg)) 62%, transparent);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card, .hero, .stage, .stat, .chip, .theme-chip, .opt-chip, .nbtn, .act {
+    transition: transform .16s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+  }
+  .nbtn:active, .act:active, .chip:active, .theme-chip:active, .opt-chip:active { transform: scale(.975); }
+  .stage { transition: box-shadow .22s ease, border-color .22s ease; }
+  .stage:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--done-bg) 15%, transparent); }
+  .hist-item, .hist-row { animation: detail-in .22s ease both; }
+  @keyframes detail-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+}
+/* Empty states: ясное сообщение и спокойная визуальная опора */
+.hist-empty, .share-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-height: 128px;
+  align-content: center;
+  padding: 22px 18px;
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--soft) 72%, transparent);
+  line-height: 1.5;
+}
+.hist-empty::before, .share-empty::before {
+  content: "↗";
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  background: var(--glass, var(--soft));
+  color: var(--text2);
+  font-size: 22px;
+  font-weight: 700;
+}
+#listEmpty { text-align: center; border-style: dashed; }
+#listEmpty h2 { margin-bottom: 8px; }
+#listEmpty p { max-width: 28em; margin-inline: auto; line-height: 1.55; }
+#storageStatus { display: flex; align-items: flex-start; gap: 7px; }
+#storageStatus::before { content: "●"; flex: none; font-size: 9px; line-height: 1.8; color: var(--done-bg); }
+#storageStatus[ data-warning="true"]::before { color: var(--danger); }
+/* Loading state for operations that may open a system sheet or prepare a file */
+button.is-busy { pointer-events: none; opacity: .82; }
+button.is-busy::before {
+  content: "";
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin: 0 8px -2px 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: busy-spin .7s linear infinite;
+}
+@keyframes busy-spin { to { transform: rotate(360deg); } }
+.toast { padding-top: 7px; padding-bottom: 7px; }
+.toast button { min-width: 88px; }
+@media (prefers-reduced-motion: reduce) {
+  :root { scroll-behavior: auto; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  button.is-busy::before { animation: none; border-right-color: currentColor; }
+}
+
+/* Подписи ползунка: «Сбросить» строго по центру */
+.scale-ends{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.scale-ends span:last-child{text-align:right}
+
+/* ── Единый стиль переключателей (как «Целые / Обрезки») ── */
+#setCard .theme-row{
+  display:flex;gap:6px;padding:3px;border:0;border-radius:999px;background:var(--soft)
+}
+#setCard .theme-chip,#setCard .opt-chip{
+  flex:1;min-width:0;height:34px;padding:0;border:0;border-radius:999px;
+  background:transparent;color:var(--text2);font-size:13px;font-weight:650;box-shadow:none
+}
+#setCard .theme-chip.on,#setCard .opt-chip.on{
+  background:var(--done-bg);color:var(--done-fg);
+  box-shadow:0 2px 8px rgba(0,122,255,.3)
+}
+@media (max-width:360px){#setCard .theme-chip,#setCard .opt-chip{font-size:12px;padding:0 4px}}
+.bk-banner{background:var(--acc-bg);color:var(--acc-fg)}
+.bk-act .nbtn.sec{color:var(--acc-fg)}
+
+/* ── Фон приложения (как в Telegram) ── */
+#wall{position:fixed;inset:0;z-index:-2;pointer-events:none;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:var(--wall-base,transparent);display:none}
+#wall.pat::before{content:"";position:absolute;inset:0;background:var(--wall-ink);-webkit-mask-image:var(--wall-mask);mask-image:var(--wall-mask);-webkit-mask-size:300px 300px;mask-size:300px 300px;-webkit-mask-repeat:repeat;mask-repeat:repeat}
+.wall-sw{position:relative;overflow:hidden}
+.wall-sw .ws-ink{position:absolute;inset:0;-webkit-mask-size:120px 120px;mask-size:120px 120px;-webkit-mask-repeat:repeat;mask-repeat:repeat}
+#wall::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,var(--wall-dim,0))}
+body.has-wall #wall{display:block}
+body.has-wall::before{display:none}
+body.has-wall{
+  --glass:color-mix(in srgb,var(--card) var(--panel,80%),transparent);
+  --tile:color-mix(in srgb,var(--card) var(--panel,80%),transparent);
+}
+body.has-wall .card{background:var(--glass)}
+body.has-wall #setCard{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}
+body.has-wall .card,body.has-wall .stage,body.has-wall .step{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.wall-prev{position:relative;height:76px;border-radius:14px;overflow:hidden;margin:12px 0 0;background:var(--bg);border:1px solid var(--line)}
+.wall-prev .wp-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.wall-prev .wp-bg.pat::before{content:"";position:absolute;inset:0;background:var(--wall-ink);-webkit-mask-image:var(--wall-mask);mask-image:var(--wall-mask);-webkit-mask-size:150px 150px;mask-size:150px 150px;-webkit-mask-repeat:repeat;mask-repeat:repeat}
+.wall-prev .wp-bg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,var(--wall-dim,0))}
+.wall-prev .wp-card{position:absolute;inset:12px 14px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--text);background:color-mix(in srgb,var(--card) var(--panel,80%),transparent);border:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.wall-fold{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0;border:0;background:transparent;color:var(--text);font:inherit;cursor:pointer;touch-action:manipulation;text-align:left}
+#setCard .wall-fold .set-l{margin:0}
+.wall-chev{width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--text2);display:grid;place-items:center;flex:none;transition:transform .2s ease}
+.wall-fold[aria-expanded="true"] .wall-chev{transform:rotate(180deg)}
+#wallBody{margin-top:12px}
+#wallBody[hidden]{display:none}
+#wallBody .scale-setting:last-child{border-bottom:0;padding-bottom:0}
+.wall-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 10px}
+.wall-sw{aspect-ratio:1;border:2px solid transparent;border-radius:14px;padding:0;cursor:pointer;background-size:cover;background-position:center;font:inherit;font-size:22px;font-weight:600;color:var(--text2);display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.wall-sw.none,.wall-sw.up{background:var(--soft);border-color:var(--line)}
+.wall-sw.on{border-color:var(--done-bg);box-shadow:0 0 0 2px var(--done-bg)}
+.wall-sw.up{font-size:12px;line-height:1.15;text-align:center;padding:2px}
+.wall-rng{width:100%;margin:6px 0 2px;accent-color:var(--done-bg)}
+.wall-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:8px}
+/* ── Круглее: кнопки, вкладки, плитки ── */
+.tabbar{border-radius:34px;padding:7px}
+.tab{border-radius:999px}
+.tab::before{border-radius:999px}
+.nbtn,.nbtn.sec,.nbtn.main,.act,.range .nbtn,#listCard .lshare,.lshare,#listCard.big .nbtn,
+#setCard .nbtn.sec,#histCard #sendHistBtn,#histCard #exportHistBtn,#histCard #importHistBtn,
+#setCard #updChkBtn,#setCard .set-sw .chip{border-radius:999px}
+.sheet-actions .nbtn,.bk-act .nbtn{border-radius:999px}
+.tile,#listCard.big .tile{border-radius:24px}
+.chip,.badctl{border-radius:999px}
+.step,.card[data-tab="calc"] .step{border-radius:26px}
+.hero{border-radius:34px}
+.card{border-radius:30px}
+
+/* ── Шапка тоже подчиняется прозрачности панелей ── */
+body.has-wall .hero{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.24),transparent 55%),
+    linear-gradient(125deg,color-mix(in srgb,#087cff var(--panel,80%),transparent),color-mix(in srgb,#0758c9 var(--panel,80%),transparent));
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+}
 </style>
 </head>
 <body>
+<div id="wall" aria-hidden="true"></div>
 <div class="app">
   <div class="jsb" id="jsBanner" role="alert"></div>
   <div class="bk-banner" id="bkBanner" data-tab="hist" hidden role="status">
@@ -1689,13 +2418,52 @@ button.badv {
     </div>
   </div>
   <div class="hero" data-tab="calc">
+    <p class="cap-top">Нужно нарезать</p>
     <p class="big" id="hsMain">—</p>
     <p class="sub" id="hs"></p>
+    <p class="sub2" id="hs2"></p>
+  </div>
+
+  <div class="card" data-tab="calc">
+    <h2>Параметры</h2>
+    <div class="theme-row" id="modeRow" role="group" aria-label="Режим" style="margin:0 0 16px">
+      <button type="button" class="opt-chip on" data-mode="0" aria-pressed="true">Целые</button>
+      <button type="button" class="opt-chip" data-mode="1" aria-pressed="false">Обрезки</button>
+    </div>
+    <div class="fields">
+      <div class="pipe-only">
+        <label for="q">Нужно заготовок, шт</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="q" data-s="-1" aria-label="Меньше">−</button>
+          <input id="q" type="number" inputmode="decimal" value="400" min="1" step="any">
+          <button type="button" class="sb" data-t="q" data-s="1" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <div>
+        <label for="p">Длина заготовки, мм</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="p" data-s="-1" aria-label="Меньше">−</button>
+          <input id="p" type="number" inputmode="decimal" value="610" min="1" step="any">
+          <button type="button" class="sb" data-t="p" data-s="1" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <div class="wide pipe-only">
+        <label for="h">Уже есть, шт</label>
+        <div class="step">
+          <button type="button" class="sb" data-t="h" data-s="-1" aria-label="Меньше">−</button>
+          <input id="h" type="number" inputmode="decimal" value="0" min="0" step="any">
+          <button type="button" class="sb" data-t="h" data-s="1" aria-label="Больше">+</button>
+        </div>
+      </div>
+      <p class="fhint pipe-only">Уже нарезаны или на складе — вычтем из заказа</p>
+      <p class="fhint scrap-only">Считайте заготовки по мере резки — число заранее неизвестно</p>
+    </div>
+    <div class="err" id="err"></div>
   </div>
 
   <div class="card" id="diaCard" data-tab="calc">
     <button type="button" class="fold-head" id="foldDia" aria-expanded="false">
-      <span class="fold-title">Сечение</span>
+      <span class="fold-title">Размер трубы</span>
       <span class="fold-val" id="foldDiaVal">Ø50 × 1,2</span>
       <span class="fold-chev" aria-hidden="true">›</span>
     </button>
@@ -1719,88 +2487,53 @@ button.badv {
         </svg>
       </div>
     </div>
-    <div class="ctl" style="margin-top:12px">
-      <div class="crow">
-        <label class="rl" for="d">Диаметр</label>
-        <div class="step sm">
+    <div class="fields size-fields">
+      <div>
+        <label for="d">Диаметр, мм</label>
+        <div class="step">
           <button type="button" class="sb" data-t="d" data-s="-1" aria-label="Меньше">−</button>
           <input id="d" type="number" inputmode="decimal" value="50" min="1" step="any">
           <button type="button" class="sb" data-t="d" data-s="1" aria-label="Больше">+</button>
         </div>
-        <input type="range" class="rng" id="dR" min="10" max="100" step="1" value="50" aria-label="Диаметр, ползунок">
       </div>
-      <div class="crow">
-        <label class="rl" for="t">Стенка</label>
-        <div class="step sm">
+      <div>
+        <label for="t">Толщина стенки, мм</label>
+        <div class="step">
           <button type="button" class="sb" data-t="t" data-s="-0.1" aria-label="Тоньше">−</button>
           <input id="t" type="number" inputmode="decimal" value="1.2" min="0.1" step="any">
           <button type="button" class="sb" data-t="t" data-s="0.1" aria-label="Толще">+</button>
         </div>
-        <div class="psets">
-          <button type="button" class="pset" data-v="1.2">1,2</button>
-          <button type="button" class="pset" data-v="1.5">1,5</button>
-        </div>
       </div>
-    </div>
-  </div>
-
-  <div class="card" data-tab="calc">
-    <h2>Параметры</h2>
-    <div class="fields">
-      <div>
-        <label for="q">Нужно заготовок, шт</label>
-        <div class="step">
-          <button type="button" class="sb" data-t="q" data-s="-1" aria-label="Меньше">−</button>
-          <input id="q" type="number" inputmode="decimal" value="400" min="1" step="any">
-          <button type="button" class="sb" data-t="q" data-s="1" aria-label="Больше">+</button>
+      <div class="pipe-only">
+        <div class="lbl-row">
+          <label for="L">Длина, мм</label>
+          <button type="button" class="lenset" id="lenReset" aria-label="Вернуть 6000 мм" style="visibility:hidden">6000</button>
         </div>
-      </div>
-      <div>
-        <label for="p">Длина заготовки, мм</label>
         <div class="step">
-          <button type="button" class="sb" data-t="p" data-s="-1" aria-label="Меньше">−</button>
-          <input id="p" type="number" inputmode="decimal" value="610" min="1" step="any">
-          <button type="button" class="sb" data-t="p" data-s="1" aria-label="Больше">+</button>
-        </div>
-      </div>
-      <div>
-        <label for="L">Длина трубы, мм</label>
-        <div class="step">
-          <button type="button" class="sb" data-t="L" data-s="-100" aria-label="Меньше">−</button>
+          <button type="button" class="sb" data-t="L" data-s="-100" aria-label="Короче">−</button>
           <input id="L" type="number" inputmode="decimal" value="6000" min="1" step="any">
-          <button type="button" class="sb" data-t="L" data-s="100" aria-label="Больше">+</button>
+          <button type="button" class="sb" data-t="L" data-s="100" aria-label="Длиннее">+</button>
         </div>
       </div>
-      <div>
-        <label for="b">Труб в пачке, шт</label>
+      <div class="pipe-only">
+        <label for="b">Труб в пачке</label>
         <div class="step">
-          <button type="button" class="sb" data-t="b" data-s="-1" aria-label="Меньше">−</button>
+          <button type="button" class="sb" data-t="b" data-s="-1" aria-label="Меньше труб в пачке">−</button>
           <input id="b" type="number" inputmode="decimal" value="50" min="1" step="any">
-          <button type="button" class="sb" data-t="b" data-s="1" aria-label="Больше">+</button>
+          <button type="button" class="sb" data-t="b" data-s="1" aria-label="Больше труб в пачке">+</button>
         </div>
       </div>
-      <div>
-        <label for="k">Пропил реза, мм</label>
-        <div class="step">
-          <button type="button" class="sb" data-t="k" data-s="-0.5" aria-label="Меньше">−</button>
-          <input id="k" type="number" inputmode="decimal" value="0" min="0" step="any">
-          <button type="button" class="sb" data-t="k" data-s="0.5" aria-label="Больше">+</button>
+      <div class="wide">
+        <label>Тип трубы</label>
+        <div class="theme-row" id="pfRow" role="group" aria-label="Тип трубы">
+          <button type="button" class="pf-opt on" data-pf="0" aria-pressed="true">Обычная</button>
+          <button type="button" class="pf-opt" data-pf="1" aria-pressed="false">Перфорация</button>
         </div>
       </div>
-      <div>
-        <label for="h">Уже есть, шт</label>
-        <div class="step">
-          <button type="button" class="sb" data-t="h" data-s="-1" aria-label="Меньше">−</button>
-          <input id="h" type="number" inputmode="decimal" value="0" min="0" step="any">
-          <button type="button" class="sb" data-t="h" data-s="1" aria-label="Больше">+</button>
-        </div>
-      </div>
-      <p class="fhint">Пропил — толщина пилы. «Уже есть» вычтем из заказа.</p>
     </div>
-    <div class="err" id="err"></div>
   </div>
 
-  <div class="card" data-tab="calc">
+  <div class="card pipe-only" id="cutCard" data-tab="calc">
     <h2>Как резать</h2>
     <div class="legend">
       <span><i style="background:var(--acc-bg);border:1px solid var(--acc-line)"></i>заготовка</span>
@@ -1810,14 +2543,9 @@ button.badv {
     <p class="cap" id="c1"></p>
     <div class="pipe" id="bar2"></div>
     <p class="cap" id="c2"></p>
+    <p class="cap" id="packNote" style="margin-bottom:6px"></p>
+    <p class="cap" id="cutsNote" style="margin-bottom:12px"></p>
     <button type="button" class="nbtn sec" id="imgBtn" style="width:100%;margin-top:0;min-height:44px">Отправить картинкой</button>
-  </div>
-
-  <div class="grid" data-tab="calc">
-    <div class="m"><p class="l">Пачек</p><p class="v" id="pipesV">—</p><p class="s" id="pipesS"></p></div>
-    <div class="m"><p class="l">Заготовок из трубы</p><p class="v" id="per">—</p><p class="s" id="perS"></p></div>
-    <div class="m"><p class="l">Обрезки</p><p class="v" id="wasteV">—</p><p class="s" id="wasteS"></p></div>
-    <div class="m"><p class="l">Резов</p><p class="v" id="cutsV">—</p><p class="s" id="cutsS"></p></div>
   </div>
 
   <div class="card" id="listEmpty" data-tab="list" data-off>
@@ -1833,86 +2561,75 @@ button.badv {
       </div>
     </div>
 
-    <div class="ptxt"><span id="pt1"></span><span id="pt2"></span></div>
-    <div class="prog"><i id="pfill"></i></div>
+    <div class="stats" id="statsRow">
+      <div class="stat" id="stat1">
+        <p class="stat-v" id="pt1">—</p>
+        <p class="stat-l" id="pt1l">трубы</p>
+      </div>
+      <div class="stat" id="stat2">
+        <p class="stat-v" id="pt2">—</p>
+        <p class="stat-l" id="pt2l">заготовки</p>
+      </div>
+    </div>
+    <div class="prog" id="progressTrack" role="progressbar" aria-label="Прогресс резки" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="pfill"></i></div>
+    <div class="progress-meta" id="progressMeta"><span id="progressText">0% выполнено</span><span id="progressCount">0 из 0</span></div>
     <p class="left" id="left"></p>
     <p class="left2" id="left2"></p>
-    <button type="button" class="lshare" id="leftShareBtn">Отправить остаток</button>
+    <button type="button" class="lshare" id="leftShareBtn">Поделиться остатком</button>
 
     <div class="now">
       <p class="nowT" id="nowT"></p>
       <p class="nowS" id="nowS"></p>
-      <div class="nrow" id="actRow">
-        <button type="button" class="nbtn" id="pieceBtn">+1 заготовка</button>
-        <button type="button" class="nbtn main" id="nextBtn">Готово</button>
-      </div>
+      <button type="button" class="nbtn main" id="nextBtn" style="width:100%">Готово</button>
       <div class="nrow" style="margin-top:10px" id="actRow2">
+        <button type="button" class="nbtn" id="pieceBtn">+1 заготовка</button>
         <button type="button" class="nbtn" id="plus10Btn">+10 труб</button>
-        <button type="button" class="nbtn sec" id="undoBtn">Назад</button>
       </div>
-      <div class="nrow" style="margin-top:10px">
+      <div class="nrow scrap-only" id="actRow3" style="margin-top:8px">
+        <button type="button" class="nbtn main" id="plus20Btn">+20</button>
+        <button type="button" class="nbtn main" id="plus50Btn">+50</button>
+      </div>
+      <button type="button" class="nbtn sec" id="undoBtn" style="width:100%;margin-top:10px">Назад</button>
+      <details class="more" id="moreBox">
+        <summary><span>Брак и остатки</span><span class="more-b" id="moreBadge"></span></summary>
         <div class="badctl" role="group" aria-label="Брак">
           <button type="button" class="badb" id="badMinus" aria-label="Брак меньше">−</button>
           <span class="badv">Брак <b id="badVal">0</b></span>
           <button type="button" class="badb" id="badBtn" aria-label="Брак больше">+</button>
         </div>
-      </div>
-      <p class="nowB" id="badNote"></p>
-      <div class="badctl" id="xCtl" role="group" aria-label="Из остатков, сверх задания" style="margin-top:10px">
-        <button type="button" class="badb" id="xMinus" aria-label="Из остатков меньше">−</button>
-        <button type="button" class="badv" id="xMid" aria-label="Ввести число из остатков">Из остатков <b id="xVal">0</b></button>
-        <button type="button" class="badb" id="xBtn" aria-label="Из остатков больше">+</button>
-      </div>
-      <p class="nowB" id="xNote"></p>
+        <p class="nowB" id="badNote"></p>
+        <div class="badctl" id="xCtl" role="group" aria-label="Из остатков, сверх задания" style="margin-top:10px">
+          <button type="button" class="badb" id="xMinus" aria-label="Из остатков меньше">−</button>
+          <button type="button" class="badv" id="xMid" aria-label="Ввести число из остатков">Из остатков <b id="xVal">0</b></button>
+          <button type="button" class="badb" id="xBtn" aria-label="Из остатков больше">+</button>
+        </div>
+        <p class="nowB" id="xNote"></p>
+      </details>
     </div>
 
     <div class="tiles" id="tiles"></div>
     <p class="tleg" id="tleg"></p>
 
-    <div class="range">
-      <span>Трубы с</span>
-      <input id="rFrom" type="number" inputmode="numeric" value="1" min="1" aria-label="С трубы номер">
+    <div class="range" id="rangeRow">
+      <span id="rangeLbl">Трубы с</span>
+      <input id="rFrom" type="number" inputmode="numeric" value="1" min="1" aria-label="С номера">
       <span>по</span>
-      <input id="rTo" type="number" inputmode="numeric" value="1" min="1" aria-label="По трубу номер">
+      <input id="rTo" type="number" inputmode="numeric" value="1" min="1" aria-label="По номер">
       <button type="button" class="nbtn" id="rBtn">Отметить</button>
     </div>
 
     <button type="button" class="nbtn sec" id="resetDone" style="width:100%;margin-top:14px;min-height:44px">Сбросить отметки</button>
-    <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:8px;height:50px">Сохранить раскрой</button>
-  </div>
-
-  <div class="card" id="bendCard" data-tab="bend">
-    <div id="bendListWrap">
-      <h2>Гибка</h2>
-      <p class="cap" style="margin-top:-8px">Выберите раскрой из истории — и считайте согнутые</p>
-      <div id="bendList"></div>
-    </div>
-    <div id="bendWork" hidden>
-      <button type="button" class="bend-back" id="bendBack">‹ К списку</button>
-      <h2 id="bendTitle">—</h2>
-      <p class="cap" id="bendMeta" style="margin-top:-8px"></p>
-      <p class="bend-cnt"><span id="bendN">0</span><small id="bendOf">/ 0</small></p>
-      <p class="bend-sub" id="bendSub"></p>
-      <div class="bend-row">
-        <button type="button" class="nbtn" id="bendM1">−1</button>
-        <button type="button" class="nbtn main" id="bendP10">+10</button>
-        <button type="button" class="nbtn" id="bendP1">+1</button>
-      </div>
-      <div class="bend-row2">
-        <button type="button" class="nbtn sec" id="bendUndo">Назад</button>
-        <button type="button" class="nbtn sec" id="bendReset">Сброс</button>
-      </div>
-    </div>
+    <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:8px;height:50px">Сохранить в историю</button>
   </div>
 
   <div class="card" id="histCard" data-tab="hist">
-    <h2>Сохранённые раскрои</h2>
-    <div id="histList"></div>
-    <button type="button" class="nbtn main" id="shareBtn" style="width:100%;margin-top:12px;height:50px">Поделиться раскроем</button>
-    <button type="button" class="nbtn sec" id="sendHistBtn" style="width:100%;margin-top:8px;min-height:44px">Отправить резервную копию</button>
+    <h2>Сохранённые</h2>
+    <div id="histList" aria-live="polite"></div>
+    <button type="button" class="nbtn main" id="shareBtn" style="width:100%;margin-top:12px;height:50px;font-size:15px">Поделиться</button>
+    <button type="button" class="nbtn sec" id="sendHistBtn" style="width:100%;margin-top:8px;min-height:44px;font-size:15px;font-weight:700">Отправить резервную копию</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-      <button type="button" class="nbtn sec" id="exportHistBtn" style="min-height:44px">Скачать файл</button>
-      <button type="button" class="nbtn sec" id="importHistBtn" style="min-height:44px">Восстановить</button>
+      <button type="button" class="nbtn sec" id="exportHistBtn" style="min-height:44px;font-size:15px;font-weight:700">Скачать файл</button>
+      <button type="button" class="nbtn sec" id="importHistBtn" style="min-height:44px;font-size:15px;font-weight:700">Восстановить</button>
     </div>
     <input type="file" id="importHistFile" accept=".json,application/json" hidden>
     <p id="storageStatus" style="font-size:12px;line-height:1.45;color:var(--text2);margin:10px 2px 0">Проверка сохранения…</p>
@@ -1922,31 +2639,57 @@ button.badv {
     <h2>Настройки</h2>
     <div class="set-body">
       <div>
-        <p class="set-l">Общий цех</p>
-        <p class="set-d" id="shopStatus">Выкл · данные только на этом телефоне</p>
-        <div class="shop-row">
-          <input class="shop-input" id="shopCode" type="text" inputmode="numeric" maxlength="6" placeholder="Код" aria-label="Код цеха" autocomplete="off">
-          <button type="button" class="nbtn main shop-btn" id="shopConnectBtn">Включить</button>
-        </div>
-        <p class="set-d" style="margin-top:10px">Одинаковый код на двух телефонах — общая история и гибка. Нужен интернет.</p>
-        <button type="button" class="nbtn sec" id="shopCfgBtn" style="width:100%;margin-top:10px;min-height:44px">Настроить облако</button>
-        <div id="shopCfgBox" hidden>
-          <p class="set-d" style="margin-bottom:8px">1) console.firebase.google.com — создать проект<br>
-          2) Realtime Database — создать (test mode)<br>
-          3) Project settings → Web — скопировать apiKey и databaseURL</p>
-          <input class="shop-field" id="fbApiKey" type="text" placeholder="apiKey" autocomplete="off" spellcheck="false">
-          <input class="shop-field" id="fbDbUrl" type="text" placeholder="databaseURL" autocomplete="off" spellcheck="false">
-          <input class="shop-field" id="fbProjectId" type="text" placeholder="projectId (необязательно)" autocomplete="off" spellcheck="false">
-          <button type="button" class="nbtn main" id="shopCfgSave" style="width:100%;height:48px">Сохранить ключи</button>
-        </div>
-      </div>
-      <div>
         <p class="set-l">Тема</p>
         <div class="theme-row" id="themeRow">
           <button type="button" class="theme-chip on" data-theme="auto">Авто</button>
           <button type="button" class="theme-chip" data-theme="light">Светлая</button>
           <button type="button" class="theme-chip" data-theme="dark">Тёмная</button>
         </div>
+      </div>
+      <div class="wall-sec">
+        <button type="button" class="wall-fold" id="wallFold" aria-expanded="false" aria-controls="wallBody">
+          <span class="set-l">Фон</span>
+          <span class="wall-chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l4 4 4-4"/></svg></span>
+        </button>
+        <div id="wallBody" hidden>
+        <div class="wall-grid" id="wallGrid"></div>
+        <input type="file" id="wallFile" accept="image/*" hidden>
+        <div class="wall-prev" aria-hidden="true"><div class="wp-bg" id="wpBg"></div><div class="wp-card">Так будут выглядеть панели</div></div>
+        <p class="set-d" id="wallDesc" style="margin-top:8px">Узоры из инструментов или своё фото. Узор можно сочетать с любой темой.</p>
+      <div class="scale-setting">
+        <div class="scale-head">
+          <div>
+            <p class="set-l">Прозрачность панелей</p>
+            <p class="set-d">Насколько фон виден сквозь карточки</p>
+          </div>
+          <output id="panelVal" for="panelRng">20%</output>
+        </div>
+        <input id="panelRng" class="scale-range" type="range" min="0" max="60" step="5" value="20" aria-label="Прозрачность панелей">
+        <div class="scale-ends"><span>Плотные</span><button type="button" id="panelReset">Сбросить</button><span>Прозрачные</span></div>
+      </div>
+      <div class="scale-setting">
+        <div class="scale-head">
+          <div>
+            <p class="set-l">Затемнение фона</p>
+            <p class="set-d">Делает узор или фото менее ярким</p>
+          </div>
+          <output id="dimVal" for="dimRng">0%</output>
+        </div>
+        <input id="dimRng" class="scale-range" type="range" min="0" max="60" step="5" value="0" aria-label="Затемнение фона">
+        <div class="scale-ends"><span>Светлее</span><button type="button" id="dimReset">Сбросить</button><span>Темнее</span></div>
+      </div>
+        </div>
+      </div>
+      <div class="scale-setting">
+        <div class="scale-head">
+          <div>
+            <p class="set-l">Масштаб интерфейса</p>
+            <p class="set-d">Изменяет размер элементов приложения</p>
+          </div>
+          <output id="scaleValue" for="scaleRange">100%</output>
+        </div>
+        <input id="scaleRange" class="scale-range" type="range" min="90" max="120" step="5" value="100" aria-label="Масштаб интерфейса">
+        <div class="scale-ends"><span>Компактный</span><button type="button" id="scaleReset">Сбросить</button><span>Крупный</span></div>
       </div>
       <div class="set-sw">
         <div>
@@ -1996,7 +2739,7 @@ button.badv {
       </div>
       <div>
         <button type="button" class="nbtn sec" id="histClearBtn" style="width:100%;min-height:44px;color:var(--danger)">Очистить историю</button>
-        <p class="set-d" style="margin-top:6px">Все сохранённые раскрои. Сразу после очистки можно отменить.</p>
+        <p class="set-d" style="margin-top:6px">Все сохранённые записи. Сразу после очистки можно отменить.</p>
       </div>
       <div>
         <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--danger)">Стереть расчёт, отметки и историю</button>
@@ -2016,10 +2759,6 @@ button.badv {
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
       <span>Чек-лист</span>
     </button>
-    <button type="button" class="tab" data-go="bend">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16c4-8 8-8 12 0"/><path d="M4 16h2M16 16h4"/><circle cx="7" cy="16" r="1.5"/><circle cx="17" cy="16" r="1.5"/></svg>
-      <span>Гибка</span>
-    </button>
     <button type="button" class="tab" data-go="hist" id="tabHist">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
       <span>История</span>
@@ -2038,7 +2777,7 @@ button.badv {
 </div>
 
 <div class="toast" id="shareToast" role="status" aria-live="polite" hidden>
-  <span>Раскрой сохранён</span>
+  <span>Сохранено</span>
   <button type="button" id="shareToastBtn">Поделиться</button>
 </div>
 
@@ -2070,9 +2809,32 @@ window.onerror = function(msg, src, line){
   }
 };
 
-var IDS = ['q','p','L','b','d','t','k','h'];
+var IDS = ['q','p','L','b','d','t','h'];
 var KEY = 'pipecalc.v1';
 var S = null;
+var PF = 0;   // 1 — перфорированная труба: только пометка, на раскрой не влияет
+var MODE = 0; // 0 — трубы, 1 — обрезки (без расчёта труб)
+
+function setPf(v){
+  PF = v ? 1 : 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.pf-opt'), function(b){
+    var on = (+b.getAttribute('data-pf')) === PF;
+    b.className = 'pf-opt' + (on ? ' on' : '');
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+function setMode(v){
+  MODE = v ? 1 : 0;
+  Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function(b){
+    var on = (+b.getAttribute('data-mode')) === MODE;
+    b.className = 'opt-chip' + (on ? ' on' : '');
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  document.body.classList.toggle('is-scrap', !!MODE);
+  var foldTitle = document.querySelector('#foldDia .fold-title');
+  if (foldTitle) foldTitle.textContent = MODE ? 'Размер' : 'Размер трубы';
+}
 
 function $(id){ return document.getElementById(id); }
 function fmt(x){ return String(Math.round(x * 10) / 10).replace('.', ','); }
@@ -2088,6 +2850,8 @@ function save(){
   try{
     var o = {};
     IDS.forEach(function(id){ o[id] = $(id).value; });
+    o.pf = PF;
+    o.mode = MODE;
     localStorage.setItem(KEY, JSON.stringify(o));
   }catch(e){}
 }
@@ -2100,6 +2864,8 @@ function load(){
     IDS.forEach(function(id){
       if (o && o[id] !== undefined && o[id] !== null && o[id] !== '') $(id).value = o[id];
     });
+    if (o && o.pf) setPf(1);
+    if (o && o.mode) setMode(1);
   }catch(e){}
 }
 
@@ -2115,92 +2881,111 @@ function draw(el, cuts, p, L, off){
   el.innerHTML = h;
 }
 
+function getScrap(sig){
+  var r = doneAll[sig];
+  return (r && !(r instanceof Array) && r.scrap > 0) ? r.scrap : 0;
+}
+function putScrap(sig, v){
+  var r = doneAll[sig];
+  if (!r || r instanceof Array){ r = {c: {}, h: []}; doneAll[sig] = r; }
+  r.scrap = Math.max(0, v);
+}
+
 function calc(){
   var L = +$('L').value, p = +$('p').value, q = +$('q').value, b = +$('b').value;
-  var kerf = $('k').value === '' ? 0 : +$('k').value;
   var have = $('h').value === '' ? 0 : +$('h').value;
   var qAll = q;
-  if (!(L > 0 && p > 0 && q > 0 && b > 0)){
+  var scrap = MODE === 1;
+
+  if (!(p > 0) || (!scrap && !(L > 0 && q > 0 && b > 0))){
     $('err').textContent = 'Заполните все поля положительными числами';
     S = null;
     return;
   }
-  if (!(kerf >= 0)){
-    $('err').textContent = 'Пропил не может быть отрицательным';
-    S = null;
-    return;
-  }
-  if (!(have >= 0)){
-    $('err').textContent = '«Уже есть» не может быть отрицательным';
-    S = null;
-    return;
-  }
-  if (q !== Math.floor(q) || b !== Math.floor(b) || have !== Math.floor(have)){
-    $('err').textContent = 'Количество заготовок, «Уже есть» и труб в пачке — целые числа';
-    S = null;
-    return;
-  }
-  q = qAll - have;   // дальше q — сколько нужно нарезать
-  if (q <= 0){
-    $('err').textContent = 'Все заготовки уже есть — резать нечего';
-    S = null;
-    return;
-  }
-  var q0 = q;      // план без учёта брака
-  var jobSig = [q0, p, L, +$('d').value || 0, +$('t').value || 0, kerf].join('|');
-  var bad = getBad(jobSig);
-  var extra = getExtra(jobSig);   // сверх задания, из остатков: трубы и пачки не меняет
-  q = q0 + bad;    // плюс заготовки взамен брака
-  if (p > L){
-    $('err').textContent = 'Заготовка длиннее трубы';
-    S = null;
-    return;
+  if (!scrap){
+    if (!(have >= 0)){
+      $('err').textContent = '«Уже есть» не может быть отрицательным';
+      S = null;
+      return;
+    }
+    if (q !== Math.floor(q) || b !== Math.floor(b) || have !== Math.floor(have)){
+      $('err').textContent = 'Количество заготовок, «Уже есть» и труб в пачке — целые числа';
+      S = null;
+      return;
+    }
+    q = qAll - have;
+    if (q <= 0){
+      $('err').textContent = 'Все заготовки уже есть — резать нечего';
+      S = null;
+      return;
+    }
+    if (p > L){
+      $('err').textContent = 'Заготовка длиннее трубы';
+      S = null;
+      return;
+    }
   }
   $('err').textContent = '';
 
-  // После каждой заготовки уходит kerf мм. Если у торца трубы ничего не остаётся, последний рез не нужен.
-  function pipeInfo(c){
-    var free = Math.round((L - (c * p + (c - 1) * kerf)) * 1000) / 1000;
-    if (free > 0) return {cuts: c, off: Math.max(free - kerf, 0)};
-    return {cuts: c - 1, off: 0};
-  }
-  var per   = Math.floor((L + kerf) / (p + kerf) + 1e-9);
-  var full  = Math.floor(q / per);
-  var rem   = q - full * per;
-  var n     = full + (rem > 0 ? 1 : 0);
-  var bn    = Math.ceil(n / b);
-  var iFull = pipeInfo(per);
-  var iLast = rem > 0 ? pipeInfo(rem) : {cuts: 0, off: 0};
-  var wFull = iFull.off;
-  var wLast = iLast.off;
-  var waste = n * L - q * p;
-  var cuts  = full * iFull.cuts + iLast.cuts;
+  var q0, jobSig, bad, extra, per, full, rem, n, bn, wFull, wLast;
 
-  S = {L:L, p:p, q:q, q0:q0, bad:bad, x:extra, sig:jobSig, h:have, k:kerf, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, cuts:cuts};
-
-  var hero = heroTexts(n, full, rem, per, have, bad);
-  $('hsMain').textContent = hero.main;
-  $('hs').textContent = hero.sub;
-  $('pipesV').textContent = bn;
-  $('pipesS').textContent = 'в пачке ' + b + (bn * b - n > 0 ? ', останется ' + (bn * b - n) : '');
-  $('per').textContent = per;
-  $('perS').textContent = 'обрезок ' + fmt(wFull) + ' мм';
-  $('wasteV').textContent = num(Math.round(waste / (n * L) * 1000) / 10) + '%';
-  $('wasteS').textContent = num(Math.round(waste / 100) / 10) + ' м';
-  $('cutsV').textContent = cuts;
-  $('cutsS').textContent = (have > 0 || bad > 0) ? 'резать ' + q + ' из ' + qAll : '';
-
-  $('bar1').style.display = full > 0 ? '' : 'none';
-  $('c1').style.display = full > 0 ? '' : 'none';
-  if (full > 0) draw($('bar1'), per, p, L, wFull);
-  $('c1').textContent = 'Целая труба ×' + full + ': ' + per + ' × ' + num(p) + ' мм, обрезок ' + fmt(wFull) + ' мм' + (kerf > 0 ? ', пропил ' + num(kerf) + ' мм' : '');
-  if (rem > 0){
-    $('bar2').style.display = '';
-    draw($('bar2'), rem, p, L, wLast);
-    $('c2').textContent = 'Последняя труба: ' + rem + ' × ' + num(p) + ' мм, остаток ' + fmt(wLast) + ' мм в запас';
+  if (scrap){
+    // Обрезки: счётчик нарезанного, план заранее неизвестен
+    jobSig = ['s', p, +$('d').value || 0, +$('t').value || 0].join('|') + (PF ? '|pf' : '');
+    bad = getBad(jobSig);
+    extra = 0;
+    q0 = 0;
+    q = getScrap(jobSig);
+    per = 1; full = 0; rem = 0; n = 0; bn = 0; wFull = 0; wLast = 0;
   } else {
-    $('bar2').style.display = 'none';
-    $('c2').textContent = 'Все трубы режутся одинаково';
+    q0 = q;
+    jobSig = [q0, p, L, +$('d').value || 0, +$('t').value || 0, 0].join('|') + (PF ? '|pf' : '');
+    bad = getBad(jobSig);
+    extra = getExtra(jobSig);
+    q = q0 + bad;
+    per   = Math.floor(L / p + 1e-9);
+    full  = Math.floor(q / per);
+    rem   = q - full * per;
+    n     = full + (rem > 0 ? 1 : 0);
+    bn    = Math.ceil(n / b);
+    wFull = Math.round((L - per * p) * 1000) / 1000;
+    wLast = rem > 0 ? Math.round((L - rem * p) * 1000) / 1000 : 0;
+  }
+
+  S = {L:L, p:p, q:q, q0:q0, bad:bad, x:extra, sig:jobSig, h:have, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, mode:MODE};
+
+  var cap = document.querySelector('.hero .cap-top');
+  if (cap) cap.textContent = scrap ? 'Из обрезков' : 'Нужно нарезать';
+
+  if (scrap){
+    var total = q;
+    $('hsMain').textContent = total > 0
+      ? total + ' ' + plural(total, 'заготовка', 'заготовки', 'заготовок')
+      : 'Пока 0';
+    $('hs').textContent = 'по ' + num(p) + ' мм';
+    $('hs2').textContent = bad > 0 ? 'брак ' + bad : 'Отмечайте в чек-листе по мере резки';
+  } else {
+    var hero = heroTexts(n, full, rem, per, have, bad);
+    $('hsMain').textContent = hero.main;
+    $('hs').textContent = hero.sub;
+    var spare = bn * b - n;
+    var pack = bn + ' ' + plural(bn, 'пачка', 'пачки', 'пачек');
+    if (spare > 0) pack += ', останется ' + spare;
+    $('hs2').textContent = (hero.sub2 ? hero.sub2 + ' · ' : '') + pack;
+    $('packNote').textContent = '';
+    $('cutsNote').textContent = '';
+    $('bar1').style.display = full > 0 ? '' : 'none';
+    $('c1').style.display = full > 0 ? '' : 'none';
+    if (full > 0) draw($('bar1'), per, p, L, wFull);
+    $('c1').textContent = 'Целая труба ×' + full + ': ' + per + ' × ' + num(p) + ' мм, обрезок ' + fmt(wFull) + ' мм';
+    if (rem > 0){
+      $('bar2').style.display = '';
+      draw($('bar2'), rem, p, L, wLast);
+      $('c2').textContent = 'Последняя труба: ' + rem + ' × ' + num(p) + ' мм, остаток ' + fmt(wLast) + ' мм';
+    } else {
+      $('bar2').style.display = 'none';
+      $('c2').textContent = 'Все трубы режутся одинаково';
+    }
   }
 }
 
@@ -2252,12 +3037,6 @@ function pipeTo(r, w){
   }
   pipeAnim = requestAnimationFrame(step);
 }
-function syncRange(id, v){
-  var el = $(id), mn = +el.min, mx = +el.max;
-  var c = Math.max(mn, Math.min(mx, v));
-  el.value = c;
-  el.style.setProperty('--p', ((c - mn) / (mx - mn) * 100) + '%');
-}
 function drawDia(){
   var d = +$('d').value;
   if (!(d > 0)) return;
@@ -2269,14 +3048,28 @@ function drawDia(){
   $('wGrp').style.display = hasT ? '' : 'none';
   if (hasT) $('wTxt').textContent = num(t) + ' мм';
   pipeTo(r, w);
-  Array.prototype.forEach.call(document.querySelectorAll('.pset'), function(b){
-    b.className = 'pset' + (hasT && Math.abs(+b.getAttribute('data-v') - t) < 0.001 ? ' on' : '');
-  });
-  syncRange('dR', d);
   var fv = $('foldDiaVal');
-  if (fv) fv.textContent = 'Ø' + num(d) + (t > 0 ? ' × ' + num(t) : '');
+  var Lv = +$('L').value, oddL = Lv > 0 && Lv !== 6000;
+  if (fv) {
+    fv.textContent = 'Ø' + num(d) + (t > 0 ? ' × ' + num(t) : '') + (oddL ? ' · ' + num(Lv) + ' мм' : '') + (PF ? ' · перф.' : '');
+    fv.style.color = oddL ? 'var(--warn-fg)' : '';
+  }
+  var lr = $('lenReset');
+  if (lr) lr.style.visibility = oddL ? 'visible' : 'hidden';
 }
-$('dR').addEventListener('input', function(){ $('d').value = this.value; update(); });
+$('lenReset').addEventListener('click', function(){ $('L').value = '6000'; update(); });
+Array.prototype.forEach.call(document.querySelectorAll('.pf-opt'), function(b){
+  b.addEventListener('click', function(){
+    setPf(+b.getAttribute('data-pf'));
+    update();
+  });
+});
+Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function(b){
+  b.addEventListener('click', function(){
+    setMode(+b.getAttribute('data-mode'));
+    update();
+  });
+});
 
 var DONE_KEY = 'pipecalc.done.v2';
 var UI_KEY = 'pipecalc.ui.v1';
@@ -2288,8 +3081,8 @@ try{
   if (d2){ for (var kk in d2){ doneAll[kk] = d2[kk]; } }
 }catch(e){}
 var curSig = null, cnt = {}, hist = [], nextIdx = -1, legacyDone = false;
-var TABS = ['calc','list','bend','hist','set'];
-var ui = {big:false, fb:true, wake:true, guard:true, theme:'auto', foldDia:false, tab:'calc', bk:'week', histMax:30};
+var TABS = ['calc','list','hist','set'];
+var ui = {big:false, fb:true, wake:true, guard:true, theme:'auto', foldDia:true, tab:'calc', bk:'week', histMax:30, scale:100};
 var leftTxt = '', hintTimer = null;
 try{
   var u = JSON.parse(localStorage.getItem(UI_KEY));
@@ -2300,11 +3093,20 @@ try{
     if (u.bk === 'month' || u.bk === 'off') ui.bk = u.bk;
     if ([30, 100, 0].indexOf(Number(u.histMax)) >= 0 && u.histMax !== null && u.histMax !== '') ui.histMax = Number(u.histMax);
     if (TABS.indexOf(u.tab) >= 0) ui.tab = u.tab;
+    if ([90,95,100,105,110,115,120].indexOf(Number(u.scale)) >= 0) ui.scale = Number(u.scale);
   }
 }catch(e){}
 
 function saveUI(){
   try{ localStorage.setItem(UI_KEY, JSON.stringify(ui)); }catch(e){}
+}
+
+function applyScale(){
+  var root = document.documentElement;
+  root.style.setProperty('--ui-scale', String(ui.scale / 100));
+  var range = $('scaleRange'), value = $('scaleValue');
+  if (range) range.value = String(ui.scale);
+  if (value) value.textContent = ui.scale + '%';
 }
 
 function applyTheme(){
@@ -2366,6 +3168,7 @@ function applyUI(){
   $('guardBtn').textContent = ui.guard ? 'Вкл' : 'Выкл';
   applyOpts();
   applyTheme();
+  applyScale();
   applyFold();
   syncTabs();
 }
@@ -2438,8 +3241,9 @@ function saveDone(){
   if (!curSig) return;
   var bad = getBad(curSig);
   var xtra = getExtra(curSig);
+  var sc = getScrap(curSig);
   delete doneAll[curSig];
-  doneAll[curSig] = {c: cnt, h: hist, bad: bad, x: xtra};
+  doneAll[curSig] = {c: cnt, h: hist, bad: bad, x: xtra, scrap: sc};
   var keys = Object.keys(doneAll);
   while (keys.length > 20){ delete doneAll[keys.shift()]; }
   try{ localStorage.setItem(DONE_KEY, JSON.stringify(doneAll)); }catch(e){}
@@ -2448,35 +3252,107 @@ function saveDone(){
 // Разбивка оставшихся труб по числу заготовок: «23 целых + 1 на 2 заготовки»
 function leftBreakdown(groups){
   var keys = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; });
-  if (keys.length < 2) return '';
+  if (!keys.length) return '';
+  if (keys.length === 1 && keys[0] === S.per) return '';
+  // «44 × 9 шт · 1 × 4 шт»
   return keys.map(function(r){
     var n = groups[r];
-    return r === S.per ? n + ' ' + plural(n, 'целая', 'целых', 'целых')
-                       : n + ' на ' + r + ' ' + pieceWord(r, 'на');
-  }).join(' + ');
+    return n + ' × ' + r + ' шт';
+  }).join(' · ');
 }
 
-// Верхний итог на «Расчёте»: «44 трубы × 9 заготовок» / «1 труба × 4 заготовки · всего 45 труб»
+// Верхний итог на «Расчёте», три строки:
+//   «44 трубы × 9 заготовок»              — главное
+//   «+ 1 труба × 4 заготовки»             — последняя труба (если есть)
+//   «Всего 45 труб · 400 заготовок · …»   — числа для сверки, мелко
 function heroTexts(n, full, rem, per, have, bad){
   function pipes(k){ return k + ' ' + plural(k, 'труба', 'трубы', 'труб'); }
   function pieces(k){ return k + '\u00a0' + plural(k, 'заготовка', 'заготовки', 'заготовок'); }
-  var main, sub = '';
+  var total = full * per + rem;
+  var main, sub = '', sub2 = '';
   if (rem > 0 && full === 0) {
     main = '1 труба × ' + pieces(rem);
   } else if (rem > 0) {
     main = pipes(full) + ' × ' + pieces(per);
-    sub = '1 труба × ' + pieces(rem) + ' · всего ' + pipes(n);
+    sub = '+\u00a01 труба × ' + pieces(rem);
+    sub2 = 'Всего ' + pipes(n) + ' · ' + pieces(total);
   } else {
     main = pipes(n) + ' × ' + pieces(per);
+    sub2 = 'Всего ' + pieces(total);
   }
-  if (have > 0) sub += (sub ? ' · ' : '') + 'уже есть ' + pieces(have);
-  if (bad > 0) sub += (sub ? ' · ' : '') + 'брак ' + pieces(bad);
-  return {main: main, sub: sub};
+  if (have > 0) sub2 += (sub2 ? ' · ' : '') + 'уже есть ' + pieces(have);
+  if (bad > 0) sub2 += (sub2 ? ' · ' : '') + 'брак ' + pieces(bad);
+  return {main: main, sub: sub, sub2: sub2};
 }
 
 function renderList(){
   var h = '', pd = 0, cd = 0, i, lg = {};
+  var scrap = S.mode === 1;
   nextIdx = -1;
+
+  // Режим обрезков — простой счётчик
+  if (scrap){
+    cd = S.q;
+    $('tiles').innerHTML = '';
+    $('tiles').style.display = 'none';
+    $('tleg').style.display = 'none';
+    $('rangeRow').style.display = 'none';
+    $('statsRow').style.display = '';
+    $('stat1').className = 'stat' + (cd > 0 ? ' done' : '');
+    $('stat2').className = 'stat';
+    $('pt1').innerHTML = '<span class="stat-num">' + cd + '</span>'; 
+    $('pt1l').textContent = plural(cd, 'заготовка', 'заготовки', 'заготовок');
+    $('pt2').innerHTML = '<span class="stat-num">' + num(S.p) + '</span>'; 
+    $('pt2l').textContent = 'мм';
+    $('pfill').style.width = '0';
+    $('pfill').parentNode.style.display = 'none';
+    $('progressMeta').style.display = 'none';
+    $('progressTrack').setAttribute('aria-valuenow', '0');
+    leftTxt = '';
+    $('left').textContent = '';
+    $('left').style.color = '';
+    $('left2').textContent = '';
+    $('leftShareBtn').disabled = cd < 1;
+    $('xCtl').style.display = 'none';
+    $('xNote').style.display = 'none';
+    var more = $('moreBox');
+    if (more) more.style.display = 'none';
+    $('nowT').textContent = cd > 0 ? ('Нарезано ' + cd + ' шт') : 'Начните резку';
+    $('nowS').textContent = 'Из обрезков · ' + num(S.p) + ' мм';
+    // Две крупные кнопки рядом: +1 и +10
+    $('nextBtn').style.display = 'none';
+    $('pieceBtn').style.display = '';
+    $('pieceBtn').textContent = '+1';
+    $('pieceBtn').className = 'nbtn main';
+    $('pieceBtn').disabled = false;
+    $('plus10Btn').style.display = '';
+    $('plus10Btn').textContent = '+10';
+    $('plus10Btn').className = 'nbtn main';
+    $('plus10Btn').disabled = false;
+    var ar = $('actRow2');
+    if (ar){ ar.style.marginTop = '0'; ar.style.gridTemplateColumns = '1fr 1fr'; }
+    $('undoBtn').style.opacity = hist.length ? '1' : '0.45';
+    return;
+  }
+
+  $('pfill').parentNode.style.display = '';
+  $('progressMeta').style.display = 'flex';
+  $('tiles').style.display = '';
+  $('tleg').style.display = '';
+  $('rangeRow').style.display = '';
+  $('nextBtn').style.display = '';
+  $('pieceBtn').style.display = '';
+  $('pieceBtn').textContent = '+1 заготовка';
+  $('pieceBtn').className = 'nbtn';
+  $('plus10Btn').textContent = '+10 труб';
+  $('plus10Btn').className = 'nbtn';
+  var ar2 = $('actRow2');
+  if (ar2){ ar2.style.marginTop = '10px'; ar2.style.gridTemplateColumns = ''; }
+  $('xCtl').style.display = '';
+  $('xNote').style.display = '';
+  var more2 = $('moreBox');
+  if (more2) more2.style.display = '';
+
   for (i = 0; i < S.n; i++){
     var pc = pcOf(i);
     var c = Math.min(cnt[i] || 0, pc);
@@ -2495,35 +3371,52 @@ function renderList(){
     var isLast = S.rem > 0 && i === S.n - 1;
     h += '<button type="button" class="tile' + (on ? ' on' : '') + (part ? ' part' : '') +
          (isLast ? ' last' : '') + (i === nextIdx ? ' next' : '') +
-         '" data-i="' + i + '" aria-pressed="' + on + '"><b>' + (i + 1) + (on ? ' ✓' : '') +
+         '" data-i="' + i + '" aria-pressed="' + on + '" aria-label="Труба ' + (i + 1) + ', ' + c2 + ' из ' + pc2 + ' заготовок' + (on ? ', выполнено' : '') + '"><b>' + (i + 1) + (on ? ' ✓' : '') +
          '</b><span>' + (part ? c2 + '/' + pc2 : '×' + pc2) + '</span></button>';
   }
   $('tiles').innerHTML = h;
 
   var all = pd === S.n;
-  $('pt1').textContent = all ? 'Всё распилено' : 'Труб: ' + pd + ' из ' + S.n;
-  $('pt2').textContent = 'Заготовок: ' + cd + ' из ' + S.q;
-  $('pfill').style.width = (cd / S.q * 100) + '%';
+  var pipesDone = pd >= S.n;
+  var piecesDone = cd >= S.q;
+  var pct = S.q > 0 ? Math.min(100, Math.round(cd / S.q * 100)) : 0;
+  $('statsRow').style.display = '';
+  $('stat1').className = 'stat' + (pd > 0 ? ' has-progress' : '') + (pipesDone ? ' done' : '');
+  $('stat2').className = 'stat' + (cd > 0 ? ' has-progress' : '') + (piecesDone ? ' done' : '');
+  $('pt1').innerHTML = pipesDone ? '<span class="stat-complete">✓</span>' : '<span class="stat-num">' + pd + '</span><span class="stat-sep"> / </span><span class="stat-total">' + S.n + '</span>'; 
+  $('pt1l').textContent = plural(S.n, 'труба', 'трубы', 'труб');
+  $('pt2').innerHTML = piecesDone ? '<span class="stat-complete">✓</span>' : '<span class="stat-num">' + cd + '</span><span class="stat-sep"> / </span><span class="stat-total">' + S.q + '</span>'; 
+  $('pt2l').textContent = plural(S.q, 'заготовка', 'заготовки', 'заготовок');
+  $('pfill').style.width = pct + '%';
+  $('progressTrack').setAttribute('aria-valuenow', String(pct));
+  $('progressText').textContent = pct + '% выполнено';
+  $('progressCount').textContent = cd + ' из ' + S.q + ' заготовок';
 
   var pl = S.n - pd, cl = S.q - cd;
   var badTxt = S.bad > 0 ? 'Брак: ' + S.bad : '';
   var xTxt = S.x > 0 ? 'Из остатков: ' + S.x : '';
   var tailTxt = [badTxt, xTxt].filter(Boolean).join(' · ');
-  leftTxt = all ? tailTxt :
-    'Осталось: ' + pl + ' ' + plural(pl, 'труба', 'трубы', 'труб') + ', ' +
-    cl + ' ' + plural(cl, 'заготовка', 'заготовки', 'заготовок') + (tailTxt ? ' · ' + tailTxt : '');
+  // Не дублируем «осталось 45 труб», если сверху уже 0/45 — показываем только доп. заметки и разбивку
+  if (all) {
+    leftTxt = tailTxt;
+  } else if (pd === 0 && !tailTxt) {
+    leftTxt = '';
+  } else if (pd === 0) {
+    leftTxt = tailTxt;
+  } else {
+    leftTxt = 'Ещё ' + pl + ' ' + plural(pl, 'труба', 'трубы', 'труб') + ', ' +
+      cl + ' ' + plural(cl, 'заготовка', 'заготовки', 'заготовок') + (tailTxt ? ' · ' + tailTxt : '');
+  }
   $('left').textContent = leftTxt;
   $('left').style.color = '';
   $('left2').textContent = all ? '' : leftBreakdown(lg);
-  $('leftShareBtn').disabled = all;   // отправлять нечего, когда всё отмечено
+  $('leftShareBtn').disabled = all;
 
   var lg2 = ['×' + S.per + ' — резать из трубы'];
   if (S.per >= 2) lg2.push(Math.min(S.per - 1, 4) + '/' + S.per + ' — уже отрезано');
   lg2.push('✓ — готово');
   $('tleg').textContent = lg2.join(' · ');
 
-  // Панель всегда одной высоты: при «Всё распилено» кнопки остаются, но неактивны,
-  // чтобы «Брак +1» в конце не сдвигал плитки вниз.
   if (nextIdx < 0){
     $('nowT').textContent = 'Всё распилено';
     $('nowS').textContent = 'Отрезано заготовок: ' + cd + ' из ' + S.q;
@@ -2556,10 +3449,19 @@ function renderList(){
     ? 'Сверх задания · всего ' + (S.q0 + S.x) + ' шт'
     : 'Нарезали из остатков сверх задания? «+» или нажмите на число';
 
+  var mb = [];
+  if (S.bad > 0) mb.push('брак ' + S.bad);
+  if (S.x > 0) mb.push('из остатков ' + S.x);
+  $('moreBadge').textContent = mb.join(' · ');
+
   $('undoBtn').style.opacity = hist.length ? '1' : '0.45';
   var f = +$('rFrom').value, t = +$('rTo').value;
   if (!(f >= 1)) $('rFrom').value = 1;
   if (!(t >= 1)) $('rTo').value = S.n;
+  var rl = $('rangeLbl');
+  if (rl) rl.textContent = scrap ? 'Заготовки с' : 'Трубы с';
+  var rr = $('rangeRow');
+  if (rr) rr.style.display = showTiles ? '' : 'none';
 }
 
 function apply(changes){
@@ -2592,7 +3494,7 @@ function syncList(){
     hist = [];
     var rec = doneAll[sig];
     if (!rec && !legacyDone){
-      // перенос отметок из старого формата ключа (без диаметра, стенки и пропила), один раз при запуске
+      // перенос отметок из старого формата ключа (без диаметра и стенки), один раз при запуске
       var oldSig = S.q0 + '|' + S.p + '|' + S.L;
       if (doneAll[oldSig]){ rec = doneAll[oldSig]; delete doneAll[oldSig]; doneAll[sig] = rec; }
     }
@@ -2678,18 +3580,37 @@ $('guardBtn').addEventListener('click', function(){
   tileHoldCancel();
 });
 
+function bumpScrap(delta){
+  if (!S || !curSig || S.mode !== 1) return;
+  var cur = getScrap(curSig);
+  var next = Math.max(0, cur + delta);
+  if (next === cur) return;
+  putScrap(curSig, next);
+  hist.push([[-3, delta]]);
+  if (hist.length > 50) hist.shift();
+  saveDone();
+  update();
+  feedback(delta > 0);
+}
+
 $('pieceBtn').addEventListener('click', function(){
-  if (!S || nextIdx < 0) return;
+  if (!S) return;
+  if (S.mode === 1){ bumpScrap(1); return; }
+  if (nextIdx < 0) return;
   apply([[nextIdx, (cnt[nextIdx] || 0) + 1]]);
 });
 
 $('nextBtn').addEventListener('click', function(){
-  if (!S || nextIdx < 0) return;
+  if (!S) return;
+  if (S.mode === 1){ bumpScrap(1); return; }
+  if (nextIdx < 0) return;
   apply([[nextIdx, pcOf(nextIdx)]]);
 });
 
 $('plus10Btn').addEventListener('click', function(){
-  if (!S || nextIdx < 0) return;
+  if (!S) return;
+  if (S.mode === 1){ bumpScrap(10); return; }
+  if (nextIdx < 0) return;
   var ch = [], marked = 0;
   for (var i = nextIdx; i < S.n && marked < 10; i++){
     var pc = pcOf(i);
@@ -2701,26 +3622,39 @@ $('plus10Btn').addEventListener('click', function(){
   }
   if (ch.length) apply(ch);
 });
+$('plus20Btn').addEventListener('click', function(){
+  if (!S || S.mode !== 1) return;
+  bumpScrap(20);
+});
+$('plus50Btn').addEventListener('click', function(){
+  if (!S || S.mode !== 1) return;
+  bumpScrap(50);
+});
 
 $('undoBtn').addEventListener('click', function(){
   if (!S || !hist.length) return;
   var g = hist.pop();
-  var badChanged = false;
+  var needUpdate = false;
   g.forEach(function(pair){
+    if (pair[0] === -3){   // счётчик обрезков
+      putScrap(curSig, Math.max(getScrap(curSig) - pair[1], 0));
+      needUpdate = true;
+      return;
+    }
     if (pair[0] === -2){   // запись «из остатков»: [-2, на сколько увеличили]
       putExtra(curSig, Math.max(getExtra(curSig) - pair[1], 0));
-      badChanged = true;
+      needUpdate = true;
       return;
     }
     if (pair[0] === -1){   // запись о браке: [-1, на сколько увеличили]
       putBad(curSig, Math.max(getBad(curSig) - pair[1], 0));
-      badChanged = true;
+      needUpdate = true;
       return;
     }
     if (pair[1] > 0) cnt[pair[0]] = pair[1]; else delete cnt[pair[0]];
   });
   saveDone();
-  if (badChanged) update(); else renderList();
+  if (needUpdate) update(); else renderList();
   feedback(false);
 });
 
@@ -2834,6 +3768,7 @@ $('resetDone').addEventListener('click', function(){
     hist = [];
     putBad(curSig, 0);
     putExtra(curSig, 0);
+    putScrap(curSig, 0);
     saveDone();
     update();
     resetArm(false);
@@ -2856,6 +3791,20 @@ Array.prototype.forEach.call(document.querySelectorAll('.theme-chip'), function(
     saveUI();
     applyTheme();
   });
+});
+$('scaleRange').addEventListener('input', function(){
+  ui.scale = Number(this.value) || 100;
+  applyScale();
+});
+$('scaleRange').addEventListener('change', function(){
+  saveUI();
+  feedback(false);
+});
+$('scaleReset').addEventListener('click', function(){
+  ui.scale = 100;
+  saveUI();
+  applyScale();
+  feedback(false);
 });
 try {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
@@ -2924,7 +3873,7 @@ function bump(id, delta){
   var v = parseFloat(el.value);
   if (isNaN(v)) v = 0;
   v = Math.round((v + delta) * 100) / 100;
-  var mn = id === 't' ? 0.1 : ((id === 'k' || id === 'h') ? 0 : 1);
+  var mn = id === 't' ? 0.1 : (id === 'h' ? 0 : 1);
   if (v < mn) v = mn;
   el.value = v;
   update();
@@ -2961,7 +3910,7 @@ function summaryText(){
   var lines = [];
   lines.push('Раскрой труб');
   lines.push('────────────');
-  lines.push('Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм');
+  lines.push('Труба' + (PF ? ' перфорированная' : '') + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм');
   lines.push('Нужно труб: ' + S.n + ' (' + S.bn + ' ' + plural(S.bn, 'пачка', 'пачки', 'пачек') + ')');
   lines.push('Заготовок: ' + S.q + ' по ' + num(S.p) + ' мм');
   lines.push('Из целой трубы: ' + S.per + ' ' + plural(S.per, 'заготовка', 'заготовки', 'заготовок') + ', обрезок ' + fmt(S.wFull) + ' мм');
@@ -3007,7 +3956,10 @@ function archiveLine(item){
   var bad = item.bad > 0 ? item.bad : 0;
   var good = item.q - bad;
   var xs = item.x > 0 ? item.x : 0;
-  return dia + '/' + wall + ' ×' + num(item.p) + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (xs > 0 ? ' + ' + xs + ' из остатков = ' + (good + xs) : '') + (bad > 0 ? ', брак ' + bad : '');
+  var head = item.mode
+    ? 'Обрезки' + (item.d > 0 ? ' ' + dia + (item.t > 0 ? '/' + wall : '') : '') + (item.pf ? ' перф.' : '')
+    : dia + '/' + wall + (item.pf ? ' перф.' : '');
+  return head + ' ×' + num(item.p) + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (xs > 0 ? ' + ' + xs + ' из остатков = ' + (good + xs) : '') + (bad > 0 ? ', брак ' + bad : '');
 }
 
 function todayArchives(){
@@ -3025,7 +3977,7 @@ function currentAsItem(){
   return {
     ts: Date.now(),
     q: Number(S.q), p: Number(S.p), L: Number(S.L),
-    d: Number($('d').value) || 0, t: Number($('t').value) || 0,
+    d: Number($('d').value) || 0, t: Number($('t').value) || 0, pf: PF ? 1 : 0,
     n: Number(S.n), per: Number(S.per) || 0, rem: Number(S.rem) || 0,
     wFull: Number(S.wFull) || 0, wLast: Number(S.wLast) || 0
   };
@@ -3040,7 +3992,7 @@ function openShareSheet(){
   syncShareAll();
 
   if (!archives.length) {
-    list.innerHTML = '<p class="share-empty">Нет сохранённых раскроев.<br>Сначала нажмите «Сохранить раскрой».</p>';
+    list.innerHTML = '<p class="share-empty">Нет сохранённых записей.<br>Сначала нажмите «Сохранить в историю».</p>';
     $('shareSheet').removeAttribute('hidden');
     $('shareSheetBg').removeAttribute('hidden');
     return;
@@ -3098,7 +4050,7 @@ function formatShareDate(ts){
 }
 
 function pipeKey(item){
-  return (item.d || 0) + '|' + (item.t || 0);
+  return (item.d || 0) + '|' + (item.t || 0) + '|' + (item.pf ? 1 : 0);
 }
 
 function buildShareText(items){
@@ -3188,18 +4140,20 @@ $('shareDo').addEventListener('click', function(){
 /* Отправка текста: системное меню «Поделиться», иначе копирование */
 function sendShareText(t, btnId){
   function flash(txt){ if (btnId) flashBtn(btnId, txt); }
+  if (btnId) setBusy(btnId, true, 'Подготовка…');
+  function finish(){ if (btnId) setBusy(btnId, false); }
   if (navigator.share) {
     navigator.share({ text: t }).then(function(){
-      flash('Отправлено');
+      finish(); flash('Отправлено');
     }).catch(function(){
-      copyText(t).then(function(){ flash('Скопировано'); });
+      copyText(t).then(function(){ finish(); flash('Скопировано'); }, function(){ finish(); flash('Ошибка'); });
     });
   } else {
-    copyText(t).then(function(){ flash('Скопировано'); }, function(){ flash('Ошибка'); });
+    copyText(t).then(function(){ finish(); flash('Скопировано'); }, function(){ finish(); flash('Ошибка'); });
   }
 }
 
-/* Тост «Раскрой сохранён · Поделиться» */
+/* Тост «Сохранено · Поделиться» */
 var shareToastTimer = null, shareToastItem = null;
 function showShareToast(item){
   shareToastItem = item;
@@ -3252,7 +4206,7 @@ function remainText(){
     cd += c;
     if (c < pc){ var r = pc - c; groups[r] = (groups[r] || 0) + 1; any = true; }
   }
-  var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + '×' + num(S.p);
+  var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + (PF ? 'перф. ' : '') + '×' + num(S.p);
   if (!any) return 'Всё нарезано\n' + head + ' - ' + S.q + ' шт' + (S.x > 0 ? ' + ' + S.x + ' из остатков = ' + (S.q + S.x) : '');
   var parts = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; }).map(function(r){
     var n = groups[r], whole = r === S.per;   // целая труба: ещё ничего не отрезано
@@ -3288,14 +4242,14 @@ function schemeCanvas(){
   if (full > 0) blocks.push({title: 'Целая труба × ' + full, cuts: S.per, off: S.wFull, word: 'обрезок'});
   if (S.rem > 0) blocks.push({title: full > 0 ? 'Последняя труба' : 'Труба', cuts: S.rem, off: S.wLast, word: 'остаток'});
 
-  var big = $('hsMain').textContent, sub = $('hs').textContent;
+  var big = $('hsMain').textContent, sub = $('hs').textContent, sub2 = $('hs2').textContent;
   var bsz = Number($('b').value) || 1, spare = S.bn * bsz - S.n;
   var head = [
-    'Труба' + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм',
-    S.q + ' ' + plural(S.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(S.p) + ' мм' + (S.k > 0 ? ', пропил ' + num(S.k) + ' мм' : ''),
+    'Труба' + (PF ? ' перфорированная' : '') + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм',
+    S.q + ' ' + plural(S.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(S.p) + ' мм',
     'Пачек: ' + S.bn + ', в пачке ' + bsz + (spare > 0 ? ', останется ' + spare : '')
   ];
-  var yBig = P + 60, ySub = yBig + (sub ? 56 : 0), yHead = ySub + 62;
+  var yBig = P + 60, ySub = yBig + (sub ? 56 : 0), ySub2 = ySub + (sub2 ? 48 : 0), yHead = ySub2 + 62;
   var y0 = yHead + (head.length - 1) * 48 + 48, BLK = 250, H = y0 + blocks.length * BLK + 96;
 
   var cv = document.createElement('canvas');
@@ -3314,6 +4268,10 @@ function schemeCanvas(){
   if (sub){
     c.fillStyle = '#4a4a4f'; fitFont(sub, 600, 40);
     c.fillText(sub, P, ySub);
+  }
+  if (sub2){
+    c.fillStyle = '#6b6b70'; fitFont(sub2, 500, 32);
+    c.fillText(sub2, P, ySub2);
   }
   c.fillStyle = '#4a4a4f'; c.font = '500 34px ' + FONT;
   head.forEach(function(line, i){ c.fillText(line, P, yHead + i * 48); });
@@ -3371,7 +4329,7 @@ function schemeCanvas(){
 function schemeFileName(){
   var d = +$('d').value || 0, t = +$('t').value || 0;
   return formatShareDate(Date.now()) +
-    (d > 0 ? ' · Ø' + num(d) + (t > 0 ? '×' + num(t) : '') : '') +
+    (d > 0 ? ' · Ø' + num(d) + (t > 0 ? '×' + num(t) : '') : '') + (PF ? ' · перф.' : '') +
     ' · ' + num(S.p) + ' мм - ' + (+$('q').value || S.q) + '.png';
 }
 
@@ -3426,170 +4384,11 @@ try {
 function saveArchives(){
   try {
     localStorage.setItem(ARCH_KEY, JSON.stringify(archives));
-    try { renderBend(); } catch(e){}
-    try { shopPush(); } catch(e){}
     return true;
   } catch(e) {
     return false;
   }
 }
-
-/* ── Bend mode (гибка) ── */
-var BEND_KEY = 'pipecalc.bend.v1';
-var bendMap = {};
-var bendIdx = -1, bendCnt = 0, bendStack = [];
-try { bendMap = JSON.parse(localStorage.getItem(BEND_KEY)) || {}; } catch(e){ bendMap = {}; }
-
-function bendKeyOf(item){
-  return [item.ts, item.q, item.p, item.L, item.d || 0, item.t || 0].join('|');
-}
-
-function saveBendMap(){
-  try { localStorage.setItem(BEND_KEY, JSON.stringify(bendMap)); } catch(e){}
-  try { shopPush(); } catch(e){}
-}
-
-function getBendCnt(item){
-  var k = bendKeyOf(item);
-  var v = bendMap[k];
-  return (v && typeof v.n === 'number') ? v.n : 0;
-}
-
-function setBendCnt(item, n){
-  var k = bendKeyOf(item);
-  n = Math.max(0, Math.floor(n));
-  if (n <= 0) delete bendMap[k];
-  else bendMap[k] = { n: n, ts: Date.now() };
-  // prune
-  var keys = Object.keys(bendMap);
-  if (keys.length > 80){
-    keys.sort(function(a, b){ return (bendMap[a].ts || 0) - (bendMap[b].ts || 0); });
-    while (keys.length > 60){ delete bendMap[keys.shift()]; }
-  }
-  saveBendMap();
-}
-
-function renderBendList(){
-  var list = $('bendList');
-  if (!list) return;
-  if (!archives.length){
-    list.innerHTML = '<p class="bend-empty">Нет сохранённых раскроев.<br>Сначала сохраните раскрой во вкладке «История» или после расчёта.</p>';
-    return;
-  }
-  var groups = [];
-  var lastKey = null;
-  archives.forEach(function(item, idx){
-    var key = dayKey(item.ts);
-    if (key !== lastKey){
-      groups.push({ label: dayLabel(item.ts), items: [] });
-      lastKey = key;
-    }
-    groups[groups.length - 1].items.push({ item: item, idx: idx });
-  });
-  var h = '';
-  groups.forEach(function(g){
-    h += '<div class="hist-day">' + g.label + '</div>';
-    g.items.forEach(function(entry){
-      var item = entry.item;
-      var n = getBendCnt(item);
-      var left = item.q - n;
-      var prog = n + '/' + item.q;
-      var sub = left > 0 ? ('осталось ' + left) : (left === 0 ? 'готово' : ('+' + (-left)));
-      h += '<button type="button" class="bend-job" data-bidx="' + entry.idx + '">' +
-        '<div style="flex:1;min-width:0"><p class="bj-title">' + archiveLine(item) + '</p>' +
-        '<p class="bj-sub">' + sub + '</p></div>' +
-        '<div class="bj-prog">' + prog + '</div></button>';
-    });
-  });
-  list.innerHTML = h;
-}
-
-function showBendWork(idx){
-  var item = archives[idx];
-  if (!item) return;
-  bendIdx = idx;
-  bendCnt = getBendCnt(item);
-  bendStack = [];
-  $('bendListWrap').hidden = true;
-  $('bendWork').hidden = false;
-  $('bendTitle').textContent = archiveLine(item);
-  var dia = item.d > 0 ? 'Ø' + num(item.d) : '';
-  var wall = item.t > 0 ? ('×' + num(item.t)) : '';
-  $('bendMeta').textContent = (dia || wall ? (dia + wall + ' · ') : '') + formatTime(item.ts) + ' · ' + dayLabel(item.ts);
-  renderBendWork();
-}
-
-function hideBendWork(){
-  bendIdx = -1;
-  $('bendWork').hidden = true;
-  $('bendListWrap').hidden = false;
-  renderBendList();
-}
-
-function renderBendWork(){
-  if (bendIdx < 0 || !archives[bendIdx]) return;
-  var item = archives[bendIdx];
-  var target = item.q;
-  $('bendN').textContent = bendCnt;
-  $('bendOf').textContent = '/ ' + target;
-  var left = target - bendCnt;
-  if (left > 0) {
-    $('bendSub').textContent = 'осталось ' + left + ' ' + plural(left, 'заготовка', 'заготовки', 'заготовок') +
-      (left >= 10 ? ' · ' + Math.floor(left / 10) + ' пач. по 10' : '');
-  } else if (left === 0) {
-    $('bendSub').textContent = 'всё согнуто';
-  } else {
-    $('bendSub').textContent = 'сверх плана: ' + (-left) + ' шт';
-  }
-  $('bendUndo').style.opacity = bendStack.length ? '1' : '0.45';
-}
-
-function bumpBend(delta){
-  if (bendIdx < 0 || !archives[bendIdx]) return;
-  var prev = bendCnt;
-  bendCnt = Math.max(0, bendCnt + delta);
-  if (bendCnt === prev) return;
-  bendStack.push(prev);
-  if (bendStack.length > 40) bendStack.shift();
-  setBendCnt(archives[bendIdx], bendCnt);
-  renderBendWork();
-  feedback(delta >= 10 || bendCnt >= archives[bendIdx].q);
-}
-
-function renderBend(){
-  if (bendIdx >= 0 && archives[bendIdx]) {
-    // keep work view in sync if archives changed
-    renderBendWork();
-  } else {
-    hideBendWork();
-  }
-  if ($('bendWork').hidden) renderBendList();
-}
-
-$('bendList').addEventListener('click', function(e){
-  var row = e.target.closest ? e.target.closest('[data-bidx]') : null;
-  if (!row) return;
-  showBendWork(+row.getAttribute('data-bidx'));
-});
-$('bendBack').addEventListener('click', hideBendWork);
-$('bendP10').addEventListener('click', function(){ bumpBend(10); });
-$('bendP1').addEventListener('click', function(){ bumpBend(1); });
-$('bendM1').addEventListener('click', function(){ bumpBend(-1); });
-$('bendUndo').addEventListener('click', function(){
-  if (!bendStack.length || bendIdx < 0) return;
-  bendCnt = bendStack.pop();
-  setBendCnt(archives[bendIdx], bendCnt);
-  renderBendWork();
-  feedback(false);
-});
-$('bendReset').addEventListener('click', function(){
-  if (bendIdx < 0 || !bendCnt) return;
-  if (!confirm('Сбросить счётчик гибки по этой позиции?')) return;
-  bendStack.push(bendCnt);
-  bendCnt = 0;
-  setBendCnt(archives[bendIdx], 0);
-  renderBendWork();
-});
 
 function setStorageStatus(message, isWarning){
   var el = $('storageStatus');
@@ -3729,6 +4528,9 @@ function downloadBackup(f){
 }
 
 function sendBackup(){
+  var active = document.activeElement;
+  var busyId = active && active.id ? active.id : 'sendHistBtn';
+  setBusy(busyId, true, 'Подготовка…');
   var f = backupFile();
   var types = ['application/json', 'text/plain'];
   var file = null, i;
@@ -3740,12 +4542,12 @@ function sendBackup(){
       } catch(e){}
     }
   }
-  if (!file) { downloadBackup(f); return; }
+  if (!file) { downloadBackup(f); setBusy(busyId, false); flashBtn(busyId, 'Скачано'); return; }
   navigator.share({files: [file], title: 'Раскрой труб — копия'}).then(function(){
-    markBackup();
+    markBackup(); setBusy(busyId, false); flashBtn(busyId, 'Отправлено');
   }).catch(function(e){
-    if (e && e.name === 'AbortError') return;
-    downloadBackup(f);
+    if (e && e.name !== 'AbortError') downloadBackup(f);
+    setBusy(busyId, false);
   });
 }
 
@@ -3765,7 +4567,7 @@ function cleanArchives(list, limit){
   }).map(function(item){
     return {
       ts:Number(item.ts), q:Number(item.q), p:Number(item.p), L:Number(item.L) || 0,
-      b:Number(item.b) || 1, k:Number(item.k) || 0, h:Number(item.h) || 0, bad:Number(item.bad) || 0, x:Number(item.x) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0,
+      b:Number(item.b) || 1, h:Number(item.h) || 0, bad:Number(item.bad) || 0, x:Number(item.x) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0, pf:item.pf ? 1 : 0, mode:item.mode ? 1 : 0,
       n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
       rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0
     };
@@ -3797,7 +4599,7 @@ function importHistoryFile(file){
         return;
       }
 
-      var parts = ['раскроев: ' + imported.length];
+      var parts = ['записей: ' + imported.length];
       if (nDone) parts.push('отметок о резке: ' + nDone);
       if (inputs) parts.push('введённые значения');
       if (uiB) parts.push('настройки');
@@ -3855,11 +4657,10 @@ function formatTime(ts){
 function renderHist(){
   applyOpts();
   try { renderBk(); } catch(e){}
-  try { renderBend(); } catch(e){}
   var list = $('histList');
   var clearBtn = $('histClearBtn');
   if (!archives.length){
-    list.innerHTML = '<p class="hist-empty">Пока пусто. Нажмите «Сохранить раскрой», чтобы запомнить текущий.</p>';
+    list.innerHTML = '<p class="hist-empty">Пока пусто. Нажмите «Сохранить в историю», чтобы запомнить текущий.</p>';
     clearBtn.disabled = true;
     $('shareBtn').hidden = true;
     return;
@@ -3911,10 +4712,10 @@ function renderHist(){
 
 function addToHist(){
   var b2 = $('saveHistBtn2');
-  if (!S || !(S.q > 0) || !(S.p > 0) || !(S.L > 0) || !(S.n > 0)) {
+  if (!S || !(S.p > 0) || (S.mode ? !(S.q > 0) : (!(S.q > 0) || !(S.n > 0) || !(S.L > 0)))) {
     if (b2) {
       b2.textContent = 'Заполните поля';
-      setTimeout(function(){ b2.textContent = 'Сохранить раскрой'; }, 1800);
+      setTimeout(function(){ b2.textContent = 'Сохранить в историю'; }, 1800);
     }
     return;
   }
@@ -3922,14 +4723,15 @@ function addToHist(){
     ts: Date.now(),
     q: Number(S.q),
     p: Number(S.p),
-    L: Number(S.L),
-    k: Number(S.k) || 0,
+    L: Number(S.L) || 0,
     h: Number(S.h) || 0,
     bad: Number(S.bad) || 0,
     x: Number(S.x) || 0,
     b: Number($('b').value) || 1,
     d: Number($('d').value) || 0,
     t: Number($('t').value) || 0,
+    pf: PF ? 1 : 0,
+    mode: S.mode ? 1 : 0,
     n: Number(S.n),
     bn: Number(S.bn) || 0,
     per: Number(S.per) || 0,
@@ -3937,9 +4739,12 @@ function addToHist(){
     wFull: Number(S.wFull) || 0,
     wLast: Number(S.wLast) || 0
   };
-  // avoid exact duplicates of the last entry
-  if (archives.length && archives[0].q === entry.q && archives[0].p === entry.p && archives[0].L === entry.L &&
-      archives[0].d === entry.d && archives[0].t === entry.t && (archives[0].k || 0) === entry.k && (archives[0].h || 0) === entry.h) {
+  // Защита только от случайного двойного нажатия: тот же раскрой в течение 3 секунд записывается один раз.
+  // Осознанный повтор (позже) сохраняется отдельной записью.
+  var a0 = archives[0];
+  if (a0 && entry.ts - a0.ts < 3000 && a0.q === entry.q && a0.p === entry.p && a0.L === entry.L &&
+      a0.d === entry.d && a0.t === entry.t && (a0.pf || 0) === entry.pf && (a0.mode || 0) === entry.mode &&
+      (a0.h || 0) === entry.h && (a0.bad || 0) === entry.bad && (a0.x || 0) === entry.x) {
     archives[0] = entry;
   } else {
     archives.unshift(entry);
@@ -3949,7 +4754,7 @@ function addToHist(){
   renderHist();
   if (b2) {
     b2.textContent = 'Сохранено';
-    setTimeout(function(){ b2.textContent = 'Сохранить раскрой'; }, 1800);
+    setTimeout(function(){ b2.textContent = 'Сохранить в историю'; }, 1800);
   }
   feedback(false);
   showShareToast(entry);
@@ -3960,12 +4765,13 @@ function restoreHist(idx){
   if (!item) return;
   $('q').value = item.q - (item.bad || 0) + (item.h || 0);
   $('p').value = item.p;
-  $('L').value = item.L;
-  $('b').value = item.b;
-  $('k').value = item.k || 0;
+  if (item.L) $('L').value = item.L;
+  if (item.b) $('b').value = item.b;
   $('h').value = item.h || 0;
   $('d').value = item.d;
   $('t').value = item.t;
+  setPf(item.pf);
+  setMode(item.mode ? 1 : 0);
   update();
   if (S && curSig && item.x > 0 && !getExtra(curSig)){ putExtra(curSig, item.x); saveDone(); update(); }
   feedback(false);
@@ -3983,7 +4789,7 @@ function showUndo(removed){
   if (!undoPending) undoPending = {list: []};
   removed.forEach(function(r){ undoPending.list.push(r); });
   var n = undoPending.list.length;
-  $('toastText').textContent = n === 1 ? 'Раскрой удалён' : 'Удалено: ' + n + ' ' + plural(n, 'раскрой', 'раскроя', 'раскроев');
+  $('toastText').textContent = n === 1 ? 'Удалено' : 'Удалено: ' + n + ' ' + plural(n, 'запись', 'записи', 'записей');
   $('toast').removeAttribute('hidden');
   clearTimeout(undoTimer);
   undoTimer = setTimeout(hideUndo, 7000);
@@ -4048,203 +4854,9 @@ $('histClearBtn').addEventListener('click', function(){
 });
 
 IDS.forEach(function(id){ $(id).addEventListener('input', update); });
-Array.prototype.forEach.call(document.querySelectorAll('.pset'), function(b){
-  b.addEventListener('click', function(){
-    $('t').value = b.getAttribute('data-v');
-    update();
-  });
-});
-/* ── Shared workshop (Firebase RTDB) ── */
-var SHOP_KEY = 'pipecalc.shop.v1';
-var shop = { code: '', on: false, apiKey: '', dbUrl: '', projectId: '' };
-var shopDb = null, shopRef = null, shopUnsub = null, shopReady = false, shopApplying = false, shopTimer = null;
-
-try {
-  var _sh = JSON.parse(localStorage.getItem(SHOP_KEY));
-  if (_sh) {
-    shop.code = String(_sh.code || '').replace(/\D/g, '').slice(0, 6);
-    shop.on = !!_sh.on && shop.code.length >= 4;
-    shop.apiKey = _sh.apiKey || '';
-    shop.dbUrl = _sh.dbUrl || '';
-    shop.projectId = _sh.projectId || '';
-  }
-} catch(e){}
-
-function saveShop(){
-  try { localStorage.setItem(SHOP_KEY, JSON.stringify(shop)); } catch(e){}
-}
-
-function shopStatus(text){
-  var el = $('shopStatus');
-  if (el) el.textContent = text;
-}
-
-function shopConfigured(){
-  return !!(shop.apiKey && shop.dbUrl);
-}
-
-function loadFirebase(cb){
-  if (window.firebase && firebase.database) { cb(true); return; }
-  var s1 = document.createElement('script');
-  s1.src = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js';
-  s1.onload = function(){
-    var s2 = document.createElement('script');
-    s2.src = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js';
-    s2.onload = function(){ cb(!!(window.firebase && firebase.database)); };
-    s2.onerror = function(){ cb(false); };
-    document.head.appendChild(s2);
-  };
-  s1.onerror = function(){ cb(false); };
-  document.head.appendChild(s1);
-}
-
-function shopDisconnect(){
-  if (shopUnsub) { try { shopUnsub(); } catch(e){} shopUnsub = null; }
-  shopRef = null;
-  shopDb = null;
-  shopReady = false;
-}
-
-function shopConnect(manual){
-  if (!shop.on || shop.code.length < 4) {
-    shopDisconnect();
-    shopStatus('Выкл · данные только на этом телефоне');
-    return;
-  }
-  if (!shopConfigured()) {
-    shopStatus('Нужна настройка облака (кнопка ниже)');
-    if (manual) {
-      $('shopCfgBox').hidden = false;
-      alert('Сначала нажмите «Настроить облако (Firebase)» и вставьте ключи.\nЭто один раз на 5 минут.');
-    }
-    return;
-  }
-  shopStatus('Подключение…');
-  loadFirebase(function(ok){
-    if (!ok) { shopStatus('Не удалось загрузить Firebase'); return; }
-    try {
-      if (!firebase.apps.length) {
-        firebase.initializeApp({
-          apiKey: shop.apiKey,
-          databaseURL: shop.dbUrl,
-          projectId: shop.projectId || undefined
-        });
-      }
-      shopDb = firebase.database();
-      if (shopUnsub) { try { shopUnsub(); } catch(e){} }
-      shopRef = shopDb.ref('workshops/' + shop.code);
-      shopUnsub = shopRef.on('value', function(snap){
-        var data = snap.val();
-        if (!data) {
-          shopReady = true;
-          shopStatus('Цех ' + shop.code + ' · онлайн (пусто, ждём данные)');
-          shopPush(true);
-          return;
-        }
-        shopApplying = true;
-        try {
-          if (Array.isArray(data.archives)) {
-            archives = data.archives.filter(function(item){
-              return item && item.ts && item.q > 0 && item.p > 0 && item.n > 0;
-            });
-            try { localStorage.setItem(ARCH_KEY, JSON.stringify(archives)); } catch(e){}
-          }
-          if (data.bend && typeof data.bend === 'object') {
-            bendMap = data.bend;
-            try { localStorage.setItem(BEND_KEY, JSON.stringify(bendMap)); } catch(e){}
-          }
-          renderHist();
-          renderBend();
-        } finally {
-          shopApplying = false;
-        }
-        shopReady = true;
-        var n = (archives || []).length;
-        shopStatus('Цех ' + shop.code + ' · онлайн · раскроев: ' + n);
-      }, function(err){
-        shopStatus('Ошибка: ' + (err && err.message ? err.message : 'нет доступа'));
-      });
-    } catch(e) {
-      shopStatus('Ошибка конфигурации Firebase');
-    }
-  });
-}
-
-function shopPush(force){
-  if (shopApplying || !shop.on || !shopReady || !shopRef) return;
-  clearTimeout(shopTimer);
-  var run = function(){
-    if (!shopRef || shopApplying) return;
-    shopRef.update({
-      archives: archives,
-      bend: bendMap,
-      updatedAt: Date.now()
-    }).catch(function(e){
-      shopStatus('Не отправилось · ' + (e && e.message ? e.message : 'сеть'));
-    });
-  };
-  if (force) run(); else shopTimer = setTimeout(run, 400);
-}
-
-function applyShopUi(){
-  $('shopCode').value = shop.code || '';
-  $('fbApiKey').value = shop.apiKey || '';
-  $('fbDbUrl').value = shop.dbUrl || '';
-  $('fbProjectId').value = shop.projectId || '';
-  $('shopConnectBtn').textContent = shop.on ? 'Выключить' : 'Включить';
-  if (!shop.on) shopStatus('Выкл · данные только на этом телефоне');
-}
-
-$('shopCfgBtn').addEventListener('click', function(){
-  $('shopCfgBox').hidden = !$('shopCfgBox').hidden;
-});
-
-$('shopCfgSave').addEventListener('click', function(){
-  shop.apiKey = ($('fbApiKey').value || '').trim();
-  shop.dbUrl = ($('fbDbUrl').value || '').trim().replace(/\/$/, '');
-  shop.projectId = ($('fbProjectId').value || '').trim();
-  saveShop();
-  shopDisconnect();
-  try { if (window.firebase && firebase.apps && firebase.apps.length) { /* keep */ } } catch(e){}
-  // re-init requires reload if app already initialized with wrong keys
-  if (shop.on) {
-    alert('Ключи сохранены. Страница перезагрузится для подключения.');
-    location.reload();
-    return;
-  }
-  $('shopCfgBox').hidden = true;
-  alert('Ключи сохранены. Теперь введите код цеха и нажмите «Включить».');
-});
-
-$('shopConnectBtn').addEventListener('click', function(){
-  if (shop.on) {
-    shop.on = false;
-    saveShop();
-    shopDisconnect();
-    applyShopUi();
-    return;
-  }
-  var code = ($('shopCode').value || '').replace(/\D/g, '').slice(0, 6);
-  if (code.length < 4) {
-    alert('Введите код цеха (минимум 4 цифры). Одинаковый на обоих телефонах.');
-    return;
-  }
-  shop.code = code;
-  shop.on = true;
-  saveShop();
-  applyShopUi();
-  shopConnect(true);
-});
-
-$('shopCode').addEventListener('input', function(){
-  this.value = this.value.replace(/\D/g, '').slice(0, 6);
-});
-
 safe(applyUI);
 safe(load);
 safe(renderHist);
-safe(applyShopUi);
-safe(function(){ if (shop.on) shopConnect(false); });
 checkStorage();
 update();
 
@@ -4252,12 +4864,12 @@ update();
 Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b){
   b.addEventListener('click', function(){
     var t = b.getAttribute('data-go');
-    if (t === ui.tab) { window.scrollTo(0, 0); return; }
+    if (t === ui.tab) { window.scrollTo({top: 0, behavior: 'smooth'}); return; }
     ui.tab = t;
     saveUI();
     syncTabs();
-    if (t === 'bend') { try { renderBend(); } catch(e){} }
-    window.scrollTo(0, 0);
+    feedback(false);
+    window.scrollTo({top: 0, behavior: 'smooth'});
   });
 });
 try {
@@ -4349,7 +4961,7 @@ Array.prototype.forEach.call(document.querySelectorAll('[data-hist]'), function(
     var v = Number(b.getAttribute('data-hist'));
     var lim = v > 0 ? v : Infinity;
     if (archives.length > lim &&
-        !confirm('В истории ' + archives.length + ' ' + plural(archives.length, 'раскрой', 'раскроя', 'раскроев') +
+        !confirm('В истории ' + archives.length + ' ' + plural(archives.length, 'запись', 'записи', 'записей') +
                  '. Останутся только последние ' + v + '. Продолжить?')) return;
     ui.histMax = v;
     saveUI();
@@ -4373,6 +4985,203 @@ $('updDo').addEventListener('click', function(){
 $('updLater').addEventListener('click', function(){ $('updBanner').hidden = true; });
 document.addEventListener('visibilitychange', function(){ if (!document.hidden) checkVersion(false); });
 setTimeout(function(){ checkVersion(true); }, 4000);
+
+/* Заливка дорожки ползунка до бегунка */
+window.fillRange = function(el){
+  if (!el) return;
+  var mn = Number(el.min || 0), mx = Number(el.max || 100);
+  el.style.setProperty('--p', ((Number(el.value) - mn) / (mx - mn) * 100) + '%');
+};
+Array.prototype.forEach.call(document.querySelectorAll('.scale-range'), function(el){
+  el.addEventListener('input', function(){ fillRange(el); });
+  fillRange(el);
+});
+['scaleReset','panelReset','dimReset'].forEach(function(id){
+  var b = document.getElementById(id);
+  if (b) b.addEventListener('click', function(){ setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.scale-range'), fillRange); }, 0); });
+});
+setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.scale-range'), fillRange); }, 0);
+/* ── Фон приложения ── */
+(function(){
+  var WK = 'pipe_wall_v1';
+  /* Плотный тайл из контурных иконок инструментов (вектор — чёткий на любом экране) */
+  var ICONS = {
+    wrench:'<path d="M-6 -31A11 11 0 1 0 6 -31V-24H-6Z"/><path d="M-5 -12V24A5 5 0 0 0 5 24V-12"/><circle cy="24" r="2"/>',
+    hammer:'<rect x="-16" y="-26" width="32" height="11" rx="2"/><rect x="-3.5" y="-15" width="7" height="40" rx="3"/>',
+    driver:'<rect x="-6" y="-28" width="12" height="20" rx="5"/><path d="M-2 -8V20M2 -8V20M-2 20L-3.5 27H3.5L2 20"/>',
+    elbow:'<path d="M-24 -10H-6A20 20 0 0 1 14 10V28M-24 10H-6V28M-24 -15V15M-10 28H18"/>',
+    tee:'<path d="M-28 -9H-9V-28M9 -28V-9H28M-28 9H28M-28 -14V14M28 -14V14M-14 -28H14"/>',
+    tape:'<circle r="18"/><circle r="6"/><path d="M14 12H32V23H8"/>',
+    gear:'<circle r="13"/><circle r="5"/><path d="M0 -13V-19M0 13V19M-13 0H-19M13 0H19M9 -9L13 -13M-9 -9L-13 -13M9 9L13 13M-9 9L-13 13"/>',
+    nut:'<path d="M0 -17L15 -8.5V8.5L0 17L-15 8.5V-8.5Z"/><circle r="6"/>',
+    bolt:'<rect x="-12" y="-26" width="24" height="9" rx="2"/><rect x="-6" y="-17" width="12" height="40"/><path d="M-6 -9H6M-6 -3H6M-6 3H6M-6 9H6M-6 15H6"/>',
+    level:'<rect x="-30" y="-8" width="60" height="16" rx="3"/><rect x="-7" y="-3.5" width="14" height="7" rx="3.5"/><path d="M-17 -8V-3M17 -8V-3"/>',
+    ruler:'<rect x="-30" y="-8" width="60" height="16" rx="2"/><path d="M-21 -8V-1M-13 -8V-4M-5 -8V-1M3 -8V-4M11 -8V-1M19 -8V-4"/>',
+    valve:'<path d="M-15 -26H15M0 -26V-10"/><rect x="-10" y="-10" width="20" height="14" rx="3"/><rect x="-28" y="4" width="56" height="14" rx="2"/>',
+    pipe:'<rect x="-30" y="-9" width="60" height="18" rx="2"/><path d="M-30 -14V14M30 -14V14M-14 -9V9M14 -9V9"/>',
+    hat:'<path d="M-19 8A19 19 0 0 1 19 8"/><rect x="-26" y="8" width="52" height="7" rx="3.5"/><path d="M-5 -9V8M5 -9V8"/>',
+    pencil:'<path d="M-4 -28H4V16L0 25L-4 16ZM-4 -19H4M-4 10H4"/>',
+    gauge:'<circle r="17"/><circle r="2"/><path d="M0 0L9 -9M0 -17V-13M-17 0H-13M17 0H13M-4 17V25H4V17"/>',
+    drill:'<rect x="-26" y="-10" width="32" height="14" rx="3"/><path d="M-18 4L-21 24H-9L-6 4"/><rect x="6" y="-7" width="8" height="8"/><path d="M14 -3H30M20 -3L23 -6M25 -3L28 -6"/>',
+    pliers:'<path d="M-14 26L-3 -4L-7 -26H7L3 -4L14 26"/><path d="M-3 -4H3M-11 14H-8M8 14H11"/><circle cy="-8" r="1.8"/>',
+    hexkey:'<path d="M-23 -24V21H22V15H-17V-24Z"/>',
+    drop:'<path d="M0 -24C10 -9 14 -3 14 5A14 14 0 0 1 -14 5C-14 -3 -10 -9 0 -24Z"/><path d="M-7 6A7 7 0 0 0 0 13"/>',
+    screw:'<circle r="14"/><path d="M-9 0H9M0 -9V9"/>',
+    star:'<path d="M0 -7L1.8 -1.8L7 0L1.8 1.8L0 7L-1.8 1.8L-7 0L-1.8 -1.8Z"/>',
+    plus:'<path d="M-5 0H5M0 -5V5"/>',
+    dot:'<circle r="3"/>',
+    dia:'<rect x="-4" y="-4" width="8" height="8" transform="rotate(45)"/>'
+  };
+  var TILE = 400;
+  var maskUrl = (function(){
+    var seed = 7;
+    function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    var big = ['wrench','gauge','hammer','tee','driver','drill','elbow','tape','pliers','hat','gear','valve',
+               'level','drop','bolt','pipe','hexkey','nut','ruler','screw','pencil','pliers','gauge','wrench','elbow'];
+    var fill = ['star','plus','dot','dia'];
+    var items = [], r, c, n = 0;
+    for (r = 0; r < 5; r++) for (c = 0; c < 5; c++) {
+      var x = (40 + 80 * c + (r % 2 ? 40 : 0) + (rnd() - .5) * 14 + TILE) % TILE;
+      var y = 40 + 80 * r + (rnd() - .5) * 14;
+      items.push([big[n++ % big.length], x, y, Math.round((rnd() - .5) * 110), .82 + rnd() * .14]);
+    }
+    n = 0;
+    for (r = 0; r < 5; r++) for (c = 0; c < 5; c++) {
+      items.push([fill[n++ % 4], 80 * c + 20 + (rnd() - .5) * 8, 80 * r + (rnd() - .5) * 8 + 0.01, Math.round(rnd() * 90), 1]);
+      items.push([fill[n++ % 4], 80 * c + 60 + (rnd() - .5) * 8, 80 * r + (rnd() - .5) * 8 + 0.01, Math.round(rnd() * 90), 1]);
+    }
+    var g = '';
+    items.forEach(function(it){
+      for (var dx = -TILE; dx <= TILE; dx += TILE) for (var dy = -TILE; dy <= TILE; dy += TILE) {
+        var X = it[1] + dx, Y = it[2] + dy;
+        if (X < -45 || X > TILE + 45 || Y < -45 || Y > TILE + 45) continue;
+        g += '<g transform="translate(' + X.toFixed(1) + ' ' + Y.toFixed(1) + ') rotate(' + it[3] + ') scale(' + it[4].toFixed(2) + ')">' + ICONS[it[0]] + '</g>';
+      }
+    });
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + TILE + '" height="' + TILE + '" viewBox="0 0 ' + TILE + ' ' + TILE + '">' +
+      '<g fill="none" stroke="#000" stroke-opacity=".6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + g + '</g></svg>';
+    return 'url("data:image/svg+xml;utf8,' + encodeURIComponent(svg) + '")';
+  })();
+  var PRESETS = [
+    {id:'neon',  name:'Неон',   base:'linear-gradient(160deg,#06222a,#050607 55%,#1b0f2e)', ink:'linear-gradient(160deg,#3fd8c8 0%,#a6c43a 55%,#a06ae0 100%)'},
+    {id:'blue',  name:'Синий',  base:'linear-gradient(160deg,#0d2b55,#071328)', ink:'linear-gradient(160deg,#59b0ff,#9be7ff)'},
+    {id:'dusk',  name:'Закат',  base:'linear-gradient(160deg,#3b1530,#1a0b22)', ink:'linear-gradient(160deg,#ffae7a,#ff6a9a 55%,#c27bff)'},
+    {id:'indigo',name:'Индиго', base:'linear-gradient(160deg,#1f1b4d,#0d0b24)', ink:'linear-gradient(160deg,#8f8bff,#d08bff)'},
+    {id:'graph', name:'Графит', base:'linear-gradient(160deg,#25272c,#101113)', ink:'linear-gradient(160deg,#a9afb9,#6a707a)'},
+    {id:'mint',  name:'Мята',   base:'linear-gradient(160deg,#f0faf5,#cfeadf)', ink:'linear-gradient(160deg,#2f9a84,#3f8fc7)'},
+    {id:'warm',  name:'Тёплый', base:'linear-gradient(160deg,#fbf0e0,#f0d9bd)', ink:'linear-gradient(160deg,#b87332,#c9505c)'}
+  ];
+  var st = {mode:'none', id:'', img:'', panel:80, dim:0, open:false};
+  try { var r = JSON.parse(localStorage.getItem(WK)); if (r && typeof r === 'object') for (var k in st) if (k in r) st[k] = r[k]; } catch(e){}
+  var wall = document.getElementById('wall'), grid = document.getElementById('wallGrid');
+  var file = document.getElementById('wallFile'), pr = document.getElementById('panelRng'), dr = document.getElementById('dimRng');
+  if (!wall || !grid) return;
+  function persist(){
+    try { localStorage.setItem(WK, JSON.stringify(st)); return true; } catch(e){ return false; }
+  }
+  function preset(id){ for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i].id === id) return PRESETS[i]; return null; }
+  function apply(){
+    var p = st.mode === 'preset' ? preset(st.id) : null;
+    var img = st.mode === 'img' && st.img;
+    if (p) {
+      wall.className = 'pat';
+      wall.style.backgroundImage = p.base;
+      wall.style.setProperty('--wall-ink', p.ink);
+      wall.style.setProperty('--wall-mask', maskUrl);
+    } else if (img) {
+      wall.className = '';
+      wall.style.backgroundImage = 'url("' + st.img + '")';
+    } else {
+      wall.className = '';
+      wall.style.backgroundImage = '';
+    }
+    var fb = document.getElementById('wallFold'), wb = document.getElementById('wallBody');
+    if (fb && wb) { fb.setAttribute('aria-expanded', st.open ? 'true' : 'false'); wb.hidden = !st.open; }
+    var wp = document.getElementById('wpBg');
+    if (wp) {
+      wp.className = 'wp-bg' + (p ? ' pat' : '');
+      wp.style.backgroundImage = p ? p.base : (img ? 'url("' + st.img + '")' : '');
+      if (p) { wp.style.setProperty('--wall-ink', p.ink); wp.style.setProperty('--wall-mask', maskUrl); }
+    }
+    var active = !!(p || img);
+    document.body.classList.toggle('has-wall', active);
+    document.body.style.setProperty('--panel', st.panel + '%');
+    document.body.style.setProperty('--wall-dim', (st.dim / 100).toString());
+    pr.value = 100 - st.panel; dr.value = st.dim;
+    if (window.fillRange){ fillRange(pr); fillRange(dr); }
+    document.getElementById('panelVal').textContent = (100 - st.panel) + '%';
+    document.getElementById('dimVal').textContent = st.dim + '%';
+    Array.prototype.forEach.call(grid.children, function(b){
+      var m = b.getAttribute('data-m'), id = b.getAttribute('data-id');
+      var on = (m === 'none' && !active) || (m === 'preset' && !!p && p.id === id) || (m === 'img' && !!img);
+      b.classList.toggle('on', on);
+    });
+  }
+  function mk(cls, m, id, label){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'wall-sw ' + cls; b.setAttribute('data-m', m); b.setAttribute('data-id', id || '');
+    b.setAttribute('aria-label', label);
+    grid.appendChild(b); return b;
+  }
+  mk('none', 'none', '', 'Без фона').textContent = '✕';
+  PRESETS.forEach(function(p){
+    var b = mk('', 'preset', p.id, 'Фон ' + p.name);
+    b.style.backgroundImage = p.base;
+    var i = document.createElement('i'); i.className = 'ws-ink';
+    i.style.backgroundImage = p.ink;
+    i.style.webkitMaskImage = maskUrl; i.style.maskImage = maskUrl;
+    b.appendChild(i);
+  });
+  var up = mk('up', 'upload', '', 'Своё фото'); up.textContent = 'Своё фото';
+  function ownThumb(url){
+    var old = grid.querySelector('[data-m="img"]');
+    if (!old) { old = mk('', 'img', 'own', 'Моё фото'); grid.insertBefore(old, up); }
+    old.style.backgroundImage = 'url("' + url + '")';
+  }
+  if (st.img) ownThumb(st.img);
+  grid.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.wall-sw') : null; if (!b) return;
+    var m = b.getAttribute('data-m');
+    if (m === 'upload') { file.click(); return; }
+    if (m === 'none') { st.mode = 'none'; }
+    else if (m === 'preset') { st.mode = 'preset'; st.id = b.getAttribute('data-id'); }
+    else if (m === 'img') { st.mode = 'img'; }
+    persist(); apply();
+  });
+  file.addEventListener('change', function(){
+    var f = file.files && file.files[0]; file.value = '';
+    if (!f) return;
+    var fr = new FileReader();
+    fr.onerror = function(){ alert('Не удалось прочитать файл.'); };
+    fr.onload = function(){
+      var im = new Image();
+      im.onerror = function(){ alert('Это не картинка или формат не поддерживается.'); };
+      im.onload = function(){
+        var tries = [[1920, .88], [1440, .8], [1080, .72], [720, .65]], done = false;
+        for (var i = 0; i < tries.length && !done; i++){
+          var sc = Math.min(1, tries[i][0] / Math.max(im.width, im.height));
+          var cv = document.createElement('canvas');
+          cv.width = Math.max(1, Math.round(im.width * sc)); cv.height = Math.max(1, Math.round(im.height * sc));
+          cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+          var url; try { url = cv.toDataURL('image/jpeg', tries[i][1]); } catch(e){ break; }
+          var prev = {mode: st.mode, img: st.img};
+          st.mode = 'img'; st.img = url;
+          if (persist()) { done = true; ownThumb(url); apply(); }
+          else { st.mode = prev.mode; st.img = prev.img; }
+        }
+        if (!done) alert('Фото слишком большое для хранения в браузере. Выберите изображение поменьше.');
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(f);
+  });
+  pr.addEventListener('input', function(){ st.panel = 100 - Number(pr.value); persist(); apply(); });
+  dr.addEventListener('input', function(){ st.dim = Number(dr.value); persist(); apply(); });
+  document.getElementById('wallFold').addEventListener('click', function(){ st.open = !st.open; persist(); apply(); });
+  document.getElementById('panelReset').addEventListener('click', function(){ st.panel = 80; persist(); apply(); });
+  document.getElementById('dimReset').addEventListener('click', function(){ st.dim = 0; persist(); apply(); });
+  apply();
+})();
 </script>
 </body>
 </html>
