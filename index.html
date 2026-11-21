@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-21.27">
+<meta name="app-build" content="2026-11-21.28">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2446,20 +2446,34 @@ body[data-accent] #listCard .tile.on{box-shadow:0 5px 16px color-mix(in srgb,var
 body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 30%,transparent)}
 
 /* ── Счётчик труб: кольцо прогресса, крупные кнопки +1 / +10 ── */
-.cnt{--ring:min(80vw,38vh,340px);position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;color:var(--text);
-  background:radial-gradient(80% 42% at 50% 24%,color-mix(in srgb,var(--done-bg) 14%,transparent),transparent 74%),var(--bg);
+.cnt{--ring:min(74vw,34vh,320px);--cnt-panel:color-mix(in srgb,var(--card) 88%,transparent);position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;color:var(--text);
+  background:
+    radial-gradient(80% 45% at 5% -5%,var(--blob1),transparent 70%),
+    radial-gradient(70% 40% at 100% 25%,var(--blob2),transparent 68%),
+    radial-gradient(75% 45% at -5% 105%,var(--blob3),transparent 70%),
+    var(--bg);
   padding:calc(env(safe-area-inset-top,0px) + 8px) 16px calc(env(safe-area-inset-bottom,0px) + 12px);
   overscroll-behavior:contain;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .cnt[hidden]{display:none}
+body.has-wall .cnt{--cnt-panel:var(--glass)}
+/* Фон счётчика = выбранный фон приложения (синхронизируется скриптом #cntWall) */
+.cnt-wall{position:absolute;inset:0;z-index:-1;display:none;pointer-events:none;background-size:cover;background-position:center;background-repeat:no-repeat}
+body.has-wall .cnt-wall{display:block}
+.cnt-wall.pat::before{content:"";position:absolute;inset:0;background:var(--wall-ink);-webkit-mask-image:var(--wall-mask);mask-image:var(--wall-mask);-webkit-mask-size:300px 300px;mask-size:300px 300px;-webkit-mask-repeat:repeat;mask-repeat:repeat}
+.cnt-wall::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,var(--wall-dim,0))}
 .cnt-top{display:flex;justify-content:space-between;align-items:center;min-height:48px}
 .cnt-tb{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;min-width:44px;padding:0 16px 0 12px;border:1px solid var(--line);border-radius:999px;
-  background:var(--glass);color:var(--text);font:inherit;font-size:16px;font-weight:650;cursor:pointer;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  background:var(--cnt-panel);color:var(--text);font:inherit;font-size:16px;font-weight:600;cursor:pointer;box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
 .cnt-tb.cnt-x{padding:0;width:44px}
 .cnt-tb:active{opacity:.6}
-.cnt-main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.cnt-main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;margin:8px 0 12px;padding:14px;
+  border-radius:var(--radius-xl);background:var(--cnt-panel);border:1px solid var(--line);
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
 .cnt-ring{position:relative;flex:none;width:var(--ring);height:var(--ring)}
 .cnt-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .cnt-trk{fill:none;stroke:var(--soft);stroke-width:14}
+.cnt-g1{stop-color:color-mix(in srgb,var(--done-bg) 62%,#fff)}
+.cnt-g2{stop-color:var(--done-bg)}
 .cnt-arc{fill:none;stroke:url(#cntGrad);stroke-width:14;stroke-linecap:round;stroke-dasharray:565.49;stroke-dashoffset:565.49}
 .cnt.done .cnt-arc{stroke:#30b566}
 .cnt-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 10%}
@@ -2473,12 +2487,15 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
 .cnt.done .cnt-cap{background:rgba(48,181,102,.16);color:#30b566}
 .cnt-pct{display:flex;justify-content:center;gap:10px;margin:0;font-size:15px;font-weight:650;color:var(--text2);font-variant-numeric:tabular-nums}
 .cnt-pct span:first-child{color:var(--text)}
+.cnt-brk{margin:0;padding:7px 14px;border-radius:999px;background:var(--acc-bg);color:var(--acc-fg);font-size:15px;font-weight:650;text-align:center;line-height:1.25;text-wrap:balance;font-variant-numeric:tabular-nums}
+.cnt-brk[hidden]{display:none}
 .cnt-pct span+span::before{content:"·";margin-right:10px}
-.cnt.scrap .cnt-ring svg,.cnt.scrap .cnt-pct,.cnt.scrap #cntPcsCard{display:none}
+.cnt.scrap .cnt-ring svg,.cnt.scrap .cnt-pct,.cnt.scrap .cnt-brk,.cnt.scrap #cntPcsCard{display:none}
 .cnt.scrap .cnt-info{grid-template-columns:1fr}
+.cnt.scrap .cnt-it+.cnt-it{border-left:0}
 .cnt-fly{position:absolute;left:50%;top:14%;font-size:30px;font-weight:750;color:var(--done-bg);opacity:0;pointer-events:none;transform:translateX(-50%)}
-.cnt-info{display:grid;grid-template-columns:1fr 1fr;margin-bottom:12px;border-radius:24px;background:var(--glass);border:1px solid var(--line);
-  box-shadow:var(--shadow-sm);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
+.cnt-info{display:grid;grid-template-columns:1fr 1fr;margin-bottom:12px;border-radius:var(--radius-xl);background:var(--cnt-panel);border:1px solid var(--line);
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
 .cnt-it{min-width:0;padding:12px 16px}
 .cnt-it+.cnt-it{border-left:1px solid var(--line)}
 .cnt-it p{margin:0}
@@ -2488,20 +2505,35 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
 .cnt-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cnt-b{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:clamp(96px,17vh,140px);border:0;border-radius:30px;font:inherit;
   color:var(--done-fg);cursor:pointer;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--done-bg) 86%,#fff),var(--done-bg));
-  box-shadow:0 10px 24px color-mix(in srgb,var(--done-bg) 34%,transparent),inset 0 1px 0 rgba(255,255,255,.38)}
+  background:linear-gradient(145deg,rgba(255,255,255,.24),transparent 55%),linear-gradient(125deg,var(--hero-a,var(--done-bg)),var(--hero-b,color-mix(in srgb,var(--done-bg) 78%,#000)));
+  box-shadow:0 12px 28px color-mix(in srgb,var(--done-bg) 30%,transparent),inset 0 1px 0 rgba(255,255,255,.42)}
 .cnt-b b{font-size:clamp(44px,14vw,58px);line-height:1;font-weight:750;letter-spacing:-.02em}
 .cnt-b span{font-size:15px;font-weight:600;opacity:.85}
+.cnt:not(.scrap) .cnt-sc{display:none}
+.cnt-btns{grid-template-columns:1.35fr 1fr}
+.cnt.scrap .cnt-btns{grid-template-columns:.8fr 1fr 1fr;gap:10px}
+.cnt.scrap #cntP50{order:-1;grid-column:1/-1;min-height:clamp(96px,15vh,140px)}
+.cnt.scrap #cntP50 b{font-size:clamp(54px,17vw,72px)}
+.cnt.scrap .cnt-b{min-height:clamp(60px,9vh,84px)}
+.cnt-b.cnt-sec,.cnt.scrap #cntP1{color:var(--acc-fg);border:1px solid color-mix(in srgb,var(--done-bg) 38%,var(--line));
+  background:var(--cnt-panel);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.22);
+  -webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
+.cnt-b.cnt-sec:disabled,.cnt.scrap #cntP1:disabled{box-shadow:none}
+.cnt.scrap .cnt-sec b,.cnt.scrap #cntP1 b{font-size:clamp(30px,9.5vw,40px)}
+.cnt.scrap .cnt-sec span,.cnt.scrap #cntP1 span{font-size:13px}
 .cnt-b:active{transform:scale(.97)}
 .cnt-b:disabled{opacity:.3;box-shadow:none}
 .cnt-b:focus-visible,.cnt-tb:focus-visible{outline:3px solid var(--done-bg);outline-offset:3px}
 @media (orientation:landscape) and (max-height:540px){
-  .cnt{--ring:min(62vh,38vw);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;column-gap:20px;
+  .cnt{--ring:min(54vh,34vw);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;column-gap:20px;
     padding-left:calc(env(safe-area-inset-left,0px) + 16px);padding-right:calc(env(safe-area-inset-right,0px) + 16px)}
   .cnt-top{grid-column:1/-1}
-  .cnt-main{grid-column:1;grid-row:2}
+  .cnt-main{grid-column:1;grid-row:2;margin-bottom:0}
   .cnt-side{grid-column:2;grid-row:2;display:flex;flex-direction:column;justify-content:center;min-height:0}
   .cnt-b{min-height:clamp(84px,30vh,130px)}
+  .cnt.scrap .cnt-b{min-height:clamp(44px,14vh,64px)}
+  .cnt.scrap #cntP50{min-height:clamp(52px,18vh,80px)}
+  .cnt.scrap #cntP50 b{font-size:clamp(34px,9vw,48px)}
   .cnt-v{font-size:22px}
 }
 @media (prefers-reduced-motion:no-preference){
@@ -2892,6 +2924,7 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
 </nav>
 
 <div class="cnt" id="cntView" role="dialog" aria-modal="true" aria-label="Счётчик труб" hidden>
+  <div class="cnt-wall" id="cntWall" aria-hidden="true"></div>
   <div class="cnt-top">
     <button type="button" class="cnt-tb" id="cntUndo" aria-label="Отменить последнее действие" style="visibility:hidden">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
@@ -2904,7 +2937,7 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
   <div class="cnt-main">
     <div class="cnt-ring" id="cntRing" role="progressbar" aria-label="Выполнено" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <svg viewBox="0 0 200 200" aria-hidden="true">
-        <defs><linearGradient id="cntGrad" gradientUnits="userSpaceOnUse" x1="190" y1="100" x2="10" y2="100"><stop offset="0" stop-color="#1686ff"/><stop offset="1" stop-color="#30b566"/></linearGradient></defs>
+        <defs><linearGradient id="cntGrad" gradientUnits="userSpaceOnUse" x1="190" y1="100" x2="10" y2="100"><stop class="cnt-g1" offset="0"/><stop class="cnt-g2" offset="1"/></linearGradient></defs>
         <circle class="cnt-trk" cx="100" cy="100" r="90"/>
         <circle class="cnt-arc" id="cntFill" cx="100" cy="100" r="90" transform="rotate(-90 100 100)"/>
       </svg>
@@ -2916,6 +2949,7 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
       <span class="cnt-fly" id="cntFly" aria-hidden="true"></span>
     </div>
     <p class="cnt-pct" id="cntProg"><span id="cntPct"></span><span id="cntPipes"></span></p>
+    <p class="cnt-brk" id="cntBrk" hidden></p>
   </div>
   <div class="cnt-side">
     <div class="cnt-info">
@@ -2932,7 +2966,9 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
     </div>
     <div class="cnt-btns">
       <button type="button" class="cnt-b" id="cntP1"><b>+1</b><span id="cntP1s"></span></button>
-      <button type="button" class="cnt-b" id="cntP10"><b>+10</b><span id="cntP10s"></span></button>
+      <button type="button" class="cnt-b cnt-sec" id="cntP10"><b>+10</b><span id="cntP10s"></span></button>
+      <button type="button" class="cnt-b cnt-sec cnt-sc" id="cntP20"><b>+20</b><span id="cntP20s"></span></button>
+      <button type="button" class="cnt-b cnt-sc" id="cntP50"><b>+50</b><span id="cntP50s"></span></button>
     </div>
   </div>
 </div>
@@ -3861,12 +3897,25 @@ function trackDelta(d){
   saveCntLog();
 }
 function cntStats(){
-  var pd = 0, cd = 0, i, pc, c;
+  var pd = 0, cd = 0, wh = 0, sh = 0, shPcs = 0, pt = 0, ptLeft = 0, i, pc, c;
   for (i = 0; i < S.n; i++){
     pc = pcOf(i); c = Math.min(cnt[i] || 0, pc);
-    cd += c; if (c >= pc) pd++;
+    cd += c;
+    if (c >= pc){ pd++; continue; }
+    if (c > 0){ pt++; ptLeft += pc - c; }          // начатая труба
+    else if (pc < S.per){ sh++; shPcs = pc; }      // последняя, короткая (остаток)
+    else wh++;                                     // целая, нетронутая
   }
-  return {pd: pd, cd: cd};
+  return {pd: pd, cd: cd, wh: wh, sh: sh, shPcs: shPcs, pt: pt, ptLeft: ptLeft};
+}
+// «4 целые + 1 на 4 заготовки» — из чего состоит остаток
+function cntBreak(st){
+  var a = [];
+  if (st.pt) a.push(st.pt + ' ' + plural(st.pt, 'начатая', 'начатые', 'начатых') + ' (ещё ' + st.ptLeft + ' ' + plural(st.ptLeft, 'заготовка', 'заготовки', 'заготовок') + ')');
+  if (st.wh) a.push(st.wh + ' ' + plural(st.wh, 'целая', 'целые', 'целых'));
+  if (st.sh) a.push(st.sh + ' на ' + st.shPcs + ' ' + plural(st.shPcs, 'заготовку', 'заготовки', 'заготовок'));
+  // только целые трубы — пояснять нечего
+  return (st.pt || st.sh) ? a.join(' + ') : '';
 }
 function cntVal(){
   if (!S) return 0;
@@ -3913,6 +3962,8 @@ function renderCounter(){
     $('cntSub').textContent = plural(v, 'заготовка', 'заготовки', 'заготовок');
     $('cntP1s').textContent = 'заготовка';
     $('cntP10s').textContent = 'заготовок';
+    $('cntP20s').textContent = 'заготовок';
+    $('cntP50s').textContent = 'заготовок';
   } else {
     var st = cntStats(), left = S.n - st.pd, pct = S.q > 0 ? Math.min(100, Math.round(st.cd / S.q * 100)) : 0;
     if (left <= 0){
@@ -3933,6 +3984,8 @@ function renderCounter(){
     $('cntRing').setAttribute('aria-valuenow', String(pct));
     $('cntPct').textContent = pct + '% выполнено';
     $('cntPipes').textContent = st.pd + ' из ' + S.n + ' ' + plural(S.n, 'трубы', 'труб', 'труб');
+    var bt = left > 0 ? cntBreak(st) : '';
+    $('cntBrk').textContent = bt; $('cntBrk').hidden = !bt;
     $('cntPcs').textContent = Math.max(0, S.q - st.cd);
     $('cntPcsOf').textContent = 'из ' + S.q;
     $('cntP1s').textContent = 'труба';
@@ -3985,6 +4038,8 @@ $('cntBtn').addEventListener('click', openCounter);
 $('cntX').addEventListener('click', closeCounter);
 $('cntP1').addEventListener('click', function(){ cntAdd($('nextBtn')); });
 $('cntP10').addEventListener('click', function(){ cntAdd($('plus10Btn')); });
+$('cntP20').addEventListener('click', function(){ cntAdd($('plus20Btn')); });
+$('cntP50').addEventListener('click', function(){ cntAdd($('plus50Btn')); });
 $('cntUndo').addEventListener('click', function(){
   if (cntActs < 1) return;
   cntActs--;
@@ -5438,6 +5493,12 @@ setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.
       wp.className = 'wp-bg' + (p ? ' pat' : '');
       wp.style.backgroundImage = p ? p.base : (img ? 'url("' + st.img + '")' : '');
       if (p) { wp.style.setProperty('--wall-ink', p.ink); wp.style.setProperty('--wall-mask', maskUrl); }
+    }
+    var cw = document.getElementById('cntWall');
+    if (cw) {
+      cw.className = 'cnt-wall' + (p ? ' pat' : '');
+      cw.style.backgroundImage = p ? p.base : (img ? 'url("' + st.img + '")' : '');
+      if (p) { cw.style.setProperty('--wall-ink', p.ink); cw.style.setProperty('--wall-mask', maskUrl); }
     }
     var active = !!(p || img);
     document.body.classList.toggle('has-wall', active);
