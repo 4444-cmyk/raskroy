@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-22.44">
+<meta name="app-build" content="2026-11-22.46">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2534,6 +2534,27 @@ body.cnt-open .app,body.cnt-open .tabbar{visibility:hidden}   /* под счёт
 @media (prefers-reduced-motion:no-preference){
   .cnt-pct.ev{animation:islPop 1.1s cubic-bezier(.2,.9,.3,1.2)}
 }
+.cnt > .cnt-pct{flex:none;align-self:center;margin:-4px 0 6px}
+/* Остров iPhone: чёрная капсула ровно поверх выреза, по контуру — прогресс; при отметке растягивается и показывает +N */
+.cnt-isl{display:none;position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) - 51px);width:131px;height:43px;transform:translateX(-50%);
+  border-radius:22px;background:#000;overflow:hidden;z-index:5;pointer-events:none}
+body.isl-hw .cnt-isl{display:block}
+body.isl-hw .cnt > .cnt-pct{display:none}
+.cnt-isl svg{position:absolute;left:0;top:0;transition:opacity .2s ease}
+.isl-trk{fill:none;stroke:rgba(255,255,255,.16);stroke-width:2.5}
+.isl-arc{fill:none;stroke:url(#islGrad);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:0 100}
+.cnt-isl.last .isl-arc{stroke:#ff9f0a}
+.cnt.done .isl-arc{stroke:#30d158}
+.cnt.scrap .cnt-isl svg{opacity:0}
+.isl-t{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#30d158;font-size:17px;font-weight:750;white-space:nowrap;opacity:0;font-variant-numeric:tabular-nums}
+.cnt-isl.ev{width:min(270px,76vw);height:48px}
+.cnt-isl.ev svg{opacity:0}
+.cnt-isl.ev .isl-t{opacity:1}
+@media (prefers-reduced-motion:no-preference){
+  .cnt-isl{transition:width .38s cubic-bezier(.3,1.35,.5,1),height .38s cubic-bezier(.3,1.35,.5,1)}
+  .isl-t{transition:opacity .2s ease .08s}
+  .isl-arc{transition:stroke-dasharray .5s cubic-bezier(.2,.8,.2,1)}
+}
 @keyframes islPop{0%{transform:scale(1)}18%{transform:scale(1.18,1.1)}65%{transform:scale(1.18,1.1)}100%{transform:scale(1)}}
 body.has-wall .cnt-guide,body.has-wall .cnt-info,body.has-wall .cnt-ring::before{background:var(--glass);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 body.has-wall .cnt-b.cnt-b-piece{background:color-mix(in srgb,var(--acc-bg) var(--panel,80%),transparent)}
@@ -2555,6 +2576,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
   .cnt{--ring:min(56vh,34vw);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;column-gap:18px;
     padding-left:calc(env(safe-area-inset-left,0px) + 16px);padding-right:calc(env(safe-area-inset-right,0px) + 16px)}
   .cnt-top{grid-column:1/-1;min-height:40px}
+  .cnt > .cnt-pct{display:none}
   .cnt-main{grid-column:1;grid-row:2;gap:8px}
   .cnt-side{grid-column:2;grid-row:2;display:flex;flex-direction:column;justify-content:center;min-height:0;gap:8px}
   .cnt-info{margin-bottom:0}
@@ -2970,6 +2992,15 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
 </nav>
 
 <div class="cnt" id="cntView" role="dialog" aria-modal="true" aria-label="Счётчик труб" hidden>
+  <div class="cnt-isl" id="cntIsl" aria-hidden="true">
+    <svg viewBox="0 0 131 43" width="131" height="43">
+      <defs><linearGradient id="islGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="131" y2="0"><stop offset="0" stop-color="#1686ff"/><stop offset="1" stop-color="#30d158"/></linearGradient></defs>
+      <rect class="isl-trk" x="1.25" y="1.25" width="128.5" height="40.5" rx="20.25"/>
+      <rect class="isl-arc" id="cntIslArc" x="1.25" y="1.25" width="128.5" height="40.5" rx="20.25" pathLength="100"/>
+    </svg>
+    <span class="isl-t" id="cntIslT"></span>
+  </div>
+    <p class="cnt-pct" id="cntProg"><span id="cntPct"></span><span id="cntPipes"></span><i class="cnt-isl-bar" aria-hidden="true"></i><b class="cnt-isl-ev" id="cntIslEv" aria-hidden="true"></b></p>
   <div class="cnt-top">
     <button type="button" class="cnt-tb" id="cntUndo" aria-label="Отменить последнее действие" style="visibility:hidden">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
@@ -2984,7 +3015,6 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
     </button>
   </div>
   <div class="cnt-main">
-    <p class="cnt-pct" id="cntProg"><span id="cntPct"></span><span id="cntPipes"></span><i class="cnt-isl-bar" aria-hidden="true"></i><b class="cnt-isl-ev" id="cntIslEv" aria-hidden="true"></b></p>
     <div class="cnt-ring" id="cntRing" role="progressbar" aria-label="Выполнено" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <svg viewBox="0 0 200 200" aria-hidden="true">
         <defs><linearGradient id="cntGrad" gradientUnits="userSpaceOnUse" x1="190" y1="100" x2="10" y2="100"><stop offset="0" stop-color="#1686ff"/><stop offset="1" stop-color="#30b566"/></linearGradient></defs>
@@ -4077,6 +4107,7 @@ function renderCounter(){
     $('cntPipes').textContent = 'по ' + num(S.p) + ' мм';
     $('cntProg').style.setProperty('--p', '0%');
     $('cntProg').classList.remove('last');
+    $('cntIsl').classList.remove('last');
     $('cntP1s').textContent = 'заготовка';
     $('cntP10b').textContent = '+10';
     $('cntP10s').textContent = 'заготовок';
@@ -4158,6 +4189,9 @@ function renderCounter(){
     $('cntPct').textContent = pct + '% выполнено';
     $('cntPipes').textContent = 'готово ' + st.pd + ' из ' + S.n;
     $('cntProg').style.setProperty('--p', pct + '%');
+    $('cntIslArc').style.strokeDasharray = pct + ' 100';
+    $('cntIslArc').style.opacity = pct < 1 ? '0' : '1';
+    $('cntIsl').classList.toggle('last', !!isLastPipe && left > 0);
     $('cntProg').classList.toggle('last', !!isLastPipe && left > 0);
 
     $('cntPipesLeft').textContent = String(left);
@@ -4183,6 +4217,7 @@ function openCounter(){
   renderCounter();
   clearInterval(cntTimer);
   cntTimer = setInterval(renderCounter, 20000);
+  cntIslCheck();
   cntWakeOn();
   try{ $('cntX').focus(); }catch(e){}
 }
@@ -4200,9 +4235,26 @@ function cntIsland(d, isPiece){
   var el = $('cntProg');
   $('cntIslEv').textContent = (S && S.mode !== 1 && !isPiece) ? ('+' + d + ' ' + plural(d, 'труба', 'трубы', 'труб')) : ('+' + d + ' шт');
   el.classList.remove('ev'); void el.offsetWidth; el.classList.add('ev');
+  var hw = $('cntIsl');
+  $('cntIslT').textContent = $('cntIslEv').textContent;
+  hw.classList.add('ev');
   clearTimeout(cntIslT);
-  cntIslT = setTimeout(function(){ el.classList.remove('ev'); }, 1100);
+  cntIslT = setTimeout(function(){ el.classList.remove('ev'); hw.classList.remove('ev'); }, 1300);
 }
+// Остров есть у iPhone 14 Pro и новее: безопасная зона сверху ≥ 59 px (только в вертикальном положении, в режиме «на экране Домой»)
+function cntIslCheck(){
+  var on = false;
+  try{
+    var pr = document.createElement('div');
+    pr.style.cssText = 'position:fixed;top:0;left:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top,0px)';
+    document.body.appendChild(pr);
+    var inset = parseFloat(getComputedStyle(pr).paddingTop) || 0;
+    document.body.removeChild(pr);
+    on = inset >= 59 && window.innerHeight > window.innerWidth;
+  }catch(e){}
+  document.body.classList.toggle('isl-hw', on);
+}
+window.addEventListener('resize', cntIslCheck);
 var cntWake = null;
 function cntWakeOn(){
   try{
