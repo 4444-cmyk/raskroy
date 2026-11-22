@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-21.28">
+<meta name="app-build" content="2026-11-22.44">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1458,10 +1458,12 @@ button.badv {
   color: var(--text);
 }
 
-#nextBtn {
+body:not(.is-scrap) #plus10Btn {
+  grid-column: 1 / -1;
   height: 64px;
   font-size: 19px;
 }
+body.is-scrap #pieceBtn { order: -1; }
 
 .more {
   margin-top: 6px;
@@ -1766,8 +1768,7 @@ button.badv {
 }
 .bk-banner[hidden]{display:none}
 .bk-banner p{margin:0 0 10px;font-size:15px;line-height:1.4;font-weight:600}
-.bk-act{display:grid;grid-template-columns:1.6fr 1fr;gap:8px}
-.bk-act{grid-template-columns:2fr 1fr}
+.bk-act{display:grid;grid-template-columns:2fr 1fr;gap:8px}
 .bk-act .nbtn{height:auto;min-height:46px;padding:6px 8px;font-size:14px;line-height:1.15;white-space:normal}
 .bk-act .nbtn.sec{height:auto;min-height:46px;font-size:14px;color:var(--warn-fg);border-color:currentColor;opacity:.85}
 
@@ -1816,7 +1817,7 @@ button.badv {
 .set-body > div{min-width:0;max-width:100%}
 #setCard{overflow-x:hidden}
 
-/* Settings v3: one consistent control language */
+/* Settings & History controls */
 #setCard .set-body{gap:0}
 #setCard .set-body > div{
   padding:14px 0;
@@ -1826,51 +1827,33 @@ button.badv {
 #setCard .set-body > div:last-child{border-bottom:0;padding-bottom:2px}
 #setCard .set-l{font-size:14px;line-height:1.3;letter-spacing:-.01em;margin:0 0 9px}
 #setCard .set-d{font-size:13px;line-height:1.45}
-#setCard .theme-row{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;
-  padding:4px;margin:0;border:1px solid var(--line);border-radius:15px;
-  background:var(--soft);
-}
-#setCard .theme-chip,#setCard .opt-chip{
-  min-width:0;height:40px;padding:0 8px;border-radius:11px;
-  font-size:13px;font-weight:650;transition:background .16s ease,color .16s ease,box-shadow .16s ease;
-}
-#setCard .theme-chip.on,#setCard .opt-chip.on{
-  background:var(--card);color:var(--acc);
-  box-shadow:0 1px 4px rgba(0,0,0,.12);
-}
 #setCard .set-sw{
   min-height:66px;padding:14px 0;border-bottom:1px solid var(--line);
 }
 #setCard .set-sw:last-of-type{border-bottom:0}
 #setCard .set-sw .chip{
-  min-width:82px;height:38px;padding:0 14px;border:1px solid var(--line);
-  border-radius:12px;background:var(--soft);font-size:13px;font-weight:700;
+  min-width:78px;height:38px;padding:0 14px;border:1px solid var(--line);
+  border-radius:999px;background:color-mix(in srgb,var(--soft) 78%,transparent);font-size:13px;font-weight:700;
 }
-#setCard .set-sw .chip.on{background:var(--done-bg);color:var(--done-fg);border-color:var(--acc-line);box-shadow:none}
-#setCard #updChkBtn{min-width:94px;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--soft);font-weight:650}
-#setCard .nbtn.sec{border-radius:13px;min-height:44px;font-weight:650}
+#setCard #updChkBtn{min-width:94px;height:40px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-weight:650}
+#setCard .nbtn.sec{min-height:44px;font-weight:650}
 #histCard #sendHistBtn,#histCard #exportHistBtn,#histCard #importHistBtn{
-  border:1px solid var(--line);border-radius:13px;background:var(--soft);
+  border:1px solid var(--line);background:var(--soft);
   color:var(--text);font-weight:650;box-shadow:none;
 }
 #histCard #sendHistBtn{background:var(--done-bg);color:var(--done-fg);border-color:var(--acc-line)}
 #histCard #exportHistBtn,#histCard #importHistBtn{min-height:44px}
 #storageStatus{padding:10px 12px;border-radius:12px;background:var(--soft)}
 @media (max-width:360px){
-  #setCard .theme-chip,#setCard .opt-chip{font-size:12px;padding:0 4px}
   #setCard .set-sw{gap:8px}
-}
-@media (prefers-reduced-motion:reduce){
-  #setCard .theme-chip,#setCard .opt-chip{transition:none}
 }
 
 /* iOS-inspired glass controls + user scale */
 :root{--ui-scale:.9;--ios-blue:#0a84ff;--ios-glass:rgba(255,255,255,.58)}
 @supports (zoom:1){
-  .app{zoom:var(--ui-scale);max-width:calc(480px / var(--ui-scale))}
-  .tabbar{zoom:var(--ui-scale)}
-  .toast,.sheet,.sheet-bg{zoom:var(--ui-scale)}
+  .app{zoom:var(--ui-scale);max-width:calc(520px / var(--ui-scale))}
+  .tabbar{zoom:var(--ui-scale);width:min(calc((100% - 24px) / var(--ui-scale)), 496px)}
+  .toast,.sheet{zoom:var(--ui-scale)}
 }
 #setCard{
   border:1px solid color-mix(in srgb,var(--line) 72%,transparent);
@@ -2446,95 +2429,146 @@ body[data-accent] #listCard .tile.on{box-shadow:0 5px 16px color-mix(in srgb,var
 body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 30%,transparent)}
 
 /* ── Счётчик труб: кольцо прогресса, крупные кнопки +1 / +10 ── */
-.cnt{--ring:min(74vw,34vh,320px);--cnt-panel:color-mix(in srgb,var(--card) 88%,transparent);position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;color:var(--text);
-  background:
-    radial-gradient(80% 45% at 5% -5%,var(--blob1),transparent 70%),
-    radial-gradient(70% 40% at 100% 25%,var(--blob2),transparent 68%),
-    radial-gradient(75% 45% at -5% 105%,var(--blob3),transparent 70%),
-    var(--bg);
+.cnt{--ring:min(80vw,30vh,290px);position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;color:var(--text);
+  background:transparent;
   padding:calc(env(safe-area-inset-top,0px) + 8px) 16px calc(env(safe-area-inset-bottom,0px) + 12px);
   overscroll-behavior:contain;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .cnt[hidden]{display:none}
-body.has-wall .cnt{--cnt-panel:var(--glass)}
-/* Фон счётчика = выбранный фон приложения (синхронизируется скриптом #cntWall) */
-.cnt-wall{position:absolute;inset:0;z-index:-1;display:none;pointer-events:none;background-size:cover;background-position:center;background-repeat:no-repeat}
-body.has-wall .cnt-wall{display:block}
-.cnt-wall.pat::before{content:"";position:absolute;inset:0;background:var(--wall-ink);-webkit-mask-image:var(--wall-mask);mask-image:var(--wall-mask);-webkit-mask-size:300px 300px;mask-size:300px 300px;-webkit-mask-repeat:repeat;mask-repeat:repeat}
-.cnt-wall::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,var(--wall-dim,0))}
-.cnt-top{display:flex;justify-content:space-between;align-items:center;min-height:48px}
+body.cnt-open .app,body.cnt-open .tabbar{visibility:hidden}   /* под счётчиком виден только фон приложения */
+.cnt-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;min-height:48px}
+.cnt-top #cntUndo{justify-self:start}
+.cnt-top #cntSave{justify-self:center;min-width:132px}
+.cnt-top #cntX{justify-self:end}
 .cnt-tb{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;min-width:44px;padding:0 16px 0 12px;border:1px solid var(--line);border-radius:999px;
-  background:var(--cnt-panel);color:var(--text);font:inherit;font-size:16px;font-weight:600;cursor:pointer;box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
+  background:var(--glass);color:var(--text);font:inherit;font-size:15px;font-weight:650;white-space:nowrap;cursor:pointer;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .cnt-tb.cnt-x{padding:0;width:44px}
 .cnt-tb:active{opacity:.6}
-.cnt-main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;margin:8px 0 12px;padding:14px;
-  border-radius:var(--radius-xl);background:var(--cnt-panel);border:1px solid var(--line);
-  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
+.cnt-main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 .cnt-ring{position:relative;flex:none;width:var(--ring);height:var(--ring)}
 .cnt-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.cnt-trk{fill:none;stroke:var(--soft);stroke-width:14}
-.cnt-g1{stop-color:color-mix(in srgb,var(--done-bg) 62%,#fff)}
-.cnt-g2{stop-color:var(--done-bg)}
-.cnt-arc{fill:none;stroke:url(#cntGrad);stroke-width:14;stroke-linecap:round;stroke-dasharray:565.49;stroke-dashoffset:565.49}
+.cnt-trk{fill:none;stroke:var(--soft);stroke-width:9}
+.cnt-arc{fill:none;stroke:url(#cntGrad);stroke-width:9;stroke-linecap:round;filter:drop-shadow(0 2px 6px rgba(22,134,255,.35));stroke-dasharray:590.62;stroke-dashoffset:590.62}
 .cnt.done .cnt-arc{stroke:#30b566}
-.cnt-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 10%}
-.cnt-cap{margin:0 0 2px;padding:5px 14px;border-radius:999px;background:var(--acc-bg);color:var(--acc-fg);font-size:14px;font-weight:700;letter-spacing:.01em}
-.cnt-num{margin:0;font-size:calc(var(--ring)*.36);line-height:1.04;font-weight:750;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
-.cnt[data-len="1"] .cnt-num,.cnt[data-len="2"] .cnt-num{font-size:calc(var(--ring)*.42)}
-.cnt[data-len="4"] .cnt-num{font-size:calc(var(--ring)*.28)}
-.cnt[data-len="5"] .cnt-num{font-size:calc(var(--ring)*.23)}
-.cnt-sub{margin:0;font-size:18px;font-weight:600;color:var(--text2)}
+.cnt-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 12%}
+.cnt-cap{margin:0 0 4px;padding:5px 14px;border-radius:999px;background:var(--acc-bg);color:var(--acc-fg);font-size:14px;font-weight:700;letter-spacing:.01em}
+.cnt-cap.last{background:var(--warn-bg);color:var(--warn-fg)}
+.cnt-num{margin:0;font-size:calc(var(--ring)*.32);line-height:1.05;font-weight:750;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.cnt[data-len="1"] .cnt-num,.cnt[data-len="2"] .cnt-num{font-size:calc(var(--ring)*.38)}
+.cnt[data-len="4"] .cnt-num{font-size:calc(var(--ring)*.25)}
+.cnt[data-len="5"] .cnt-num{font-size:calc(var(--ring)*.21)}
+.cnt-sub{margin:4px 0 0;font-size:17px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
 .cnt.done .cnt-num{color:#30b566}
 .cnt.done .cnt-cap{background:rgba(48,181,102,.16);color:#30b566}
 .cnt-pct{display:flex;justify-content:center;gap:10px;margin:0;font-size:15px;font-weight:650;color:var(--text2);font-variant-numeric:tabular-nums}
 .cnt-pct span:first-child{color:var(--text)}
-.cnt-brk{margin:0;padding:7px 14px;border-radius:999px;background:var(--acc-bg);color:var(--acc-fg);font-size:15px;font-weight:650;text-align:center;line-height:1.25;text-wrap:balance;font-variant-numeric:tabular-nums}
-.cnt-brk[hidden]{display:none}
 .cnt-pct span+span::before{content:"·";margin-right:10px}
-.cnt.scrap .cnt-ring svg,.cnt.scrap .cnt-pct,.cnt.scrap .cnt-brk,.cnt.scrap #cntPcsCard{display:none}
+.cnt-guide{width:100%;padding:12px 16px;border-radius:24px;background:var(--glass);border:1px solid var(--line);text-align:center;box-shadow:var(--shadow-sm);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.cnt-guide p{margin:0;font-variant-numeric:tabular-nums}
+.cnt-dim{margin:3px 0 0;font-size:14px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
+.cnt-dim:empty{display:none}
+.cnt-g1{font-size:15px;font-weight:700;color:var(--text);line-height:1.35;white-space:pre-line}
+.cnt-g2{margin-top:3px;font-size:13px;font-weight:550;color:var(--text2);line-height:1.35}
+.cnt-g2:empty{display:none}
+.cnt.scrap .cnt-ring svg,.cnt.scrap #cntPcsCard{display:none}
 .cnt.scrap .cnt-info{grid-template-columns:1fr}
-.cnt.scrap .cnt-it+.cnt-it{border-left:0}
 .cnt-fly{position:absolute;left:50%;top:14%;font-size:30px;font-weight:750;color:var(--done-bg);opacity:0;pointer-events:none;transform:translateX(-50%)}
-.cnt-info{display:grid;grid-template-columns:1fr 1fr;margin-bottom:12px;border-radius:var(--radius-xl);background:var(--cnt-panel);border:1px solid var(--line);
-  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
-.cnt-it{min-width:0;padding:12px 16px}
+.cnt-info{display:grid;grid-template-columns:1fr 1fr;margin-bottom:12px;border-radius:24px;background:var(--glass);border:1px solid var(--line);
+  box-shadow:var(--shadow-sm);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
+.cnt-it{min-width:0;padding:10px 16px}
 .cnt-it+.cnt-it{border-left:1px solid var(--line)}
 .cnt-it p{margin:0}
 .cnt-k{font-size:13px;font-weight:600;color:var(--text2)}
 .cnt-v{margin-top:3px;font-size:26px;line-height:1.15;font-weight:750;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .cnt-s{margin-top:2px;min-height:1.3em;font-size:14px;line-height:1.3;font-weight:500;color:var(--text2)}
 .cnt-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cnt-b{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:clamp(96px,17vh,140px);border:0;border-radius:30px;font:inherit;
+.cnt-b{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:clamp(80px,13.5vh,112px);border:0;border-radius:30px;font:inherit;
   color:var(--done-fg);cursor:pointer;
-  background:linear-gradient(145deg,rgba(255,255,255,.24),transparent 55%),linear-gradient(125deg,var(--hero-a,var(--done-bg)),var(--hero-b,color-mix(in srgb,var(--done-bg) 78%,#000)));
-  box-shadow:0 12px 28px color-mix(in srgb,var(--done-bg) 30%,transparent),inset 0 1px 0 rgba(255,255,255,.42)}
-.cnt-b b{font-size:clamp(44px,14vw,58px);line-height:1;font-weight:750;letter-spacing:-.02em}
-.cnt-b span{font-size:15px;font-weight:600;opacity:.85}
-.cnt:not(.scrap) .cnt-sc{display:none}
-.cnt-btns{grid-template-columns:1.35fr 1fr}
-.cnt.scrap .cnt-btns{grid-template-columns:.8fr 1fr 1fr;gap:10px}
-.cnt.scrap #cntP50{order:-1;grid-column:1/-1;min-height:clamp(96px,15vh,140px)}
-.cnt.scrap #cntP50 b{font-size:clamp(54px,17vw,72px)}
-.cnt.scrap .cnt-b{min-height:clamp(60px,9vh,84px)}
-.cnt-b.cnt-sec,.cnt.scrap #cntP1{color:var(--acc-fg);border:1px solid color-mix(in srgb,var(--done-bg) 38%,var(--line));
-  background:var(--cnt-panel);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.22);
-  -webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
-.cnt-b.cnt-sec:disabled,.cnt.scrap #cntP1:disabled{box-shadow:none}
-.cnt.scrap .cnt-sec b,.cnt.scrap #cntP1 b{font-size:clamp(30px,9.5vw,40px)}
-.cnt.scrap .cnt-sec span,.cnt.scrap #cntP1 span{font-size:13px}
+  background:linear-gradient(180deg,color-mix(in srgb,var(--done-bg) 86%,#fff),var(--done-bg));
+  box-shadow:0 10px 24px color-mix(in srgb,var(--done-bg) 34%,transparent),inset 0 1px 0 rgba(255,255,255,.38)}
+.cnt-b b{font-size:clamp(42px,13vw,56px);line-height:1;font-weight:750;letter-spacing:-.02em}
+.cnt-b span{font-size:15px;font-weight:600;opacity:.85;text-align:center;line-height:1.2;padding:0 8px}
+.cnt-b.cnt-b-piece{border-radius:24px;
+  background:var(--glass);color:var(--done-bg);border:1px solid var(--line);
+  box-shadow:var(--shadow-sm);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
+.cnt-b.cnt-b-piece span{font-size:15px;font-weight:650;opacity:1;color:var(--text)}
+#cntP10{grid-column:1/-1}
+#cntP20,#cntP50{display:none}
+.cnt.scrap #cntP20,.cnt.scrap #cntP50{display:flex}
+.cnt.scrap #cntP1{grid-column:auto;order:-1}
+.cnt.scrap #cntP10{grid-column:auto}
+.cnt.scrap .cnt-b{min-height:clamp(68px,11vh,92px)}
+.cnt.scrap .cnt-b b{font-size:clamp(34px,10vw,44px)}
+.cnt-b.cnt-b-s{min-height:clamp(68px,11vh,92px)}
+.cnt-b.cnt-b-s b{font-size:clamp(34px,10vw,44px)}
+.cnt.scrap .cnt-b-piece{display:none}
 .cnt-b:active{transform:scale(.97)}
 .cnt-b:disabled{opacity:.3;box-shadow:none}
 .cnt-b:focus-visible,.cnt-tb:focus-visible{outline:3px solid var(--done-bg);outline-offset:3px}
+/* ── Счётчик в стиле приложения: стеклянные карточки, синий градиент как у «героя» ── */
+.cnt-ring::before{content:"";position:absolute;inset:7.5%;border-radius:50%;background:color-mix(in srgb,var(--card) 84%,transparent);border:1px solid var(--line);
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
+.cnt-in{padding:0 10%}
+.cnt-trk,.cnt-arc{stroke-width:7}
+.cnt-cap{font-size:clamp(11px,calc(var(--ring)*.044),12.5px);padding:4px 11px;margin:0 0 3px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.cnt-num{font-size:calc(var(--ring)*.29)}
+.cnt[data-len="1"] .cnt-num,.cnt[data-len="2"] .cnt-num{font-size:calc(var(--ring)*.35)}
+.cnt-sub{font-size:15px;margin-top:2px}
+.cnt-dim{font-size:13px;margin-top:2px}
+.cnt-num small{font-size:.36em;font-weight:650;letter-spacing:0;color:var(--text2);margin-left:.14em}
+.cnt.done .cnt-num small{color:#30b566}
+.cnt-guide,.cnt-info{background:color-mix(in srgb,var(--card) 88%,transparent);border:1px solid var(--line);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(28px) saturate(165%);backdrop-filter:blur(28px) saturate(165%)}
+.cnt-v{color:var(--text)}
+.cnt-pct{padding:5px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+/* «Остров»: тёмная капсула с общим прогрессом; при отметке расширяется и показывает +N */
+.cnt-pct{position:relative;overflow:hidden;height:34px;align-items:center;min-width:200px;padding:0 16px;font-size:14px;background:#000;border:1px solid rgba(255,255,255,.14);color:#fff;
+  box-shadow:0 6px 18px rgba(0,0,0,.28);-webkit-backdrop-filter:none;backdrop-filter:none}
+.cnt-pct span{white-space:nowrap}
+.cnt-pct span:first-child{color:#fff}
+.cnt-pct span+span{color:rgba(255,255,255,.68)}
+.cnt-isl-bar{position:absolute;left:0;bottom:0;height:3px;width:var(--p,0%);background:linear-gradient(90deg,#1686ff,#30d158);border-radius:0 3px 0 0;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.cnt-pct.last .cnt-isl-bar{background:linear-gradient(90deg,#ff9f0a,#ffd60a)}
+.cnt.done .cnt-isl-bar{background:#30d158}
+.cnt-isl-ev{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#30d158;font-size:16px;font-weight:750;opacity:0;pointer-events:none}
+.cnt-pct.ev .cnt-isl-ev{opacity:1}
+@media (prefers-reduced-motion:no-preference){
+  .cnt-pct.ev{animation:islPop 1.1s cubic-bezier(.2,.9,.3,1.2)}
+}
+@keyframes islPop{0%{transform:scale(1)}18%{transform:scale(1.18,1.1)}65%{transform:scale(1.18,1.1)}100%{transform:scale(1)}}
+body.has-wall .cnt-guide,body.has-wall .cnt-info,body.has-wall .cnt-ring::before{background:var(--glass);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+body.has-wall .cnt-b.cnt-b-piece{background:color-mix(in srgb,var(--acc-bg) var(--panel,80%),transparent)}
+.cnt-b:not(.cnt-b-piece){color:#fff;border-radius:var(--radius-xl);
+  background:linear-gradient(145deg,rgba(255,255,255,.24),transparent 55%),linear-gradient(125deg,var(--hero-a,#087cff),var(--hero-b,#0758c9));
+  box-shadow:0 15px 34px color-mix(in srgb,var(--done-bg) 26%,transparent),inset 0 1px 0 rgba(255,255,255,.42)}
+.cnt-b:not(.cnt-b-piece):disabled{background:color-mix(in srgb,var(--card) 78%,transparent);color:var(--text2);opacity:.85;box-shadow:inset 0 0 0 1px var(--line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
+.cnt-b:not(.cnt-b-piece):disabled span{opacity:.9}
+.cnt-b.cnt-b-piece{background:var(--acc-bg);border:1px solid var(--acc-line);border-radius:var(--radius-lg);color:var(--acc-fg);-webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:0 8px 20px color-mix(in srgb,var(--done-bg) 18%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
+.cnt-b.cnt-b-piece b,.cnt-b.cnt-b-piece span{color:var(--acc-fg)}
+.cnt-b.cnt-b-piece:disabled{opacity:.45;box-shadow:none}
+.cnt.piece-main .cnt-b.cnt-b-piece{color:#fff;border-color:transparent;
+  background:linear-gradient(145deg,rgba(255,255,255,.24),transparent 55%),linear-gradient(125deg,var(--hero-a,#087cff),var(--hero-b,#0758c9));
+  box-shadow:0 15px 34px color-mix(in srgb,var(--done-bg) 30%,transparent),inset 0 1px 0 rgba(255,255,255,.42)}
+.cnt.piece-main .cnt-b.cnt-b-piece b,.cnt.piece-main .cnt-b.cnt-b-piece span{color:#fff}
 @media (orientation:landscape) and (max-height:540px){
-  .cnt{--ring:min(54vh,34vw);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;column-gap:20px;
+  .cnt{--ring:min(56vh,34vw);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;column-gap:18px;
     padding-left:calc(env(safe-area-inset-left,0px) + 16px);padding-right:calc(env(safe-area-inset-right,0px) + 16px)}
-  .cnt-top{grid-column:1/-1}
-  .cnt-main{grid-column:1;grid-row:2;margin-bottom:0}
-  .cnt-side{grid-column:2;grid-row:2;display:flex;flex-direction:column;justify-content:center;min-height:0}
-  .cnt-b{min-height:clamp(84px,30vh,130px)}
-  .cnt.scrap .cnt-b{min-height:clamp(44px,14vh,64px)}
-  .cnt.scrap #cntP50{min-height:clamp(52px,18vh,80px)}
-  .cnt.scrap #cntP50 b{font-size:clamp(34px,9vw,48px)}
-  .cnt-v{font-size:22px}
+  .cnt-top{grid-column:1/-1;min-height:40px}
+  .cnt-main{grid-column:1;grid-row:2;gap:8px}
+  .cnt-side{grid-column:2;grid-row:2;display:flex;flex-direction:column;justify-content:center;min-height:0;gap:8px}
+  .cnt-info{margin-bottom:0}
+  .cnt-it{padding:8px 12px}
+  .cnt-b{min-height:clamp(58px,20vh,86px);border-radius:22px}
+  .cnt-b b{font-size:clamp(30px,9vh,42px)}
+  .cnt-b.cnt-b-s,.cnt.scrap .cnt-b{min-height:clamp(52px,16vh,72px)}
+  .cnt.scrap .cnt-b b{font-size:clamp(26px,8vh,34px)}
+  .cnt-b.cnt-b-s b{font-size:clamp(26px,8vh,34px)}
+  .cnt-b.cnt-b-piece{border-radius:18px}
+  .cnt-v{font-size:20px}
+  .cnt-guide{padding:6px 12px}
+  .cnt-g1{font-size:13px}
+  .cnt-g2{font-size:12px}
 }
 @media (prefers-reduced-motion:no-preference){
   .cnt-b{transition:transform .12s ease,opacity .2s ease}
@@ -2728,14 +2762,18 @@ body.has-wall .cnt-wall{display:block}
     <div class="now">
       <p class="nowT" id="nowT"></p>
       <p class="nowS" id="nowS"></p>
-      <button type="button" class="nbtn main" id="nextBtn" style="width:100%">Готово</button>
-      <div class="nrow" style="margin-top:10px" id="actRow2">
+      <div class="nrow" id="actRow2">
+        <button type="button" class="nbtn main" id="plus10Btn">+10 труб</button>
+        <button type="button" class="nbtn" id="nextBtn">Готово</button>
         <button type="button" class="nbtn" id="pieceBtn">+1 заготовка</button>
-        <button type="button" class="nbtn" id="plus10Btn">+10 труб</button>
       </div>
       <div class="nrow scrap-only" id="actRow3" style="margin-top:8px">
         <button type="button" class="nbtn main" id="plus20Btn">+20</button>
         <button type="button" class="nbtn main" id="plus50Btn">+50</button>
+      </div>
+      <div class="nrow scrap-only" id="actRow4" style="margin-top:8px">
+        <button type="button" class="nbtn sec" id="scrapResetBtn">Сброс 0</button>
+        <button type="button" class="nbtn" id="scrapSaveBtn">В историю</button>
       </div>
       <button type="button" class="nbtn sec" id="undoBtn" style="width:100%;margin-top:10px">Назад</button>
       <details class="more" id="moreBox">
@@ -2750,6 +2788,11 @@ body.has-wall .cnt-wall{display:block}
           <button type="button" class="badb" id="xMinus" aria-label="Из остатков меньше">−</button>
           <button type="button" class="badv" id="xMid" aria-label="Ввести число из остатков">Из остатков <b id="xVal">0</b></button>
           <button type="button" class="badb" id="xBtn" aria-label="Из остатков больше">+</button>
+        </div>
+        <div class="range" id="xEditRow" hidden style="margin-top:8px">
+          <span>Из остатков:</span>
+          <input id="xInput" type="number" inputmode="numeric" min="0" max="100000" aria-label="Количество из остатков" style="width:78px">
+          <button type="button" class="nbtn" id="xOkBtn">ОК</button>
         </div>
         <p class="nowB" id="xNote"></p>
       </details>
@@ -2807,7 +2850,10 @@ body.has-wall .cnt-wall{display:block}
         <div class="wall-grid" id="wallGrid"></div>
         <input type="file" id="wallFile" accept="image/*" hidden>
         <div class="wall-prev" aria-hidden="true"><div class="wp-bg" id="wpBg"></div><div class="wp-card">Так будут выглядеть панели</div></div>
-        <p class="set-d" id="wallDesc" style="margin-top:8px">Узоры из инструментов или своё фото. Узор можно сочетать с любой темой.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px">
+          <p class="set-d" id="wallDesc" style="margin:0">Узоры из инструментов или своё фото. Узор можно сочетать с любой темой.</p>
+          <button type="button" class="chip" id="wallDelBtn" hidden style="flex:none;height:32px;padding:0 12px;background:var(--soft);color:var(--danger);font-size:12px;font-weight:650">Убрать фото</button>
+        </div>
       <div class="scale-setting">
         <div class="scale-head">
           <div>
@@ -2895,7 +2941,7 @@ body.has-wall .cnt-wall{display:block}
       </div>
       <div>
         <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--danger)">Стереть расчёт, отметки и историю</button>
-        <p class="set-d" style="margin-top:6px">Настройки останутся. Вернуть нельзя.</p>
+        <p class="set-d" style="margin-top:6px">Настройки и фото фона останутся. Вернуть нельзя.</p>
       </div>
     </div>
   </div>
@@ -2924,51 +2970,59 @@ body.has-wall .cnt-wall{display:block}
 </nav>
 
 <div class="cnt" id="cntView" role="dialog" aria-modal="true" aria-label="Счётчик труб" hidden>
-  <div class="cnt-wall" id="cntWall" aria-hidden="true"></div>
   <div class="cnt-top">
     <button type="button" class="cnt-tb" id="cntUndo" aria-label="Отменить последнее действие" style="visibility:hidden">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
       <span>Назад</span>
+    </button>
+    <button type="button" class="cnt-tb" id="cntSave" aria-label="Сохранить в историю">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v17l-6-4-6 4z"/></svg>
+      <span id="cntSaveT">В историю</span>
     </button>
     <button type="button" class="cnt-tb cnt-x" id="cntX" aria-label="Закрыть счётчик">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
   </div>
   <div class="cnt-main">
+    <p class="cnt-pct" id="cntProg"><span id="cntPct"></span><span id="cntPipes"></span><i class="cnt-isl-bar" aria-hidden="true"></i><b class="cnt-isl-ev" id="cntIslEv" aria-hidden="true"></b></p>
     <div class="cnt-ring" id="cntRing" role="progressbar" aria-label="Выполнено" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <svg viewBox="0 0 200 200" aria-hidden="true">
-        <defs><linearGradient id="cntGrad" gradientUnits="userSpaceOnUse" x1="190" y1="100" x2="10" y2="100"><stop class="cnt-g1" offset="0"/><stop class="cnt-g2" offset="1"/></linearGradient></defs>
-        <circle class="cnt-trk" cx="100" cy="100" r="90"/>
-        <circle class="cnt-arc" id="cntFill" cx="100" cy="100" r="90" transform="rotate(-90 100 100)"/>
+        <defs><linearGradient id="cntGrad" gradientUnits="userSpaceOnUse" x1="190" y1="100" x2="10" y2="100"><stop offset="0" stop-color="#1686ff"/><stop offset="1" stop-color="#30b566"/></linearGradient></defs>
+        <circle class="cnt-trk" cx="100" cy="100" r="94"/>
+        <circle class="cnt-arc" id="cntFill" cx="100" cy="100" r="94" transform="rotate(-90 100 100)"/>
       </svg>
       <div class="cnt-in" aria-live="polite">
         <p class="cnt-cap" id="cntCap"></p>
         <p class="cnt-num" id="cntNum">0</p>
         <p class="cnt-sub" id="cntSub"></p>
+        <p class="cnt-dim" id="cntDim"></p>
       </div>
       <span class="cnt-fly" id="cntFly" aria-hidden="true"></span>
     </div>
-    <p class="cnt-pct" id="cntProg"><span id="cntPct"></span><span id="cntPipes"></span></p>
-    <p class="cnt-brk" id="cntBrk" hidden></p>
+    <div class="cnt-guide" id="cntGuide">
+      <p class="cnt-g1" id="cntG1"></p>
+      <p class="cnt-g2" id="cntG2"></p>
+    </div>
   </div>
   <div class="cnt-side">
     <div class="cnt-info">
       <div class="cnt-it" id="cntPcsCard">
-        <p class="cnt-k">Заготовок осталось</p>
+        <p class="cnt-k">Труб осталось</p>
+        <p class="cnt-v" id="cntPipesLeft">—</p>
+        <p class="cnt-s" id="cntPipesOf"></p>
+      </div>
+      <div class="cnt-it">
+        <p class="cnt-k" id="cntCard2K">Заготовок осталось</p>
         <p class="cnt-v" id="cntPcs">—</p>
         <p class="cnt-s" id="cntPcsOf"></p>
       </div>
-      <div class="cnt-it">
-        <p class="cnt-k">Последняя отметка</p>
-        <p class="cnt-v" id="cntLast">—</p>
-        <p class="cnt-s" id="cntLastWhen"></p>
-      </div>
     </div>
     <div class="cnt-btns">
-      <button type="button" class="cnt-b" id="cntP1"><b>+1</b><span id="cntP1s"></span></button>
-      <button type="button" class="cnt-b cnt-sec" id="cntP10"><b>+10</b><span id="cntP10s"></span></button>
-      <button type="button" class="cnt-b cnt-sec cnt-sc" id="cntP20"><b>+20</b><span id="cntP20s"></span></button>
-      <button type="button" class="cnt-b cnt-sc" id="cntP50"><b>+50</b><span id="cntP50s"></span></button>
+      <button type="button" class="cnt-b" id="cntP10"><b id="cntP10b">+10</b><span id="cntP10s"></span></button>
+      <button type="button" class="cnt-b cnt-b-s" id="cntP1"><b>+1</b><span id="cntP1s"></span></button>
+      <button type="button" class="cnt-b" id="cntP20"><b>+20</b><span>заготовок</span></button>
+      <button type="button" class="cnt-b" id="cntP50"><b>+50</b><span>заготовок</span></button>
+      <button type="button" class="cnt-b cnt-b-s cnt-b-piece" id="cntPiece"><b>+1</b><span id="cntPieceS">заготовка</span></button>
     </div>
   </div>
 </div>
@@ -2984,9 +3038,9 @@ body.has-wall .cnt-wall{display:block}
 </div>
 
 <div class="sheet-bg" id="shareSheetBg" hidden></div>
-<div class="sheet" id="shareSheet" hidden>
+<div class="sheet" id="shareSheet" role="dialog" aria-modal="true" aria-labelledby="shareSheetTitle" hidden>
   <div class="sheet-handle"></div>
-  <h3 class="sheet-title">Поделиться</h3>
+  <h3 class="sheet-title" id="shareSheetTitle">Поделиться</h3>
   <p class="sheet-sub">Сегодня отмечены · можно выбрать любые</p>
   <div class="sheet-tools"><button type="button" class="share-all" id="shareAll">Выбрать все</button></div>
   <div class="sheet-list" id="shareList"></div>
@@ -3268,6 +3322,9 @@ Array.prototype.forEach.call(document.querySelectorAll('.pf-opt'), function(b){
 });
 Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function(b){
   b.addEventListener('click', function(){
+    if (typeof scrapResetArm === 'function') scrapResetArm(false);
+    if (typeof resetArm === 'function') resetArm(false);
+    if (typeof rangeArm === 'function') rangeArm(false);
     setMode(+b.getAttribute('data-mode'));
     update();
   });
@@ -3518,6 +3575,7 @@ function renderList(){
     $('left').style.color = '';
     $('left2').textContent = '';
     $('leftShareBtn').disabled = cd < 1;
+    $('leftShareBtn').textContent = 'Поделиться результатом';
     $('xCtl').style.display = 'none';
     $('xNote').style.display = 'none';
     var more = $('moreBox');
@@ -3551,9 +3609,9 @@ function renderList(){
   $('pieceBtn').textContent = '+1 заготовка';
   $('pieceBtn').className = 'nbtn';
   $('plus10Btn').textContent = '+10 труб';
-  $('plus10Btn').className = 'nbtn';
+  $('plus10Btn').className = 'nbtn main';
   var ar2 = $('actRow2');
-  if (ar2){ ar2.style.marginTop = '10px'; ar2.style.gridTemplateColumns = ''; }
+  if (ar2){ ar2.style.marginTop = '0'; ar2.style.gridTemplateColumns = ''; }
   $('xCtl').style.display = '';
   $('xNote').style.display = '';
   var more2 = $('moreBox');
@@ -3617,6 +3675,7 @@ function renderList(){
   $('left').style.color = '';
   $('left2').textContent = all ? '' : leftBreakdown(lg);
   $('leftShareBtn').disabled = all;
+  $('leftShareBtn').textContent = 'Поделиться остатком';
 
   var lg2 = ['×' + S.per + ' — резать из трубы'];
   if (S.per >= 2) lg2.push(Math.min(S.per - 1, 4) + '/' + S.per + ' — уже отрезано');
@@ -3626,7 +3685,7 @@ function renderList(){
   if (nextIdx < 0){
     $('nowT').textContent = 'Всё распилено';
     $('nowS').textContent = 'Отрезано заготовок: ' + cd + ' из ' + S.q;
-    $('nextBtn').textContent = 'Готово';
+    $('nextBtn').textContent = '+1 труба';
     $('pieceBtn').disabled = true;
     $('nextBtn').disabled = true;
     $('plus10Btn').disabled = true;
@@ -3635,10 +3694,21 @@ function renderList(){
     var isLastPipe = S.rem > 0 && nextIdx === S.n - 1;
     $('nowT').textContent = isLastPipe ? 'Последняя труба №' + (nextIdx + 1) : 'Следующая: труба №' + (nextIdx + 1);
     $('nowS').textContent = 'Отрезано заготовок: ' + cn + ' из ' + pcn + ' по ' + S.p + ' мм';
-    $('nextBtn').textContent = 'Готово №' + (nextIdx + 1);
+    $('nextBtn').textContent = cn > 0 ? 'Дорезать трубу' : '+1 труба';
     $('pieceBtn').disabled = false;
     $('nextBtn').disabled = false;
-    $('plus10Btn').disabled = false;
+    // «+N» отмечает только целые нетронутые трубы подряд (как в счётчике); начатую и короткую последнюю — кнопка «+1 труба»
+    var wholeRun = 0, wi;
+    if (cn === 0){
+      for (wi = nextIdx; wi < S.n && wholeRun < 10; wi++){
+        if (pcOf(wi) !== S.per || Math.min(cnt[wi] || 0, S.per) > 0) break;
+        wholeRun++;
+      }
+    }
+    $('plus10Btn').disabled = wholeRun < 2;
+    $('plus10Btn').textContent = wholeRun >= 2
+      ? '+' + wholeRun + ' ' + plural(wholeRun, 'целая труба', 'целые трубы', 'целых труб')
+      : '+10 целых труб';
   }
 
   $('badVal').textContent = S.bad;
@@ -3665,7 +3735,7 @@ function renderList(){
   if (!(f >= 1)) $('rFrom').value = 1;
   if (!(t >= 1)) $('rTo').value = S.n;
   var rl = $('rangeLbl');
-  if (rl) rl.textContent = scrap ? 'Заготовки с' : 'Трубы с';
+  if (rl) rl.textContent = 'Трубы с';
   var rr = $('rangeRow');
   if (rr) rr.style.display = '';
   if (cntOpen) renderCounter();
@@ -3697,6 +3767,7 @@ function syncList(){
   card.style.display = '';
   var sig = S.sig;
   if (sig !== curSig){
+    if ($('xEditRow')) $('xEditRow').hidden = true;
     curSig = sig;
     cnt = {};
     hist = [];
@@ -3806,7 +3877,18 @@ $('pieceBtn').addEventListener('click', function(){
   if (!S) return;
   if (S.mode === 1){ bumpScrap(1); return; }
   if (nextIdx < 0) return;
-  apply([[nextIdx, (cnt[nextIdx] || 0) + 1]]);
+  var pdBefore = cntStats().pd;
+  if (apply([[nextIdx, (cnt[nextIdx] || 0) + 1]])){
+    // Если труба ещё не закрылась целиком, фиксируем в журнале +1 заготовку
+    if (cntStats().pd === pdBefore && curSig){
+      var log = cntLogAll[curSig] || [];
+      delete cntLogAll[curSig];
+      log.push([Date.now(), 1, 'p']);
+      if (log.length > 300) log.shift();
+      cntLogAll[curSig] = log;
+      saveCntLog();
+    }
+  }
 });
 
 $('nextBtn').addEventListener('click', function(){
@@ -3820,16 +3902,7 @@ $('plus10Btn').addEventListener('click', function(){
   if (!S) return;
   if (S.mode === 1){ bumpScrap(10); return; }
   if (nextIdx < 0) return;
-  var ch = [], marked = 0;
-  for (var i = nextIdx; i < S.n && marked < 10; i++){
-    var pc = pcOf(i);
-    var c = Math.min(cnt[i] || 0, pc);
-    if (c < pc){
-      ch.push([i, pc]);
-      marked++;
-    }
-  }
-  if (ch.length) apply(ch);
+  markWholePipes(10);   // только целые нетронутые трубы подряд — то же, что написано на кнопке
 });
 $('plus20Btn').addEventListener('click', function(){
   if (!S || S.mode !== 1) return;
@@ -3839,6 +3912,36 @@ $('plus50Btn').addEventListener('click', function(){
   if (!S || S.mode !== 1) return;
   bumpScrap(50);
 });
+var scrapResetTimer = null;
+function scrapResetArm(on){
+  var b = $('scrapResetBtn');
+  if (!b) return;
+  clearTimeout(scrapResetTimer);
+  if (on){
+    b.textContent = 'Ещё раз: 0';
+    b.setAttribute('data-armed', '1');
+    b.style.color = 'var(--danger)';
+    b.style.borderColor = 'var(--danger)';
+    scrapResetTimer = setTimeout(function(){ scrapResetArm(false); }, 3000);
+  } else {
+    b.textContent = 'Сброс 0';
+    b.removeAttribute('data-armed');
+    b.style.color = '';
+    b.style.borderColor = '';
+  }
+}
+$('scrapResetBtn').addEventListener('click', function(){
+  if (!S || S.mode !== 1) return;
+  if (this.getAttribute('data-armed')){
+    cnt = {}; hist = [];
+    delete cntLogAll[curSig]; saveCntLog();
+    putBad(curSig, 0); putExtra(curSig, 0); putScrap(curSig, 0);
+    saveDone(); update(); scrapResetArm(false); feedback(true);
+  } else {
+    scrapResetArm(true);
+  }
+});
+$('scrapSaveBtn').addEventListener('click', function(){ addToHist(); });
 
 $('undoBtn').addEventListener('click', function(){
   if (!S || !hist.length) return;
@@ -3864,7 +3967,14 @@ $('undoBtn').addEventListener('click', function(){
     }
     if (pair[1] > 0) cnt[pair[0]] = pair[1]; else delete cnt[pair[0]];
   });
-  if (S && S.mode !== 1) trackDelta(cntVal() - mv0);
+  if (S && S.mode !== 1){
+    var dPipe = cntVal() - mv0;
+    if (dPipe !== 0) trackDelta(dPipe);
+    else if (curSig && cntLogAll[curSig] && cntLogAll[curSig].length && cntLogAll[curSig][cntLogAll[curSig].length - 1][2] === 'p'){
+      cntLogAll[curSig].pop();
+      saveCntLog();
+    }
+  }
   saveDone();
   if (needUpdate) update(); else renderList();
   feedback(false);
@@ -3897,25 +4007,12 @@ function trackDelta(d){
   saveCntLog();
 }
 function cntStats(){
-  var pd = 0, cd = 0, wh = 0, sh = 0, shPcs = 0, pt = 0, ptLeft = 0, i, pc, c;
+  var pd = 0, cd = 0, i, pc, c;
   for (i = 0; i < S.n; i++){
     pc = pcOf(i); c = Math.min(cnt[i] || 0, pc);
-    cd += c;
-    if (c >= pc){ pd++; continue; }
-    if (c > 0){ pt++; ptLeft += pc - c; }          // начатая труба
-    else if (pc < S.per){ sh++; shPcs = pc; }      // последняя, короткая (остаток)
-    else wh++;                                     // целая, нетронутая
+    cd += c; if (c >= pc) pd++;
   }
-  return {pd: pd, cd: cd, wh: wh, sh: sh, shPcs: shPcs, pt: pt, ptLeft: ptLeft};
-}
-// «4 целые + 1 на 4 заготовки» — из чего состоит остаток
-function cntBreak(st){
-  var a = [];
-  if (st.pt) a.push(st.pt + ' ' + plural(st.pt, 'начатая', 'начатые', 'начатых') + ' (ещё ' + st.ptLeft + ' ' + plural(st.ptLeft, 'заготовка', 'заготовки', 'заготовок') + ')');
-  if (st.wh) a.push(st.wh + ' ' + plural(st.wh, 'целая', 'целые', 'целых'));
-  if (st.sh) a.push(st.sh + ' на ' + st.shPcs + ' ' + plural(st.shPcs, 'заготовку', 'заготовки', 'заготовок'));
-  // только целые трубы — пояснять нечего
-  return (st.pt || st.sh) ? a.join(' + ') : '';
+  return {pd: pd, cd: cd};
 }
 function cntVal(){
   if (!S) return 0;
@@ -3935,77 +4032,145 @@ function cntAgo(ts){
 }
 var cntOpen = false, cntActs = 0, cntPrevFocus = null, cntTimer = null;
 function setCntNum(v){
-  var n = $('cntNum'), t = String(v);
-  $('cntView').setAttribute('data-len', String(t.length));
-  if (n.textContent === t) return;
-  n.textContent = t;
+  var n = $('cntNum'), t = String(v), unit = / шт$/.test(t);
+  $('cntView').setAttribute('data-len', String(unit ? t.length - 3 : t.length));
+  if (n.getAttribute('data-v') === t) return;
+  n.setAttribute('data-v', t);
+  if (unit){ n.textContent = t.slice(0, -3); var u = document.createElement('small'); u.textContent = 'шт'; n.appendChild(u); }
+  else n.textContent = t;
   n.classList.remove('pop'); void n.offsetWidth; n.classList.add('pop');
 }
-function cntFly(d){
+function cntFly(txt){
   var f = $('cntFly');
-  f.textContent = '+' + d;
+  f.textContent = txt;
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
 }
 function renderCounter(){
   if (!cntOpen) return;
   if (!S){ closeCounter(); return; }
-  var el = $('cntView'), scrap = S.mode === 1, off = false;
+  var el = $('cntView'), scrap = S.mode === 1, off = false, lockP1 = false;
   var log = curSig && cntLogAll[curSig];
   var last = (log && log.length) ? log[log.length - 1] : null;
-  var k;
+  var capEl = $('cntCap');
 
   if (scrap){
     var v = S.q;
-    $('cntCap').textContent = 'Нарезано';
+    capEl.className = 'cnt-cap';
+    capEl.textContent = 'Из обрезков';
     el.className = 'cnt scrap';
     setCntNum(v);
     $('cntSub').textContent = plural(v, 'заготовка', 'заготовки', 'заготовок');
+    $('cntG1').textContent = 'Резать по ' + num(S.p) + ' мм';
+    $('cntG2').textContent = S.bad > 0 ? ('Брак: ' + S.bad) : 'Отмечайте +1 или +10 по мере резки';
+    $('cntCard2K').textContent = 'Последняя отметка';
+    if (last){
+      var lk = last[1];
+      $('cntPcs').textContent = '+' + lk + ' ' + plural(lk, 'заготовка', 'заготовки', 'заготовок');
+      var agoS = cntAgo(last[0]);
+      $('cntPcsOf').textContent = agoS ? hhmm(last[0]) + ' · ' + agoS : hhmm(last[0]);
+    } else {
+      $('cntPcs').textContent = '—';
+      $('cntPcsOf').textContent = 'Пока без отметок';
+    }
+    $('cntDim').textContent = '';
+    $('cntPct').textContent = 'Из обрезков';
+    $('cntPipes').textContent = 'по ' + num(S.p) + ' мм';
+    $('cntProg').style.setProperty('--p', '0%');
+    $('cntProg').classList.remove('last');
     $('cntP1s').textContent = 'заготовка';
+    $('cntP10b').textContent = '+10';
     $('cntP10s').textContent = 'заготовок';
-    $('cntP20s').textContent = 'заготовок';
-    $('cntP50s').textContent = 'заготовок';
+    $('cntP10').disabled = false;
   } else {
     var st = cntStats(), left = S.n - st.pd, pct = S.q > 0 ? Math.min(100, Math.round(st.cd / S.q * 100)) : 0;
-    if (left <= 0){
-      $('cntCap').textContent = 'Готово';
+    var groups = {}, ii;
+    for (ii = 0; ii < S.n; ii++){
+      var pci = pcOf(ii), ci = Math.min(cnt[ii] || 0, pci);
+      if (ci < pci) groups[pci - ci] = (groups[pci - ci] || 0) + 1;
+    }
+    var remParts = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; }).map(function(r){
+      var n = groups[r], whole = r === S.per;
+      var pipe = (whole ? plural(n, 'целая', 'целых', 'целых') + ' ' : '') + plural(n, 'труба', 'трубы', 'труб');
+      return n + ' ' + pipe + (whole ? ' по ' : ' на ') + r + ' ' + pieceWord(r, whole ? 'по' : 'на');
+    });
+
+    if (left <= 0 || nextIdx < 0){
+      capEl.className = 'cnt-cap';
+      capEl.textContent = 'Готово';
       el.className = 'cnt done';
       setCntNum('✓');
       $('cntSub').textContent = 'Все трубы нарезаны';
+      $('cntDim').textContent = '';
+      $('cntG1').textContent = 'Нарезано ' + st.cd + ' из ' + S.q + ' по ' + num(S.p) + ' мм';
+      $('cntG2').textContent = '';
+      $('cntP1s').textContent = 'труба';
+      $('cntP10b').textContent = '+10';
+      $('cntP10s').textContent = 'труб';
+      $('cntP10').disabled = true;
       off = true;
     } else {
-      $('cntCap').textContent = 'Осталось';
+      var pcn = pcOf(nextIdx), cn = Math.min(cnt[nextIdx] || 0, pcn), needNow = pcn - cn;
+      var isLastPipe = S.rem > 0 && nextIdx === S.n - 1;
+      capEl.className = 'cnt-cap' + (isLastPipe ? ' last' : '');
+      capEl.textContent = isLastPipe
+        ? ('Последняя №' + (nextIdx + 1))
+        : ('Труба №' + (nextIdx + 1) + ' из ' + S.n);
       el.className = 'cnt';
-      setCntNum(left);
-      $('cntSub').textContent = 'из ' + S.n + ' ' + plural(S.n, 'трубы', 'труб', 'труб');
+      setCntNum(needNow + ' шт');
+      $('cntSub').textContent = 'резать по ' + num(S.p) + ' мм';
+      var dd = Number($('d').value) || 0, tt = Number($('t').value) || 0;
+      $('cntDim').textContent = dd > 0 ? ('Ø' + num(dd) + (tt > 0 ? ' × ' + num(tt) : '') + (PF ? ' · перф.' : '')) : (PF ? 'перф.' : '');
+      $('cntG1').textContent = !remParts.length ? '' : (remParts.length === 1 ? ('Осталось: ' + remParts[0]) : ('Осталось:\n' + remParts.join('\n')));
+      $('cntG2').textContent = '';   // остаток по текущей трубе уже в кольце и на кнопке заготовки
+
+      // «Целая» труба — полной длины (S.per заготовок), на которой ещё ничего не отрезано.
+      // «+N» отмечает только такие трубы подряд. Короткая последняя закрывается отдельно кнопкой «+1 труба (N шт)».
+      var started = cn > 0, wholeRun = 0, wi;
+      if (!started){
+        for (wi = nextIdx; wi < S.n && wholeRun < 10; wi++){
+          if (pcOf(wi) !== S.per || Math.min(cnt[wi] || 0, S.per) > 0) break;
+          wholeRun++;
+        }
+      }
+      lockP1 = started;
+      el.classList.toggle('piece-main', started);
+      $('cntP1s').textContent = started ? 'дорежьте текущую' : (isLastPipe ? ('труба (' + needNow + ' шт)') : 'целая труба');
+      if (wholeRun >= 2){
+        $('cntP10b').textContent = '+' + wholeRun;
+        $('cntP10s').textContent = plural(wholeRun, 'целая труба', 'целые трубы', 'целых труб');
+        $('cntP10').disabled = false;
+      } else {
+        $('cntP10b').textContent = '+10';
+        $('cntP10s').textContent = started ? 'дорежьте текущую' : 'целых труб';
+        $('cntP10').disabled = true;
+      }
+
+      // Кнопка +1 заготовка: сколько заготовок осталось отрезать на текущей трубе
+      if ($('cntPieceS')){
+        $('cntPieceS').textContent = 'заготовка · осталось ' + needNow;
+      }
     }
+
     var arc = $('cntFill');
-    arc.style.strokeDashoffset = String(565.49 * (1 - pct / 100));
+    arc.style.strokeDashoffset = String(590.62 * (1 - pct / 100));
     arc.style.opacity = pct < 1 ? '0' : '1';
     $('cntRing').setAttribute('aria-valuenow', String(pct));
     $('cntPct').textContent = pct + '% выполнено';
-    $('cntPipes').textContent = st.pd + ' из ' + S.n + ' ' + plural(S.n, 'трубы', 'труб', 'труб');
-    var bt = left > 0 ? cntBreak(st) : '';
-    $('cntBrk').textContent = bt; $('cntBrk').hidden = !bt;
-    $('cntPcs').textContent = Math.max(0, S.q - st.cd);
-    $('cntPcsOf').textContent = 'из ' + S.q;
-    $('cntP1s').textContent = 'труба';
-    $('cntP10s').textContent = 'труб';
+    $('cntPipes').textContent = 'готово ' + st.pd + ' из ' + S.n;
+    $('cntProg').style.setProperty('--p', pct + '%');
+    $('cntProg').classList.toggle('last', !!isLastPipe && left > 0);
+
+    $('cntPipesLeft').textContent = String(left);
+    $('cntPipesOf').textContent = 'из ' + S.n + ' ' + plural(S.n, 'трубы', 'труб', 'труб');
+    $('cntCard2K').textContent = 'Заготовок осталось';
+    $('cntPcs').textContent = String(Math.max(0, S.q - st.cd));
+    $('cntPcsOf').textContent = 'из ' + S.q + ' шт';
   }
 
-  if (last){
-    k = last[1];
-    $('cntLast').textContent = '+' + k + ' ' + (scrap ? plural(k, 'заготовка', 'заготовки', 'заготовок') : plural(k, 'труба', 'трубы', 'труб'));
-    var today = new Date(last[0]).toDateString() === new Date().toDateString();
-    var when = (today ? '' : dayLabel(last[0]) + ', ') + hhmm(last[0]);
-    var ago = cntAgo(last[0]);
-    $('cntLastWhen').textContent = ago ? when + ' · ' + ago : when;
-  } else {
-    $('cntLast').textContent = '—';
-    $('cntLastWhen').textContent = 'Пока без отметок';
-  }
-  $('cntP1').disabled = off;
-  $('cntP10').disabled = off;
-  $('cntUndo').style.visibility = cntActs < 1 ? 'hidden' : 'visible';
+  $('cntP1').disabled = off || lockP1;
+  if ($('cntPiece')) $('cntPiece').disabled = off;
+  var canUndoCut = (hist.length > 0 && hist[hist.length - 1][0][0] >= 0) || (hist.length > 0 && hist[hist.length - 1][0][0] === -3);
+  $('cntUndo').style.visibility = canUndoCut ? 'visible' : 'hidden';
 }
 function openCounter(){
   if (!S) return;
@@ -4013,36 +4178,99 @@ function openCounter(){
   cntPrevFocus = document.activeElement;
   $('cntFly').classList.remove('go');
   $('cntView').hidden = false;
+  document.body.classList.add('cnt-open');
   document.body.style.overflow = 'hidden';
   renderCounter();
   clearInterval(cntTimer);
   cntTimer = setInterval(renderCounter, 20000);
+  cntWakeOn();
   try{ $('cntX').focus(); }catch(e){}
 }
 function closeCounter(){
   cntOpen = false;
+  cntWakeOff();
   clearInterval(cntTimer);
   $('cntView').hidden = true;
+  document.body.classList.remove('cnt-open');
   document.body.style.overflow = '';
   try{ if (cntPrevFocus && cntPrevFocus.focus) cntPrevFocus.focus(); }catch(e){}
 }
-function cntAdd(btn){
-  var b = cntVal();
-  btn.click();                       // та же логика, что у кнопок чек-листа
-  var d = cntVal() - b;
-  if (d !== 0) cntActs++;
-  renderCounter();
-  if (d > 0) cntFly(d);
+var cntIslT = null;
+function cntIsland(d, isPiece){
+  var el = $('cntProg');
+  $('cntIslEv').textContent = (S && S.mode !== 1 && !isPiece) ? ('+' + d + ' ' + plural(d, 'труба', 'трубы', 'труб')) : ('+' + d + ' шт');
+  el.classList.remove('ev'); void el.offsetWidth; el.classList.add('ev');
+  clearTimeout(cntIslT);
+  cntIslT = setTimeout(function(){ el.classList.remove('ev'); }, 1100);
 }
+var cntWake = null;
+function cntWakeOn(){
+  try{
+    if (!navigator.wakeLock || cntWake) return;
+    navigator.wakeLock.request('screen').then(function(l){
+      if (!cntOpen){ l.release(); return; }
+      cntWake = l;
+      l.addEventListener('release', function(){ cntWake = null; });
+    }).catch(function(){});
+  }catch(e){}
+}
+function cntWakeOff(){
+  try{ if (cntWake){ cntWake.release(); cntWake = null; } }catch(e){}
+}
+document.addEventListener('visibilitychange', function(){ if (cntOpen && !document.hidden) cntWakeOn(); });
+function cntAdd(btn, isPiece){
+  var st0 = S ? cntStats() : {pd:0, cd:0};
+  var b = S && S.mode === 1 ? S.q : (isPiece ? st0.cd : st0.pd);
+  var hLen = hist.length, hLast = hist[hist.length - 1];
+  if (typeof btn === 'function') btn(); else btn.click();   // та же логика, что у кнопок чек-листа
+  var st1 = S ? cntStats() : {pd:0, cd:0};
+  var a = S && S.mode === 1 ? S.q : (isPiece ? st1.cd : st1.pd);
+  var d = a - b;
+  if (d !== 0 || hist.length !== hLen || hist[hist.length - 1] !== hLast){
+    cntActs++;
+    if (isPiece && curSig && cntLogAll[curSig] && cntLogAll[curSig].length){
+      cntLogAll[curSig][cntLogAll[curSig].length - 1][2] = 'p';
+      saveCntLog();
+    }
+  }
+  renderCounter();
+  if (d > 0){ cntFly('+' + d + (isPiece ? ' шт' : '')); cntIsland(d, isPiece); }
+}
+$('cntSave').addEventListener('click', function(){
+  var before = archives[0];
+  addToHist();
+  hideShareToast();   // тост «Поделиться» прячется под счётчиком, показываем результат на самой кнопке
+  flashBtn('cntSaveT', archives[0] !== before ? 'Сохранено' : 'Нет данных', 'В историю');
+});
 $('cntBtn').addEventListener('click', openCounter);
 $('cntX').addEventListener('click', closeCounter);
-$('cntP1').addEventListener('click', function(){ cntAdd($('nextBtn')); });
-$('cntP10').addEventListener('click', function(){ cntAdd($('plus10Btn')); });
-$('cntP20').addEventListener('click', function(){ cntAdd($('plus20Btn')); });
-$('cntP50').addEventListener('click', function(){ cntAdd($('plus50Btn')); });
+$('cntP1').addEventListener('click', function(){
+  if (S && S.mode !== 1 && nextIdx >= 0 && Math.min(cnt[nextIdx] || 0, pcOf(nextIdx)) > 0) return;  // труба уже начата
+  cntAdd($('nextBtn'), false);
+});
+// Отмечает подряд идущие целые (нетронутые) трубы; начатую трубу не трогает
+function markWholePipes(max){
+  if (!S || S.mode === 1 || nextIdx < 0) return;
+  var ch = [];
+  for (var i = nextIdx; i < S.n && ch.length < max; i++){
+    var pc = pcOf(i);
+    if (pc !== S.per || Math.min(cnt[i] || 0, pc) > 0) break;   // только полные нетронутые трубы
+    ch.push([i, pc]);
+  }
+  if (ch.length) apply(ch);
+}
+$('cntP20').addEventListener('click', function(){ cntAdd($('plus20Btn'), false); });
+$('cntP50').addEventListener('click', function(){ cntAdd($('plus50Btn'), false); });
+$('cntP10').addEventListener('click', function(){
+  if (S && S.mode === 1) cntAdd($('plus10Btn'), false);
+  else cntAdd(function(){ markWholePipes(10); }, false);
+});
+$('cntPiece').addEventListener('click', function(){ cntAdd($('pieceBtn'), true); });
 $('cntUndo').addEventListener('click', function(){
-  if (cntActs < 1) return;
-  cntActs--;
+  if (!hist.length) return;
+  var topCode = hist[hist.length - 1][0][0];
+  if (topCode === -1 || topCode === -2) return;
+  if (cntActs > 0) cntActs--;
   $('undoBtn').click();
   renderCounter();
 });
@@ -4090,15 +4318,37 @@ $('xMinus').addEventListener('click', function(){
   changeExtra(getExtra(curSig) - 1, false);
 });
 
-$('xMid').addEventListener('click', function(){
+function applyXInput(){
   if (!S || !curSig) return;
-  var cur = getExtra(curSig);
-  var v = prompt('Сколько заготовок нарезано из остатков сверх задания?', cur || '');
-  if (v === null) return;
-  v = Math.floor(Number(String(v).replace(',', '.')));
+  var inp = $('xInput'), row = $('xEditRow');
+  var raw = inp ? String(inp.value).trim() : '';
+  if (row) row.hidden = true;
+  if (raw === '') return;
+  var v = Math.floor(Number(raw.replace(',', '.')));
   if (!(v >= 0) || v > 100000) return;
   changeExtra(v, true);
+}
+$('xMid').addEventListener('click', function(){
+  if (!S || !curSig) return;
+  var row = $('xEditRow'), inp = $('xInput');
+  if (!row || !inp) return;
+  if (!row.hidden){ row.hidden = true; return; }
+  var cur = getExtra(curSig);
+  inp.value = cur > 0 ? String(cur) : '';
+  row.hidden = false;
+  try { inp.focus(); inp.select(); } catch(e){}
 });
+$('xOkBtn').addEventListener('click', applyXInput);
+$('xInput').setAttribute('enterkeyhint', 'done');
+$('xInput').addEventListener('keydown', function(e){
+  if (e.key === 'Enter'){ e.preventDefault(); applyXInput(); }
+  else if (e.key === 'Escape'){ $('xEditRow').hidden = true; }
+});
+if ($('moreBox')){
+  $('moreBox').addEventListener('toggle', function(){
+    if (!this.open && $('xEditRow')) $('xEditRow').hidden = true;
+  });
+}
 
 var rangeTimer = null;
 function rangeArm(on, n, key){
@@ -4342,6 +4592,24 @@ function flashBtn(id, text, restore){
   flashTimers[id] = setTimeout(function(){ btn.textContent = orig; }, 1800);
 }
 
+function setBusy(id, busy, label){
+  var btn = $(id);
+  if (!btn) return;
+  if (busy){
+    if (!btn.hasAttribute('data-busy-orig')) btn.setAttribute('data-busy-orig', btn.textContent);
+    btn.classList.add('is-busy');
+    btn.setAttribute('aria-busy', 'true');
+    if (label) btn.textContent = label;
+  } else {
+    btn.classList.remove('is-busy');
+    btn.removeAttribute('aria-busy');
+    if (btn.hasAttribute('data-busy-orig')){
+      btn.textContent = btn.getAttribute('data-busy-orig');
+      btn.removeAttribute('data-busy-orig');
+    }
+  }
+}
+
 function archiveLine(item){
   var dia = item.d > 0 ? 'Ø' + num(item.d) : '—';
   var wall = item.t > 0 ? num(item.t) : '—';
@@ -4375,10 +4643,23 @@ function currentAsItem(){
   };
 }
 
-var shareSel = {};
+var shareSel = {}, sharePrevFocus = null;
+
+function trapFocus(box, e){
+  if (e.key !== 'Tab' || !box || box.hidden) return;
+  var nodes = Array.prototype.filter.call(
+    box.querySelectorAll('button:not([disabled]):not([hidden]), input:not([disabled]):not([hidden]), [tabindex]:not([tabindex="-1"])'),
+    function(el){ return el.offsetParent !== null; }
+  );
+  if (!nodes.length) return;
+  var first = nodes[0], last = nodes[nodes.length - 1];
+  if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+}
 
 function openShareSheet(){
   var list = $('shareList');
+  sharePrevFocus = document.activeElement;
   shareSel = {};
   var h = '';
   syncShareAll();
@@ -4387,6 +4668,7 @@ function openShareSheet(){
     list.innerHTML = '<p class="share-empty">Нет сохранённых записей.<br>Сначала нажмите «Сохранить в историю».</p>';
     $('shareSheet').removeAttribute('hidden');
     $('shareSheetBg').removeAttribute('hidden');
+    try { $('shareCancel').focus(); } catch(e){}
     return;
   }
 
@@ -4420,6 +4702,7 @@ function openShareSheet(){
   syncShareAll();
   $('shareSheet').removeAttribute('hidden');
   $('shareSheetBg').removeAttribute('hidden');
+  try { $('shareDo').focus(); } catch(e){}
 }
 
 function syncShareAll(){
@@ -4433,7 +4716,16 @@ function syncShareAll(){
 function closeShareSheet(){
   $('shareSheet').setAttribute('hidden', '');
   $('shareSheetBg').setAttribute('hidden', '');
+  try { if (sharePrevFocus && sharePrevFocus.focus) sharePrevFocus.focus(); } catch(e){}
 }
+document.addEventListener('keydown', function(e){
+  var sh = $('shareSheet');
+  if (sh && !sh.hidden){
+    if (e.key === 'Escape'){ closeShareSheet(); return; }
+    trapFocus(sh, e);
+  }
+  if (cntOpen) trapFocus($('cntView'), e);
+});
 
 function formatShareDate(ts){
   var d = new Date(ts);
@@ -4592,13 +4884,16 @@ function pieceWord(r, prep){
 function remainText(){
   if (!S) return '';
   var d = +$('d').value || 0, t = +$('t').value || 0;
+  var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + (PF ? 'перф. ' : '') + '×' + num(S.p);
+  if (S.mode === 1){
+    return 'Нарезано из обрезков\n' + head + ' — ' + S.q + ' шт' + (S.bad > 0 ? ' (брак ' + S.bad + ')' : '');
+  }
   var cd = 0, groups = {}, any = false, i;
   for (i = 0; i < S.n; i++){
     var pc = pcOf(i), c = Math.min(cnt[i] || 0, pc);
     cd += c;
     if (c < pc){ var r = pc - c; groups[r] = (groups[r] || 0) + 1; any = true; }
   }
-  var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + (PF ? 'перф. ' : '') + '×' + num(S.p);
   if (!any) return 'Всё нарезано\n' + head + ' - ' + S.q + ' шт' + (S.x > 0 ? ' + ' + S.x + ' из остатков = ' + (S.q + S.x) : '');
   var parts = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; }).map(function(r){
     var n = groups[r], whole = r === S.per;   // целая труба: ещё ничего не отрезано
@@ -4769,7 +5064,7 @@ try {
   archives = JSON.parse(localStorage.getItem(ARCH_KEY)) || [];
   // drop broken entries from older buggy saves
   archives = archives.filter(function(item){
-    return item && item.ts && item.q > 0 && item.p > 0 && item.n > 0;
+    return item && item.ts && item.q > 0 && item.p > 0 && (item.mode ? true : item.n > 0);
   });
 } catch(e){ archives = []; }
 
@@ -4955,7 +5250,7 @@ function limitOf(u){
 function cleanArchives(list, limit){
   if (!(list instanceof Array)) return [];
   return list.filter(function(item){
-    return item && Number(item.ts) > 0 && Number(item.q) > 0 && Number(item.p) > 0 && Number(item.n) > 0;
+    return item && Number(item.ts) > 0 && Number(item.q) > 0 && Number(item.p) > 0 && (item.mode ? true : Number(item.n) > 0);
   }).map(function(item){
     return {
       ts:Number(item.ts), q:Number(item.q), p:Number(item.p), L:Number(item.L) || 0,
@@ -5010,14 +5305,14 @@ function importHistoryFile(file){
       var uiOut = uiB;
       if (widen){ uiOut = JSON.parse(JSON.stringify(uiB || ui)); uiOut.histMax = imported.length <= 100 ? 100 : 0; }
       if (uiOut) put(UI_KEY, uiOut);
-      if (!ok) { alert('Не удалось записать часть данных. Попробуйте ещё раз.'); return; }
-      alert('Копия восстановлена. Приложение перезапустится.');
-      location.reload();
+      if (!ok) { setStorageStatus('Не удалось записать часть данных. Попробуйте ещё раз.', true); return; }
+      setStorageStatus('Копия восстановлена. Перезапускаем приложение…', false);
+      setTimeout(function(){ location.reload(); }, 350);
     } catch(e) {
-      alert('Не удалось прочитать копию. Выберите JSON-файл, созданный программой «Раскрой труб».');
+      setStorageStatus('Не удалось прочитать копию. Выберите JSON-файл, созданный программой «Раскрой труб».', true);
     }
   };
-  reader.onerror = function(){ alert('Не удалось прочитать выбранный файл.'); };
+  reader.onerror = function(){ setStorageStatus('Не удалось прочитать выбранный файл.', true); };
   reader.readAsText(file);
 }
 
@@ -5085,7 +5380,10 @@ function renderHist(){
       var per = item.per > 0 ? item.per : 0;
       var full = item.n - (rem > 0 ? 1 : 0);
       var sub;
-      if (rem > 0) {
+      if (item.mode) {
+        var sec = item.d > 0 ? (' · Ø' + num(item.d) + (item.t > 0 ? '×' + num(item.t) : '')) : '';
+        sub = 'Из обрезков' + sec + ' · ' + item.q + ' ' + plural(item.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(item.p) + ' мм';
+      } else if (rem > 0) {
         sub = full + ' × ' + per + ' шт + 1 × ' + rem + ' шт' +
               (item.wLast > 0 ? ', остаток ' + fmt(item.wLast) + ' мм' : '');
       } else {
@@ -5103,12 +5401,13 @@ function renderHist(){
 }
 
 function addToHist(){
-  var b2 = $('saveHistBtn2');
+  var b2 = $('saveHistBtn2'), bs = $('scrapSaveBtn');
   if (!S || !(S.p > 0) || (S.mode ? !(S.q > 0) : (!(S.q > 0) || !(S.n > 0) || !(S.L > 0)))) {
     if (b2) {
       b2.textContent = 'Заполните поля';
       setTimeout(function(){ b2.textContent = 'Сохранить в историю'; }, 1800);
     }
+    if (bs && S && S.mode === 1) flashBtn('scrapSaveBtn', 'Пока 0', 'В историю');
     return;
   }
   var entry = {
@@ -5148,6 +5447,7 @@ function addToHist(){
     b2.textContent = 'Сохранено';
     setTimeout(function(){ b2.textContent = 'Сохранить в историю'; }, 1800);
   }
+  if (bs && S && S.mode === 1) flashBtn('scrapSaveBtn', 'Сохранено', 'В историю');
   feedback(false);
   showShareToast(entry);
 }
@@ -5155,17 +5455,31 @@ function addToHist(){
 function restoreHist(idx){
   var item = archives[idx];
   if (!item) return;
-  $('q').value = item.q - (item.bad || 0) + (item.h || 0);
+  var hasCurProgress = S && curSig && (
+    (S.mode === 1 && getScrap(curSig) > 0) ||
+    (S.mode !== 1 && (Object.keys(cnt).length > 0 || getBad(curSig) > 0 || getExtra(curSig) > 0))
+  );
+  if (hasCurProgress && !confirm('В текущем расчёте уже есть отметки. Загрузить параметры из истории? (Сами отметки текущего расчёта сохранятся в памяти.)')) return;
+  var isScrap = !!item.mode;
+  if (!isScrap) {
+    $('q').value = Math.max(1, (item.q || 1) - (item.bad || 0) + (item.h || 0));
+  }
   $('p').value = item.p;
   if (item.L) $('L').value = item.L;
   if (item.b) $('b').value = item.b;
-  $('h').value = item.h || 0;
-  $('d').value = item.d;
-  $('t').value = item.t;
+  $('h').value = isScrap ? 0 : (item.h || 0);
+  $('d').value = item.d || 0;
+  $('t').value = item.t || 0;
   setPf(item.pf);
-  setMode(item.mode ? 1 : 0);
+  setMode(isScrap ? 1 : 0);
   update();
-  if (S && curSig && item.x > 0 && !getExtra(curSig)){ putExtra(curSig, item.x); saveDone(); update(); }
+  if (S && curSig) {
+    var changed = false;
+    if (isScrap && item.q > 0 && getScrap(curSig) === 0) { putScrap(curSig, item.q); changed = true; }
+    if (item.bad > 0 && getBad(curSig) === 0) { putBad(curSig, item.bad); changed = true; }
+    if (!isScrap && item.x > 0 && getExtra(curSig) === 0) { putExtra(curSig, item.x); changed = true; }
+    if (changed) { saveDone(); update(); }
+  }
   feedback(false);
   ui.tab = 'calc';
   saveUI();
@@ -5245,7 +5559,29 @@ $('histClearBtn').addEventListener('click', function(){
   showUndo(all);
 });
 
-IDS.forEach(function(id){ $(id).addEventListener('input', update); });
+IDS.forEach(function(id){
+  var el = $(id);
+  if (!el) return;
+  el.setAttribute('enterkeyhint', 'done');
+  el.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){ e.preventDefault(); el.blur(); }
+  });
+  el.addEventListener('beforeinput', function(e){
+    if (e.data && e.data.indexOf(',') >= 0 && el.type === 'number'){
+      // На некоторых мобильных клавиатурах запятая в type="number" очищает поле;
+      // подстрахуемся при потере фокуса, если браузер оставил raw-текст
+    }
+  });
+  el.addEventListener('input', update);
+});
+['rFrom', 'rTo'].forEach(function(id){
+  var el = $(id);
+  if (!el) return;
+  el.setAttribute('enterkeyhint', 'done');
+  el.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){ e.preventDefault(); el.blur(); }
+  });
+});
 safe(applyUI);
 safe(load);
 safe(renderHist);
@@ -5256,6 +5592,9 @@ update();
 Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b){
   b.addEventListener('click', function(){
     var t = b.getAttribute('data-go');
+    if (typeof scrapResetArm === 'function') scrapResetArm(false);
+    if (typeof resetArm === 'function') resetArm(false);
+    if (typeof rangeArm === 'function') rangeArm(false);
     if (t === ui.tab) { window.scrollTo({top: 0, behavior: 'smooth'}); return; }
     ui.tab = t;
     saveUI();
@@ -5297,7 +5636,8 @@ function checkVersion(force){
   var meta = document.querySelector('meta[name="app-build"]');
   var mine = meta ? meta.getAttribute('content') : null;
   if (!mine) return;
-  fetch('index.html?chk=' + now, {cache: 'no-store'}).then(function(r){
+  var pageUrl = (location.pathname.split('/').pop() || 'index.html');
+  fetch(pageUrl + '?chk=' + now, {cache: 'no-store'}).then(function(r){
     return r.ok ? r.text() : Promise.reject();
   }).then(function(t){
     var theirs = buildOf(t);
@@ -5322,7 +5662,8 @@ $('updChkBtn').addEventListener('click', function(){
   if (!/^https?:$/.test(location.protocol) || !window.fetch || !mine) { setVerStatus('проверка работает только на сайте'); return; }
   if (navigator.onLine === false) { setVerStatus('нет сети'); return; }
   btn.textContent = '…';
-  fetch('index.html?chk=' + Date.now(), {cache: 'no-store'}).then(function(r){
+  var pageUrl = (location.pathname.split('/').pop() || 'index.html');
+  fetch(pageUrl + '?chk=' + Date.now(), {cache: 'no-store'}).then(function(r){
     return r.ok ? r.text() : Promise.reject();
   }).then(function(t){
     var theirs = buildOf(t);
@@ -5357,7 +5698,13 @@ Array.prototype.forEach.call(document.querySelectorAll('[data-hist]'), function(
                  '. Останутся только последние ' + v + '. Продолжить?')) return;
     ui.histMax = v;
     saveUI();
-    if (archives.length > lim) { archives = archives.slice(0, v); saveArchives(); renderHist(); }
+    if (archives.length > lim) {
+      var trimmed = archives.slice(v).map(function(item, idx){ return {item: item, idx: v + idx}; });
+      archives = archives.slice(0, v);
+      saveArchives();
+      renderHist();
+      if (trimmed.length) showUndo(trimmed);
+    }
     applyOpts();
   });
 });
@@ -5372,7 +5719,29 @@ $('wipeBtn').addEventListener('click', function(){
 
 $('updDo').addEventListener('click', function(){
   try { save(); saveDone(); } catch(e){}
-  location.reload();
+  setBusy('updDo', true, 'Обновление…');
+  var go = function(){
+    try {
+      var u = new URL(location.href);
+      u.searchParams.set('v', String(Date.now()));
+      location.replace(u.toString());
+    } catch(e){
+      location.reload();
+    }
+  };
+  try {
+    if ('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistration().then(function(reg){
+        if (!reg){ go(); return; }
+        reg.update().then(function(){
+          if (reg.waiting) reg.waiting.postMessage({type: 'SKIP_WAITING'});
+          setTimeout(go, 250);
+        }, go);
+      }, go);
+      return;
+    }
+  } catch(e){}
+  go();
 });
 $('updLater').addEventListener('click', function(){ $('updBanner').hidden = true; });
 document.addEventListener('visibilitychange', function(){ if (!document.hidden) checkVersion(false); });
@@ -5467,8 +5836,44 @@ setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.
   var wall = document.getElementById('wall'), grid = document.getElementById('wallGrid');
   var file = document.getElementById('wallFile'), pr = document.getElementById('panelRng'), dr = document.getElementById('dimRng');
   if (!wall || !grid) return;
+  function idbWall(op, val){
+    return new Promise(function(resolve){
+      if (!window.indexedDB){ resolve(null); return; }
+      try {
+        var req = indexedDB.open('pipe_wall_db', 1);
+        req.onupgradeneeded = function(){ try { req.result.createObjectStore('kv'); } catch(e){} };
+        req.onerror = function(){ resolve(null); };
+        req.onsuccess = function(){
+          var db = req.result;
+          try {
+            var tx = db.transaction('kv', op === 'get' ? 'readonly' : 'readwrite');
+            var store = tx.objectStore('kv');
+            if (op === 'get'){
+              var g = store.get('wallImg');
+              g.onsuccess = function(){ resolve(g.result || null); db.close(); };
+              g.onerror = function(){ resolve(null); db.close(); };
+            } else {
+              if (val) store.put(val, 'wallImg'); else store.delete('wallImg');
+              tx.oncomplete = function(){ resolve(true); db.close(); };
+              tx.onerror = function(){ resolve(false); db.close(); };
+            }
+          } catch(e){ resolve(null); try { db.close(); } catch(e2){} }
+        };
+      } catch(e){ resolve(null); }
+    });
+  }
   function persist(){
-    try { localStorage.setItem(WK, JSON.stringify(st)); return true; } catch(e){ return false; }
+    try {
+      var slim = {mode:st.mode, id:st.id, img:(st.img === '__idb__' ? '__idb__' : ''), panel:st.panel, dim:st.dim, open:st.open};
+      if (st.img && st.img !== '__idb__'){
+        try {
+          localStorage.setItem(WK, JSON.stringify({mode:st.mode, id:st.id, img:st.img, panel:st.panel, dim:st.dim, open:st.open}));
+          return true;
+        } catch(e){}
+      }
+      localStorage.setItem(WK, JSON.stringify(slim));
+      return true;
+    } catch(e){ return false; }
   }
   function preset(id){ for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i].id === id) return PRESETS[i]; return null; }
   function apply(){
@@ -5494,12 +5899,6 @@ setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.
       wp.style.backgroundImage = p ? p.base : (img ? 'url("' + st.img + '")' : '');
       if (p) { wp.style.setProperty('--wall-ink', p.ink); wp.style.setProperty('--wall-mask', maskUrl); }
     }
-    var cw = document.getElementById('cntWall');
-    if (cw) {
-      cw.className = 'cnt-wall' + (p ? ' pat' : '');
-      cw.style.backgroundImage = p ? p.base : (img ? 'url("' + st.img + '")' : '');
-      if (p) { cw.style.setProperty('--wall-ink', p.ink); cw.style.setProperty('--wall-mask', maskUrl); }
-    }
     var active = !!(p || img);
     document.body.classList.toggle('has-wall', active);
     document.body.style.setProperty('--panel', st.panel + '%');
@@ -5513,6 +5912,8 @@ setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.
       var on = (m === 'none' && !active) || (m === 'preset' && !!p && p.id === id) || (m === 'img' && !!img);
       b.classList.toggle('on', on);
     });
+    var delBtn = document.getElementById('wallDelBtn');
+    if (delBtn) delBtn.hidden = !(st.img || img);
   }
   function mk(cls, m, id, label){
     var b = document.createElement('button');
@@ -5535,7 +5936,13 @@ setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.
     if (!old) { old = mk('', 'img', 'own', 'Моё фото'); grid.insertBefore(old, up); }
     old.style.backgroundImage = 'url("' + url + '")';
   }
-  if (st.img) ownThumb(st.img);
+  if (st.img && st.img !== '__idb__') ownThumb(st.img);
+  if (st.img === '__idb__'){
+    st.img = '';
+    idbWall('get').then(function(dataUrl){
+      if (dataUrl){ st.img = dataUrl; ownThumb(dataUrl); apply(); }
+    });
+  }
   grid.addEventListener('click', function(e){
     var b = e.target.closest ? e.target.closest('.wall-sw') : null; if (!b) return;
     var m = b.getAttribute('data-m');
@@ -5545,28 +5952,56 @@ setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.
     else if (m === 'img') { st.mode = 'img'; }
     persist(); apply();
   });
+  var wallMsgTm = null;
+  function wallNote(msg, isErr){
+    var wd = document.getElementById('wallDesc');
+    if (!wd) return;
+    clearTimeout(wallMsgTm);
+    wd.textContent = msg;
+    wd.style.color = isErr ? 'var(--danger)' : '';
+    if (isErr){
+      wallMsgTm = setTimeout(function(){
+        wd.textContent = 'Узоры из инструментов или своё фото. Узор можно сочетать с любой темой.';
+        wd.style.color = '';
+      }, 4500);
+    }
+  }
   file.addEventListener('change', function(){
     var f = file.files && file.files[0]; file.value = '';
     if (!f) return;
     var fr = new FileReader();
-    fr.onerror = function(){ alert('Не удалось прочитать файл.'); };
+    fr.onerror = function(){ wallNote('Не удалось прочитать файл.', true); };
     fr.onload = function(){
       var im = new Image();
-      im.onerror = function(){ alert('Это не картинка или формат не поддерживается.'); };
+      im.onerror = function(){ wallNote('Это не картинка или формат не поддерживается.', true); };
       im.onload = function(){
-        var tries = [[1920, .88], [1440, .8], [1080, .72], [720, .65]], done = false;
-        for (var i = 0; i < tries.length && !done; i++){
-          var sc = Math.min(1, tries[i][0] / Math.max(im.width, im.height));
-          var cv = document.createElement('canvas');
-          cv.width = Math.max(1, Math.round(im.width * sc)); cv.height = Math.max(1, Math.round(im.height * sc));
-          cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
-          var url; try { url = cv.toDataURL('image/jpeg', tries[i][1]); } catch(e){ break; }
-          var prev = {mode: st.mode, img: st.img};
-          st.mode = 'img'; st.img = url;
-          if (persist()) { done = true; ownThumb(url); apply(); }
-          else { st.mode = prev.mode; st.img = prev.img; }
-        }
-        if (!done) alert('Фото слишком большое для хранения в браузере. Выберите изображение поменьше.');
+        var sc0 = Math.min(1, 1920 / Math.max(im.width, im.height));
+        var cv0 = document.createElement('canvas');
+        cv0.width = Math.max(1, Math.round(im.width * sc0)); cv0.height = Math.max(1, Math.round(im.height * sc0));
+        cv0.getContext('2d').drawImage(im, 0, 0, cv0.width, cv0.height);
+        var url0 = '';
+        try { url0 = cv0.toDataURL('image/jpeg', .88); } catch(e){}
+        idbWall('set', url0).then(function(idbOk){
+          if (idbOk && url0){
+            st.mode = 'img'; st.img = '__idb__'; persist();
+            st.img = url0; ownThumb(url0); apply();
+            wallNote('Узоры из инструментов или своё фото. Узор можно сочетать с любой темой.', false);
+            return;
+          }
+          var tries = [[1440, .8], [1080, .72], [720, .65]], done = false;
+          for (var i = 0; i < tries.length && !done; i++){
+            var sc = Math.min(1, tries[i][0] / Math.max(im.width, im.height));
+            var cv = document.createElement('canvas');
+            cv.width = Math.max(1, Math.round(im.width * sc)); cv.height = Math.max(1, Math.round(im.height * sc));
+            cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+            var url; try { url = cv.toDataURL('image/jpeg', tries[i][1]); } catch(e){ break; }
+            var prev = {mode: st.mode, img: st.img};
+            st.mode = 'img'; st.img = url;
+            if (persist()) { done = true; ownThumb(url); apply(); wallNote('Узоры из инструментов или своё фото. Узор можно сочетать с любой темой.', false); }
+            else { st.mode = prev.mode; st.img = prev.img; }
+          }
+          if (!done) wallNote('Фото слишком большое для хранения в браузере. Выберите изображение поменьше.', true);
+        });
       };
       im.src = fr.result;
     };
@@ -5577,6 +6012,16 @@ setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.
   document.getElementById('wallFold').addEventListener('click', function(){ st.open = !st.open; persist(); apply(); });
   document.getElementById('panelReset').addEventListener('click', function(){ st.panel = 80; persist(); apply(); });
   document.getElementById('dimReset').addEventListener('click', function(){ st.dim = 0; persist(); apply(); });
+  var delWall = document.getElementById('wallDelBtn');
+  if (delWall) delWall.addEventListener('click', function(){
+    st.img = '';
+    if (st.mode === 'img') st.mode = 'none';
+    var old = grid.querySelector('[data-m="img"]');
+    if (old) old.remove();
+    idbWall('set', null);
+    persist();
+    apply();
+  });
   apply();
 })();
 /* ── Цвет акцента ── */
