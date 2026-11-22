@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-22.42">
+<meta name="app-build" content="2026-11-22.50">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2435,10 +2435,16 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
   overscroll-behavior:contain;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .cnt[hidden]{display:none}
 body.cnt-open .app,body.cnt-open .tabbar{visibility:hidden}   /* под счётчиком виден только фон приложения */
-.cnt-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;min-height:48px}
-.cnt-top #cntUndo{justify-self:start}
-.cnt-top #cntSave{justify-self:center;min-width:132px}
-.cnt-top #cntX{justify-self:end}
+.cnt-top{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:52px}
+.cnt-top .cnt-tb{height:48px;border-radius:999px;font-size:17px;font-weight:600}
+.cnt-top .cnt-tb svg{width:22px;height:22px}
+.cnt-top .cnt-tb{border:1px solid var(--line);background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
+  box-shadow:0 4px 14px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.45)}
+#cntUndo{width:48px;min-width:48px;padding:0}
+.cnt-grp{display:inline-flex;align-items:center;gap:10px}
+.cnt-grp #cntSave{padding:0 16px 0 14px;gap:7px}
+.cnt-grp .cnt-x{width:48px;min-width:48px;padding:0}
+.cnt-tb:disabled{opacity:.4;pointer-events:none}
 .cnt-tb{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;min-width:44px;padding:0 16px 0 12px;border:1px solid var(--line);border-radius:999px;
   background:var(--glass);color:var(--text);font:inherit;font-size:15px;font-weight:650;white-space:nowrap;cursor:pointer;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .cnt-tb.cnt-x{padding:0;width:44px}
@@ -2956,10 +2962,10 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
 
 <div class="cnt" id="cntView" role="dialog" aria-modal="true" aria-label="Счётчик труб" hidden>
   <div class="cnt-top">
-    <button type="button" class="cnt-tb" id="cntUndo" aria-label="Отменить последнее действие" style="visibility:hidden">
+    <button type="button" class="cnt-tb" id="cntUndo" aria-label="Отменить последнее действие" disabled>
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
-      <span>Назад</span>
     </button>
+    <div class="cnt-grp">
     <button type="button" class="cnt-tb" id="cntSave" aria-label="Сохранить в историю">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12v17l-6-4-6 4z"/></svg>
       <span id="cntSaveT">В историю</span>
@@ -2967,6 +2973,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
     <button type="button" class="cnt-tb cnt-x" id="cntX" aria-label="Закрыть счётчик">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
+    </div>
   </div>
   <div class="cnt-main">
     <div class="cnt-ring" id="cntRing" role="progressbar" aria-label="Выполнено" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -4015,7 +4022,7 @@ function cntAgo(ts){
   if (h < 24) return h + ' ч' + (m % 60 ? ' ' + (m % 60) + ' мин' : '') + ' назад';
   return '';
 }
-var cntOpen = false, cntActs = 0, cntPrevFocus = null, cntTimer = null;
+var cntOpen = false, cntPrevFocus = null, cntTimer = null;
 function setCntNum(v){
   var n = $('cntNum'), t = String(v), unit = / шт$/.test(t);
   $('cntView').setAttribute('data-len', String(unit ? t.length - 3 : t.length));
@@ -4046,7 +4053,7 @@ function renderCounter(){
     setCntNum(v);
     $('cntSub').textContent = plural(v, 'заготовка', 'заготовки', 'заготовок');
     $('cntG1').textContent = 'Резать по ' + num(S.p) + ' мм';
-    $('cntG2').textContent = S.bad > 0 ? ('Брак: ' + S.bad) : 'Отмечайте +1 или +10 по мере резки';
+    $('cntG2').textContent = S.bad > 0 ? ('Брак: ' + S.bad) : 'Отмечайте по мере резки';
     $('cntCard2K').textContent = 'Последняя отметка';
     if (last){
       var lk = last[1];
@@ -4148,12 +4155,12 @@ function renderCounter(){
 
   $('cntP1').disabled = off || lockP1;
   if ($('cntPiece')) $('cntPiece').disabled = off;
-  var canUndoCut = (hist.length > 0 && hist[hist.length - 1][0][0] >= 0) || (hist.length > 0 && hist[hist.length - 1][0][0] === -3);
-  $('cntUndo').style.visibility = canUndoCut ? 'visible' : 'hidden';
+  var canUndoCut = hist.length > 0 && (hist[hist.length - 1][0][0] >= 0 || hist[hist.length - 1][0][0] === -3);
+  $('cntUndo').disabled = !canUndoCut;
 }
 function openCounter(){
   if (!S) return;
-  cntOpen = true; cntActs = 0;
+  cntOpen = true;
   cntPrevFocus = document.activeElement;
   $('cntFly').classList.remove('go');
   $('cntView').hidden = false;
@@ -4181,7 +4188,6 @@ function cntAdd(btn, isPiece){
   var a = S && S.mode === 1 ? S.q : (isPiece ? st1.cd : st1.pd);
   var d = a - b;
   if (d !== 0 || hist.length !== hLen || hist[hist.length - 1] !== hLast){
-    cntActs++;
     if (isPiece && curSig && cntLogAll[curSig] && cntLogAll[curSig].length){
       cntLogAll[curSig][cntLogAll[curSig].length - 1][2] = 'p';
       saveCntLog();
@@ -4224,7 +4230,6 @@ $('cntUndo').addEventListener('click', function(){
   if (!hist.length) return;
   var topCode = hist[hist.length - 1][0][0];
   if (topCode === -1 || topCode === -2) return;
-  if (cntActs > 0) cntActs--;
   $('undoBtn').click();
   renderCounter();
 });
