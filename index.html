@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-23.60">
+<meta name="app-build" content="2026-11-23.61">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1910,6 +1910,7 @@ body.is-scrap .pipe-only{display:none !important}
 body.is-bundle .pipe-only.bundle-show{display:block !important}
 body.is-bundle .fields > div.bundle-show{grid-column:1/-1}
 body:not(.is-scrap) .scrap-only{display:none !important}
+body.is-scrap #saveHistBtn2, body.is-scrap #resetDone{display:none !important}
 body.is-scrap .scrap-only{display:block}
 body.is-scrap .nrow.scrap-only{display:grid}
 body.is-scrap .fields > div:not(.pipe-only){grid-column:1/-1}
@@ -4748,6 +4749,16 @@ function archiveLine(item){
   return head + ' ×' + num(item.p) + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (xs > 0 ? ' + ' + xs + ' из остатков = ' + (good + xs) : '') + (bad > 0 ? ', брак ' + bad : '');
 }
 
+// Для обрезков и остатка пачки: строка без названия режима + само название отдельно
+function archiveParts(item){
+  var title = archiveLine(item), lead = '';
+  if (item.mode){
+    lead = item.bundle ? 'Остаток пачки' : 'Обрезки';
+    if (title.indexOf(lead) === 0) title = title.slice(lead.length).replace(/^\s+/, '');
+  }
+  return { title: title, lead: lead };
+}
+
 function todayArchives(){
   var now = new Date();
   var key = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
@@ -4819,8 +4830,8 @@ function openShareSheet(){
       var item = entry.item;
       h += '<div class="share-item' + (on ? ' on' : '') + '" data-id="' + id + '">' +
         '<div class="share-check">✓</div>' +
-        '<div class="share-body"><p class="share-title">' + archiveLine(item) + '</p>' +
-        '<p class="share-sub">' + formatTime(item.ts) + '</p></div></div>';
+        '<div class="share-body"><p class="share-title">' + archiveParts(item).title + '</p>' +
+        '<p class="share-sub">' + (archiveParts(item).lead ? archiveParts(item).lead + ' · ' : '') + formatTime(item.ts) + '</p></div></div>';
     });
   });
 
@@ -4902,7 +4913,9 @@ function buildShareText(items){
       if (lastPipe !== null && pk !== lastPipe) {
         out.push(''); // blank line when Ø or wall changes
       }
-      out.push(archiveLine(item));
+      var ap = archiveParts(item);
+      out.push(ap.title);
+      if (ap.lead) out.push(ap.lead);
       lastPipe = pk;
     });
   });
@@ -5577,28 +5590,27 @@ function renderHist(){
       var wall = item.t > 0 ? num(item.t) : '—';
       var title = archiveLine(item);
       var rem = item.rem > 0 ? item.rem : 0;
-      if (!item.mode){
-        var offW = rem > 0 ? item.wLast : item.wFull;
-        if (offW > 0) title = title.replace(' — ', ', ' + (rem > 0 ? 'остаток ' : 'обрезок ') + fmt(offW) + ' мм — ');
+      if (item.mode){
+        // «Обрезки Ø32/3 ×500 — 10 шт» → «Ø32/3 ×500 — 10 шт», а «Обрезки» уходит во вторую строку
+        var lead = item.bundle ? 'Остаток пачки' : 'Обрезки';
+        if (title.indexOf(lead) === 0) title = title.slice(lead.length).replace(/^\s+/, '');
       }
       var per = item.per > 0 ? item.per : 0;
       var full = item.n - (rem > 0 ? 1 : 0);
       var sub;
       if (item.mode) {
-        var sec = item.d > 0 ? (' · Ø' + num(item.d) + (item.t > 0 ? '×' + num(item.t) : '')) : '';
-        sub = (item.bundle ? 'Остаток пачки' : 'Из обрезков') + sec + ' · ' + item.q + ' ' + plural(item.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(item.p) + ' мм' +
-              (item.bundle && item.per > 0 ? ' · ' + pipesText(item.q, item.per) : '');
+        sub = item.bundle ? 'Остаток пачки' : 'Обрезки';
       } else if (rem > 0) {
         sub = full + ' × ' + per + ' шт + 1 × ' + rem + ' шт';
       } else {
         sub = item.n + ' × ' + per + ' шт';
       }
-      if (item.left > 0) sub += ' · передано сменщику: ' + item.left;
+      if (item.left > 0) sub += (sub ? ' · ' : '') + 'передано сменщику: ' + item.left;
       h += '<div class="hist-item" data-idx="' + idx + '">' +
         '<button type="button" class="hist-del-bg" data-del="' + idx + '">Удалить</button>' +
         '<div class="hist-fg">' +
           '<div class="hist-time">' + formatTime(item.ts) + '</div>' +
-          '<div class="hist-body"><p class="hist-title">' + title + '</p><p class="hist-sub">' + sub + '</p></div>' +
+          '<div class="hist-body"><p class="hist-title">' + title + '</p>' + (sub ? '<p class="hist-sub">' + sub + '</p>' : '') + '</div>' +
         '</div>' +
       '</div>';
     });
