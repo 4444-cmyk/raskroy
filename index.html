@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-23.54">
+<meta name="app-build" content="2026-11-23.58">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1907,6 +1907,7 @@ button:active{filter:brightness(.97)}
 [data-off]{display:none !important}
 body.is-scrap .pipe-only{display:none !important}
 body.is-bundle .pipe-only.bundle-show{display:block !important}
+body.is-bundle .fields > div.bundle-show{grid-column:1/-1}
 body:not(.is-scrap) .scrap-only{display:none !important}
 body.is-scrap .scrap-only{display:block}
 body.is-scrap .nrow.scrap-only{display:grid}
@@ -2264,6 +2265,34 @@ button:focus-visible, [tabindex]:focus-visible {
   .hist-item, .hist-row { animation: detail-in .22s ease both; }
   @keyframes detail-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 }
+/* История: сворачиваемые дни и компактные записи */
+button.hist-day{
+  display:flex;align-items:center;gap:8px;width:100%;min-height:44px;
+  margin:6px 0 0;padding:0 2px;border:0;background:transparent;
+  color:var(--text);font-family:inherit;font-size:15px;font-weight:700;
+  letter-spacing:-.01em;text-align:left;cursor:pointer;touch-action:manipulation;
+}
+button.hist-day:active{opacity:.7}
+.hist-grp + .hist-grp{border-top:1px solid var(--line)}
+.hist-grp:first-child button.hist-day{margin-top:0}
+.hd-l{flex:1;min-width:0}
+.hd-n{flex:none;font-size:13px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
+.hd-c{flex:none;font-style:normal;font-size:22px;line-height:1;color:var(--muted);transform:rotate(90deg);transition:transform .18s ease}
+.hist-grp.open .hd-c{transform:rotate(-90deg)}
+.hist-grp:not(.open) .hist-grp-b{display:none}
+.hist-grp-b{padding:0 0 6px}
+.hist-item{display:block;padding:0}
+.hist-row1{display:flex;align-items:center;gap:12px;min-height:48px;padding:4px 0}
+.hist-row1 .hist-title{margin:0;flex:1;min-width:0}
+.hist-row1 .hist-chev{flex:none;font-size:20px;line-height:1;color:var(--muted);transform:rotate(90deg);transition:transform .18s ease}
+.hist-item.open .hist-chev{transform:rotate(-90deg)}
+.hist-more{display:none;padding:0 0 12px 54px}
+.hist-item.open .hist-more{display:block}
+.hist-more .hist-sub{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.4;margin:0 0 10px}
+.hist-act{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hist-act .nbtn{height:44px;font-size:15px}
+.hist-act .nbtn.del{color:var(--danger)}
+.hist-more-btn{width:100%;margin-top:10px;min-height:44px;font-size:15px}
 /* Empty states: ясное сообщение и спокойная визуальная опора */
 .hist-empty, .share-empty {
   display: grid;
@@ -2618,7 +2647,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
   <div class="card" data-tab="calc">
     <h2>Параметры</h2>
     <div class="theme-row" id="modeRow" role="group" aria-label="Режим" style="margin:0 0 16px">
-      <button type="button" class="opt-chip on" data-mode="0" aria-pressed="true">Трубы</button>
+      <button type="button" class="opt-chip on" data-mode="0" aria-pressed="true">По заданию</button>
       <button type="button" class="opt-chip" data-mode="2" aria-pressed="false">Остаток пачки</button>
       <button type="button" class="opt-chip" data-mode="1" aria-pressed="false">Обрезки</button>
     </div>
@@ -2698,7 +2727,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
       </div>
       <div class="pipe-only bundle-show">
         <div class="lbl-row">
-          <label for="L">Длина, мм</label>
+          <label for="L">Длина трубы, мм</label>
           <button type="button" class="lenset" id="lenReset" aria-label="Вернуть 6000 мм" style="visibility:hidden">6000</button>
         </div>
         <div class="step">
@@ -4021,7 +4050,7 @@ $('handoffBtn').addEventListener('click', function(){
   $('hoDoneL').textContent = plural(done, 'заготовка', 'заготовки', 'заготовок');
   $('hoLeft').textContent = left;
   $('hoLeftL').textContent = plural(left, 'заготовка', 'заготовки', 'заготовок');
-  $('hoNote').textContent = 'В расчёте сразу выставится «Уже есть: ' + ((Number(S.h) || 0) + done) + '»';
+  $('hoNote').textContent = 'Сменщику уйдёт сообщение с остатком. Ваш расчёт не изменится';
   handoffRun = function(){
   var per = Number(S.per) || 1, q = st.cd, b = Number($('b').value) || 1;
   var full = Math.floor(q / per), rem = q - full * per, n = full + (rem > 0 ? 1 : 0);
@@ -4036,11 +4065,12 @@ $('handoffBtn').addEventListener('click', function(){
   archives.unshift(entry);
   if (archives.length > histMax()) archives = archives.slice(0, histMax());
   saveArchives();
-  $('h').value = have + done;
-  $('h').dispatchEvent(new Event('input', {bubbles: true}));
   renderHist();
   feedback(false);
-  flashBtn(id, 'Записано · сменщику ' + left, orig);
+  var total = (Number(S.q0) || 0) + have;
+  var msg = 'Передача смены\nНарезано ' + done + ' из ' + total + ' · труба ' + num(S.L) + ' мм\n' + remainText() +
+            '\nВ приложении: нужно ' + total + ', уже есть ' + (have + done);
+  sendShareText(msg, id);
   };
   $('handoffSheet').removeAttribute('hidden');
   $('handoffBg').removeAttribute('hidden');
@@ -5465,6 +5495,8 @@ function importHistoryFile(file){
   reader.readAsText(file);
 }
 
+var histDayOpen = {};   // ключ дня -> true/false (ручное раскрытие/сворачивание)
+var HIST_STEP = 7, histDaysShown = HIST_STEP;
 var MONTHS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 
 function dayKey(ts){
@@ -5518,8 +5550,15 @@ function renderHist(){
   });
 
   var h = '';
-  groups.forEach(function(g){
-    h += '<div class="hist-day">' + g.label + '</div>';
+  var totalDays = groups.length;
+  var shownGroups = groups.slice(0, histDaysShown);
+  shownGroups.forEach(function(g, gi){
+    var open = (g.key in histDayOpen) ? histDayOpen[g.key] : gi === 0;   // по умолчанию раскрыт только новейший день
+    h += '<div class="hist-grp' + (open ? ' open' : '') + '" data-day="' + g.key + '">' +
+      '<button type="button" class="hist-day" aria-expanded="' + (open ? 'true' : 'false') + '">' +
+      '<span class="hd-l">' + g.label + '</span>' +
+      '<span class="hd-n">' + g.items.length + ' ' + plural(g.items.length, 'расчёт', 'расчёта', 'расчётов') + '</span>' +
+      '<i class="hd-c" aria-hidden="true">›</i></button><div class="hist-grp-b">';
     g.items.forEach(function(entry){
       var item = entry.item;
       var idx = entry.idx;
@@ -5543,12 +5582,24 @@ function renderHist(){
       }
       if (item.left > 0) sub += ' · передано сменщику: ' + item.left;
       h += '<div class="hist-item" data-idx="' + idx + '">' +
-        '<div class="hist-time">' + formatTime(item.ts) + '</div>' +
-        '<div class="hist-body"><p class="hist-title">' + title + '</p><p class="hist-sub">' + sub + '</p></div>' +
-        '<button type="button" class="hist-del" data-del="' + idx + '" aria-label="Удалить">×</button>' +
+        '<div class="hist-row1">' +
+          '<div class="hist-time">' + formatTime(item.ts) + '</div>' +
+          '<p class="hist-title">' + title + '</p>' +
+          '<span class="hist-chev" aria-hidden="true">›</span>' +
+        '</div>' +
+        '<div class="hist-more"><p class="hist-sub">' + sub + '</p>' +
+          '<div class="hist-act">' +
+            '<button type="button" class="nbtn main" data-load="' + idx + '">Загрузить</button>' +
+            '<button type="button" class="nbtn sec del" data-del="' + idx + '">Удалить</button>' +
+          '</div></div>' +
       '</div>';
     });
+    h += '</div></div>';
   });
+  if (totalDays > shownGroups.length){
+    var rest = totalDays - shownGroups.length;
+    h += '<button type="button" class="nbtn sec hist-more-btn" data-more="1">Показать ранее (ещё ' + rest + ' ' + plural(rest, 'день', 'дня', 'дней') + ')</button>';
+  }
   list.innerHTML = h;
 }
 
@@ -5594,6 +5645,7 @@ function addToHist(){
     archives.unshift(entry);
   }
   if (archives.length > histMax()) archives = archives.slice(0, histMax());
+  histDayOpen[dayKey(entry.ts)] = true;
   saveArchives();
   renderHist();
   if (b2) {
@@ -5699,9 +5751,30 @@ $('histList').addEventListener('click', function(e){
     if (gone.length) showUndo([{item: gone[0], idx: i}]);
     return;
   }
+  var ld = e.target.closest ? e.target.closest('[data-load]') : null;
+  if (ld){
+    restoreHist(+ld.getAttribute('data-load'));
+    return;
+  }
+  if (e.target.closest && e.target.closest('[data-more]')){
+    histDaysShown += HIST_STEP;
+    renderHist();
+    return;
+  }
+  var dh = e.target.closest ? e.target.closest('button.hist-day') : null;
+  if (dh){
+    var grp = dh.parentNode;
+    var nowOpen = !grp.classList.contains('open');
+    grp.classList.toggle('open', nowOpen);
+    dh.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
+    histDayOpen[grp.getAttribute('data-day')] = nowOpen;
+    return;
+  }
   var item = e.target.closest ? e.target.closest('.hist-item') : null;
   if (item){
-    restoreHist(+item.getAttribute('data-idx'));
+    var was = item.classList.contains('open');
+    Array.prototype.forEach.call($('histList').querySelectorAll('.hist-item.open'), function(n){ n.classList.remove('open'); });
+    if (!was) item.classList.add('open');
   }
 });
 
