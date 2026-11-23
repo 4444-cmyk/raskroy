@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-23.53">
+<meta name="app-build" content="2026-11-23.54">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -667,6 +667,15 @@ body::before {
 .sheet-actions .nbtn {
   height: 50px;
 }
+
+/* Передача смены */
+.ho-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px}
+.ho-box{background:var(--soft);border-radius:22px;padding:16px 10px;text-align:center}
+.ho-box.next{background:var(--acc-bg);color:var(--acc-fg)}
+.ho-num{font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.ho-cap{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.7;margin:0 0 6px}
+.ho-lbl{font-size:13px;opacity:.75;margin-top:4px}
+.ho-note{font-size:14px;line-height:1.4;color:var(--text2);text-align:center;margin:0 4px 16px}
 
 /* Fields */
 .fields .wide {
@@ -3058,6 +3067,30 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
   </div>
 </div>
 
+<div class="sheet-bg" id="handoffBg" hidden></div>
+<div class="sheet" id="handoffSheet" role="dialog" aria-modal="true" aria-labelledby="handoffTitle" hidden>
+  <div class="sheet-handle"></div>
+  <h3 class="sheet-title" id="handoffTitle">Передать смену</h3>
+  <p class="sheet-sub">Сменщик продолжит с того места, где вы остановились</p>
+  <div class="ho-grid">
+    <div class="ho-box">
+      <p class="ho-cap">В историю</p>
+      <div class="ho-num" id="hoDone">0</div>
+      <div class="ho-lbl" id="hoDoneL"></div>
+    </div>
+    <div class="ho-box next">
+      <p class="ho-cap">Сменщику</p>
+      <div class="ho-num" id="hoLeft">0</div>
+      <div class="ho-lbl" id="hoLeftL"></div>
+    </div>
+  </div>
+  <p class="ho-note" id="hoNote"></p>
+  <div class="sheet-actions">
+    <button type="button" class="nbtn sec" id="handoffCancel">Отмена</button>
+    <button type="button" class="nbtn main" id="handoffDo">Передать</button>
+  </div>
+</div>
+
 <script>
 (function(){
   var b = document.getElementById('jsBanner');
@@ -3984,10 +4017,12 @@ $('handoffBtn').addEventListener('click', function(){
   var left = Math.max(0, Number(S.q0) - done);
   if (done <= 0) { flashBtn(id, 'Пока ничего не нарезано', orig); return; }
   if (left <= 0) { flashBtn(id, 'Всё нарезано — сохраните в историю', orig); return; }
-  var w = function(k, a, b2, c){ return k + ' ' + plural(k, a, b2, c); };
-  if (!confirm('Передать смену?\n\nВ историю запишется: ' + w(done, 'заготовка', 'заготовки', 'заготовок') +
-      '.\nСменщику останется: ' + w(left, 'заготовка', 'заготовки', 'заготовок') +
-      '.\n\nВ расчёте сразу выставится «Уже есть: ' + ((Number(S.h) || 0) + done) + '».')) return;
+  $('hoDone').textContent = done;
+  $('hoDoneL').textContent = plural(done, 'заготовка', 'заготовки', 'заготовок');
+  $('hoLeft').textContent = left;
+  $('hoLeftL').textContent = plural(left, 'заготовка', 'заготовки', 'заготовок');
+  $('hoNote').textContent = 'В расчёте сразу выставится «Уже есть: ' + ((Number(S.h) || 0) + done) + '»';
+  handoffRun = function(){
   var per = Number(S.per) || 1, q = st.cd, b = Number($('b').value) || 1;
   var full = Math.floor(q / per), rem = q - full * per, n = full + (rem > 0 ? 1 : 0);
   var entry = {
@@ -4006,6 +4041,21 @@ $('handoffBtn').addEventListener('click', function(){
   renderHist();
   feedback(false);
   flashBtn(id, 'Записано · сменщику ' + left, orig);
+  };
+  $('handoffSheet').removeAttribute('hidden');
+  $('handoffBg').removeAttribute('hidden');
+});
+var handoffRun = null;
+function closeHandoff(){
+  $('handoffSheet').setAttribute('hidden', '');
+  $('handoffBg').setAttribute('hidden', '');
+}
+$('handoffBg').addEventListener('click', function(){ handoffRun = null; closeHandoff(); });
+$('handoffCancel').addEventListener('click', function(){ handoffRun = null; closeHandoff(); });
+$('handoffDo').addEventListener('click', function(){
+  var run = handoffRun; handoffRun = null;
+  closeHandoff();
+  if (run) run();
 });
 
 $('undoBtn').addEventListener('click', function(){
