@@ -4073,8 +4073,8 @@ $('handoffBtn').addEventListener('click', function(){
   renderHist();
   feedback(false);
   var total = (Number(S.q0) || 0) + have;
-  var msg = 'Передача смены\nНарезано ' + done + ' из ' + total + ' · труба ' + num(S.L) + ' мм\n' + remainText() +
-            '\nВ приложении: нужно ' + total + ', уже есть ' + (have + done);
+  var msg = 'Передано сменщику: ' + left + ' шт.\nНарезано ' + done + ' из ' + total + ' · труба ' + num(S.L) + ' мм.\n' + remainText() +
+            '\nВ приложении: нужно ' + total + ', уже есть ' + (have + done) + '.';
   sendShareText(msg, id);
   };
   $('handoffSheet').removeAttribute('hidden');
@@ -4753,8 +4753,9 @@ function archiveLine(item){
 function archiveParts(item){
   var title = archiveLine(item), lead = '';
   if (item.mode){
-    lead = item.bundle ? 'Остаток пачки' : 'Обрезки';
-    if (title.indexOf(lead) === 0) title = title.slice(lead.length).replace(/^\s+/, '');
+    var src = item.bundle ? 'Остаток пачки' : 'Обрезки';
+    lead = item.bundle ? 'Остаток пачки' : 'Из обрезков';
+    if (title.indexOf(src) === 0) title = title.slice(src.length).replace(/^\s+/, '');
   }
   return { title: title, lead: lead };
 }
@@ -4830,7 +4831,7 @@ function openShareSheet(){
       var item = entry.item;
       h += '<div class="share-item' + (on ? ' on' : '') + '" data-id="' + id + '">' +
         '<div class="share-check">✓</div>' +
-        '<div class="share-body"><p class="share-title">' + archiveParts(item).title + '</p>' +
+        '<div class="share-body"><p class="share-title">' + archiveParts(item).title + '.</p>' +
         '<p class="share-sub">' + (archiveParts(item).lead ? archiveParts(item).lead + ' · ' : '') + formatTime(item.ts) + '</p></div></div>';
     });
   });
@@ -4914,8 +4915,9 @@ function buildShareText(items){
         out.push(''); // blank line when Ø or wall changes
       }
       var ap = archiveParts(item);
-      out.push(ap.title);
-      if (ap.lead) out.push(ap.lead);
+      out.push(ap.title + '.');
+      if (ap.lead) out.push(ap.lead + '.');
+      if (item.left > 0) out.push('Передано сменщику: ' + item.left + ' шт.');
       lastPipe = pk;
     });
   });
@@ -5025,7 +5027,7 @@ function remainText(){
   var d = +$('d').value || 0, t = +$('t').value || 0;
   var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + (PF ? 'перф. ' : '') + '×' + num(S.p);
   if (S.mode === 1){
-    return (S.bundle ? 'Остаток пачки, нарезано\n' : 'Нарезано из обрезков\n') + head + ' — ' + S.q + ' шт' + (S.bundle ? ' (' + pipesText(S.q, S.per) + ')' : '') + (S.bad > 0 ? ' (брак ' + S.bad + ')' : '');
+    return (S.bundle ? 'Остаток пачки, нарезано.\n' : 'Нарезано из обрезков.\n') + head + ' — ' + S.q + ' шт' + (S.bundle ? ' (' + pipesText(S.q, S.per) + ')' : '') + (S.bad > 0 ? ' (брак ' + S.bad + ')' : '') + '.';
   }
   var cd = 0, groups = {}, any = false, i;
   for (i = 0; i < S.n; i++){
@@ -5033,13 +5035,13 @@ function remainText(){
     cd += c;
     if (c < pc){ var r = pc - c; groups[r] = (groups[r] || 0) + 1; any = true; }
   }
-  if (!any) return 'Всё нарезано\n' + head + ' - ' + S.q + ' шт' + (S.x > 0 ? ' + ' + S.x + ' из остатков = ' + (S.q + S.x) : '');
+  if (!any) return 'Всё нарезано.\n' + head + ' — ' + S.q + ' шт' + (S.x > 0 ? ' + ' + S.x + ' из остатков = ' + (S.q + S.x) : '') + '.';
   var parts = Object.keys(groups).map(Number).sort(function(x, y){ return y - x; }).map(function(r){
     var n = groups[r], whole = r === S.per;   // целая труба: ещё ничего не отрезано
     var pipe = (whole ? plural(n, 'целая', 'целых', 'целых') + ' ' : '') + plural(n, 'труба', 'трубы', 'труб');
     return n + ' ' + pipe + (whole ? ' по ' : ' на ') + r + ' ' + pieceWord(r, whole ? 'по' : 'на');
   });
-  return 'Осталось нарезать\n' + head + ' - ' + (S.q - cd) + ' шт\n' + parts.join(' + ');
+  return 'Осталось нарезать.\n' + head + ' — ' + (S.q - cd) + ' шт.\n' + parts.join(' + ') + '.';
 }
 
 $('leftShareBtn').addEventListener('click', function(){
@@ -5597,15 +5599,11 @@ function renderHist(){
       }
       var per = item.per > 0 ? item.per : 0;
       var full = item.n - (rem > 0 ? 1 : 0);
-      var sub;
-      if (item.mode) {
-        sub = item.bundle ? 'Остаток пачки' : 'Обрезки';
-      } else if (rem > 0) {
-        sub = full + ' × ' + per + ' шт + 1 × ' + rem + ' шт';
-      } else {
-        sub = item.n + ' × ' + per + ' шт';
-      }
-      if (item.left > 0) sub += (sub ? ' · ' : '') + 'передано сменщику: ' + item.left;
+      var sub = '';
+      if (item.mode) sub = item.bundle ? 'Остаток пачки' : 'Из обрезков';
+      if (item.left > 0) sub += (sub ? '. ' : '') + 'Передано сменщику: ' + item.left + ' шт';
+      if (sub) sub += '.';
+      title += '.';
       h += '<div class="hist-item" data-idx="' + idx + '">' +
         '<button type="button" class="hist-del-bg" data-del="' + idx + '">Удалить</button>' +
         '<div class="hist-fg">' +
