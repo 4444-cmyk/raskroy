@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-22.50">
+<meta name="app-build" content="2026-11-23.51">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1837,12 +1837,14 @@ body.is-scrap #pieceBtn { order: -1; }
 }
 #setCard #updChkBtn{min-width:94px;height:40px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-weight:650}
 #setCard .nbtn.sec{min-height:44px;font-weight:650}
-#histCard #sendHistBtn,#histCard #exportHistBtn,#histCard #importHistBtn{
+#bkCard #importHistBtn,#histCard #shareBtn{
   border:1px solid var(--line);background:var(--soft);
   color:var(--text);font-weight:650;box-shadow:none;
 }
-#histCard #sendHistBtn{background:var(--done-bg);color:var(--done-fg);border-color:var(--acc-line)}
-#histCard #exportHistBtn,#histCard #importHistBtn{min-height:44px}
+.bk-last{margin:-6px 2px 12px;font-size:14px;line-height:1.4;color:var(--text2)}
+.bk-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bk-row .nbtn{height:auto;min-height:50px;padding:6px 10px;font-size:15px;line-height:1.15;white-space:normal;font-weight:700}
+.bk-row .nbtn.is-busy{opacity:.7;pointer-events:none}
 #storageStatus{padding:10px 12px;border-radius:12px;background:var(--soft)}
 @media (max-width:360px){
   #setCard .set-sw{gap:8px}
@@ -2364,7 +2366,7 @@ body.has-wall .card,body.has-wall .stage,body.has-wall .step{-webkit-backdrop-fi
 .tab{border-radius:999px}
 .tab::before{border-radius:999px}
 .nbtn,.nbtn.sec,.nbtn.main,.act,.range .nbtn,#listCard .lshare,.lshare,#listCard.big .nbtn,
-#setCard .nbtn.sec,#histCard #sendHistBtn,#histCard #exportHistBtn,#histCard #importHistBtn,
+#setCard .nbtn.sec,#bkCard #importHistBtn,#histCard #shareBtn,
 #setCard #updChkBtn,#setCard .set-sw .chip{border-radius:999px}
 .sheet-actions .nbtn,.bk-act .nbtn{border-radius:999px}
 .tile,#listCard.big .tile{border-radius:24px}
@@ -2578,8 +2580,15 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
   <div class="bk-banner" id="bkBanner" data-tab="hist" hidden role="status">
     <p id="bkText"></p>
     <div class="bk-act">
-      <button type="button" class="nbtn main" id="bkSend">Отправить резервную копию</button>
-      <button type="button" class="nbtn sec" id="bkLater">Позже</button>
+      <button type="button" class="nbtn main" id="bkSend">Сохранить копию</button>
+      <button type="button" class="nbtn sec" id="bkLater">Завтра</button>
+    </div>
+  </div>
+  <div class="bk-banner" id="undoBanner" hidden role="status">
+    <p id="undoText"></p>
+    <div class="bk-act">
+      <button type="button" class="nbtn main" id="undoDo">Отменить замену</button>
+      <button type="button" class="nbtn sec" id="undoOk">Оставить</button>
     </div>
   </div>
   <div class="upd-banner" id="updBanner" hidden role="status">
@@ -2804,17 +2813,21 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
     <button type="button" class="nbtn main" id="saveHistBtn2" style="width:100%;margin-top:8px;height:50px">Сохранить в историю</button>
   </div>
 
+  <div class="card" id="bkCard" data-tab="hist">
+    <h2>Резервная копия</h2>
+    <p class="bk-last" id="bkLast">Копий ещё не было</p>
+    <div class="bk-row">
+      <button type="button" class="nbtn main" id="bkSaveBtn">Сохранить копию</button>
+      <button type="button" class="nbtn sec" id="importHistBtn">Восстановить из файла</button>
+    </div>
+    <input type="file" id="importHistFile" accept=".json,application/json" hidden>
+    <p id="storageStatus" style="display:none;font-size:13px;line-height:1.45;color:var(--text2);margin:10px 2px 0"></p>
+  </div>
+
   <div class="card" id="histCard" data-tab="hist">
     <h2>Сохранённые</h2>
     <div id="histList" aria-live="polite"></div>
-    <button type="button" class="nbtn main" id="shareBtn" style="width:100%;margin-top:12px;height:50px;font-size:15px">Поделиться</button>
-    <button type="button" class="nbtn sec" id="sendHistBtn" style="width:100%;margin-top:8px;min-height:44px;font-size:15px;font-weight:700">Отправить резервную копию</button>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-      <button type="button" class="nbtn sec" id="exportHistBtn" style="min-height:44px;font-size:15px;font-weight:700">Скачать файл</button>
-      <button type="button" class="nbtn sec" id="importHistBtn" style="min-height:44px;font-size:15px;font-weight:700">Восстановить</button>
-    </div>
-    <input type="file" id="importHistFile" accept=".json,application/json" hidden>
-    <p id="storageStatus" style="font-size:13px;line-height:1.45;color:var(--text2);margin:10px 2px 0">Проверка сохранения…</p>
+    <button type="button" class="nbtn sec" id="shareBtn" style="width:100%;margin-top:12px;min-height:44px;font-size:15px">Отправить расчёты</button>
   </div>
 
   <div class="card set-card" id="setCard" data-tab="set">
@@ -2904,8 +2917,8 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
       <div>
         <p class="set-l">Напоминание о копии</p>
         <div class="theme-row" id="bkRow" style="margin-bottom:6px">
-          <button type="button" class="opt-chip on" data-bk="week">Понедельник</button>
-          <button type="button" class="opt-chip" data-bk="month">Месяц</button>
+          <button type="button" class="opt-chip on" data-bk="week">Раз в неделю</button>
+          <button type="button" class="opt-chip" data-bk="month">Раз в месяц</button>
           <button type="button" class="opt-chip" data-bk="off">Выкл</button>
         </div>
         <p class="set-d" id="bkDesc"></p>
@@ -2928,11 +2941,11 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
       </div>
       <div>
         <button type="button" class="nbtn sec" id="histClearBtn" style="width:100%;min-height:44px;color:var(--danger)">Очистить историю</button>
-        <p class="set-d" style="margin-top:6px">Все сохранённые записи. Сразу после очистки можно отменить.</p>
+        <p class="set-d" style="margin-top:6px">Удалит все сохранённые записи. Сразу после очистки можно отменить.</p>
       </div>
-      <div>
-        <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--danger)">Стереть расчёт, отметки и историю</button>
-        <p class="set-d" style="margin-top:6px">Настройки и фото фона останутся. Вернуть нельзя.</p>
+      <div style="margin-top:6px;padding-top:14px;border-top:1px solid var(--line)">
+        <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--danger)">Стереть расчёт, отметки, счётчик и историю</button>
+        <p class="set-d" style="margin-top:6px">Настройки и фото фона останутся. Сразу после стирания данные можно вернуть в течение 10 минут.</p>
       </div>
     </div>
   </div>
@@ -3400,8 +3413,8 @@ function applyOpts(){
     b.className = 'opt-chip' + (Number(b.getAttribute('data-hist')) === ui.histMax ? ' on' : '');
   });
   var d = $('bkDesc');
-  if (d) d.textContent = ui.bk === 'week' ? 'По понедельникам, если копии ещё не было'
-    : ui.bk === 'month' ? 'В начале месяца, если копии ещё не было' : 'Баннер не показывается';
+  if (d) d.textContent = ui.bk === 'week' ? 'Напомним, если с последней копии прошло 7 дней'
+    : ui.bk === 'month' ? 'Напомним, если с последней копии прошло 30 дней' : 'Баннер не показывается';
   var h = $('histDesc');
   if (h) h.textContent = 'Сейчас сохранено: ' + (archives || []).length;
 }
@@ -5039,7 +5052,8 @@ function saveArchives(){
 function setStorageStatus(message, isWarning){
   var el = $('storageStatus');
   if (!el) return;
-  el.textContent = message;
+  el.textContent = message || '';
+  el.style.display = message ? '' : 'none';
   el.style.color = isWarning ? 'var(--danger)' : 'var(--text2)';
 }
 
@@ -5050,12 +5064,12 @@ function checkStorage(){
     var ok = localStorage.getItem(testKey) === '1';
     localStorage.removeItem(testKey);
     if (ok) {
-      setStorageStatus('Автосохранение включено. Для надёжности периодически скачивайте резервную копию: локальные данные Safari могут быть удалены системой или настройками.', false);
+      setStorageStatus('', false);
     } else {
-      setStorageStatus('Браузер не подтвердил сохранение. Скачайте резервную копию после важных изменений.', true);
+      setStorageStatus('Браузер не подтвердил сохранение. Сохраните резервную копию после важных изменений.', true);
     }
   } catch(e) {
-    setStorageStatus('Safari не разрешил локальное сохранение для этого способа открытия файла. После каждого изменения скачивайте копию истории.', true);
+    setStorageStatus('Safari не разрешил локальное сохранение для этого способа открытия файла. После каждого изменения сохраняйте копию.', true);
   }
 }
 
@@ -5072,35 +5086,33 @@ function saveBk(){
 }
 if (!bk.since) { bk.since = Date.now(); saveBk(); }
 
-// Начало последнего понедельника (00:00 по местному времени); если сегодня понедельник — сегодняшнего дня.
-function lastMonday(ts){
-  var d = new Date(ts);
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-  return d.getTime();
-}
-
 function bkHasData(){
   return archives.length > 0 || Object.keys(doneAll).length > 0;
 }
 
-function monthStart(ts){
-  var d = new Date(ts);
-  d.setHours(0, 0, 0, 0);
-  d.setDate(1);
-  return d.getTime();
-}
-
 function bkDue(){
   if (ui.bk === 'off' || !bkHasData()) return false;
-  var ref = Math.max(bk.last, bk.since);
-  return ref < (ui.bk === 'month' ? monthStart(Date.now()) : lastMonday(Date.now()));
+  return Date.now() >= Math.max(bk.last, bk.since) + bkPeriod();
+}
+
+function bkPeriod(){ return (ui.bk === 'month' ? 30 : 7) * 86400000; }
+
+function fmtDay(ts){ var d = new Date(ts); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+
+function agoText(ts){
+  var days = Math.floor((Date.now() - ts) / 86400000);
+  return days < 1 ? 'сегодня' : days + ' ' + plural(days, 'день', 'дня', 'дней') + ' назад';
 }
 
 function renderBk(){
   var el = $('bkBanner');
   if (!el) return;
   var due = bkDue();
+  var last = $('bkLast');
+  if (last) {
+    last.textContent = bk.last ? 'Последняя копия: ' + fmtDay(bk.last) + ', ' + agoText(bk.last) : 'Копий ещё не было';
+    last.style.color = due ? 'var(--warn-fg)' : '';
+  }
   var dot = $('bkDot'), tab = $('tabHist');
   if (dot) dot.hidden = !due;
   if (tab) tab.setAttribute('aria-label', due ? 'История, пора сохранить копию' : 'История');
@@ -5109,23 +5121,21 @@ function renderBk(){
   if (!show) return;
   var t, pre = ui.bk === 'month' ? 'Ежемесячная копия' : 'Еженедельная копия';
   if (bk.last) {
-    var days = Math.floor((Date.now() - bk.last) / 86400000);
-    t = pre + ': пора сохранить данные. Последняя — ' +
-        (days < 1 ? 'меньше суток назад' : days + ' ' + plural(days, 'день', 'дня', 'дней') + ' назад') + '.';
+    t = pre + ': пора сохранить данные. Последняя — ' + agoText(bk.last) + '.';
   } else {
     t = pre + ': пора сохранить данные. Копий ещё не было.';
   }
   $('bkText').textContent = t;
 }
 
-function markBackup(){
+function markBackup(extra){
   bk.last = Date.now();
   bk.snooze = '';
   saveBk();
   renderBk();
-  var d = new Date();
-  setStorageStatus('Копия сохранена ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + '.' +
-    (ui.bk === 'week' ? ' Следующее напоминание — в понедельник.' : ui.bk === 'month' ? ' Следующее напоминание — в начале месяца.' : ''), false);
+  setStorageStatus('Копия сохранена.' +
+    (ui.bk === 'off' ? '' : ' Следующее напоминание — ' + fmtDay(bk.last + bkPeriod()) + '.') +
+    (extra ? ' ' + extra : ''), false);
 }
 
 function readJSON(key){
@@ -5166,18 +5176,21 @@ function downloadBackup(f){
     a.click();
     a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
-    markBackup();
-    setStorageStatus('Файл копии подготовлен. Сохраните его в приложении «Файлы».', false);
+    markBackup('Файл скачан — найдите его в приложении «Файлы».');
   } catch(e) {
     setStorageStatus('Не удалось создать файл копии. Попробуйте открыть сайт в Safari.', true);
   }
 }
 
-function sendBackup(){
-  var active = document.activeElement;
-  var busyId = active && active.id ? active.id : 'sendHistBtn';
-  setBusy(busyId, true, 'Подготовка…');
+var bkBusy = false;
+
+function sendBackup(btnId){
+  if (bkBusy) return;
   var f = backupFile();
+  bkBusy = true;
+  var busyId = btnId || 'bkSaveBtn';
+  setBusy(busyId, true, 'Подготовка…');
+  var finish = function(){ bkBusy = false; setBusy(busyId, false); };
   var types = ['application/json', 'text/plain'];
   var file = null, i;
   if (navigator.share && navigator.canShare && typeof File === 'function') {
@@ -5188,13 +5201,72 @@ function sendBackup(){
       } catch(e){}
     }
   }
-  if (!file) { downloadBackup(f); setBusy(busyId, false); flashBtn(busyId, 'Скачано'); return; }
+  if (!file) { downloadBackup(f); finish(); flashBtn(busyId, 'Скачано'); return; }
   navigator.share({files: [file], title: 'Раскрой труб — копия'}).then(function(){
-    markBackup(); setBusy(busyId, false); flashBtn(busyId, 'Отправлено');
+    markBackup(); finish(); flashBtn(busyId, 'Готово');
   }).catch(function(e){
     if (e && e.name !== 'AbortError') downloadBackup(f);
-    setBusy(busyId, false);
+    finish();
   });
+}
+
+/* ── Откат замены данных после «Восстановить из файла» ── */
+var UNDO_KEY = 'pipecalc.undo.v1';
+var UNDO_MS = 10 * 60 * 1000;
+
+function undoKeys(){ return [ARCH_KEY, KEY, DONE_KEY, UI_KEY, OLD_DONE_KEY, CNT_LOG_KEY]; }
+
+function takeUndoSnapshot(kind){
+  try { save(); } catch(e){}
+  try { saveCntLog(); } catch(e){}
+  try { saveDone(); } catch(e){}
+  try { saveUI(); } catch(e){}
+  try {
+    var data = {};
+    undoKeys().forEach(function(k){ data[k] = localStorage.getItem(k); });
+    localStorage.setItem(UNDO_KEY, JSON.stringify({ts: Date.now(), kind: kind || 'restore', data: data}));
+    return true;
+  } catch(e) {
+    try { localStorage.removeItem(UNDO_KEY); } catch(_){}
+    return false;
+  }
+}
+
+function dropUndo(){ try { localStorage.removeItem(UNDO_KEY); } catch(e){} renderUndo(); }
+
+function renderUndo(){
+  var el = $('undoBanner');
+  if (!el) return;
+  var u = readJSON(UNDO_KEY);
+  var left = u ? UNDO_MS - (Date.now() - Number(u.ts)) : 0;
+  if (!u || !(left > 0)) {
+    el.hidden = true;
+    if (u) { try { localStorage.removeItem(UNDO_KEY); } catch(e){} }
+    return;
+  }
+  var m = Math.max(1, Math.ceil(left / 60000));
+  var wiped = u.kind === 'wipe', mt = m + ' ' + plural(m, 'минуту', 'минуты', 'минут');
+  $('undoText').textContent = wiped ? 'Данные стёрты. Вернуть можно ещё ' + mt + '.' : 'Данные заменены копией. Отменить можно ещё ' + mt + '.';
+  $('undoDo').textContent = wiped ? 'Вернуть данные' : 'Отменить замену';
+  $('undoOk').textContent = wiped ? 'Закрыть' : 'Оставить';
+  el.hidden = false;
+}
+
+function undoRestore(){
+  var u = readJSON(UNDO_KEY);
+  if (!u || !isObj(u.data) || !(UNDO_MS - (Date.now() - Number(u.ts)) > 0)) { dropUndo(); return; }
+  var ok = true, allowed = undoKeys();
+  Object.keys(u.data).forEach(function(k){
+    if (allowed.indexOf(k) < 0) return;
+    try {
+      if (u.data[k] === null) localStorage.removeItem(k);
+      else localStorage.setItem(k, String(u.data[k]));
+    } catch(e){ ok = false; }
+  });
+  if (!ok) { setStorageStatus('Не удалось вернуть прежние данные.', true); return; }
+  try { localStorage.removeItem(UNDO_KEY); } catch(e){}
+  setStorageStatus('Прежние данные возвращены. Перезапускаем приложение…', false);
+  setTimeout(function(){ location.reload(); }, 350);
 }
 
 function isObj(x){ return !!x && typeof x === 'object' && !(x instanceof Array); }
@@ -5236,12 +5308,14 @@ function importHistoryFile(file){
 
       if (!full) {
         var widenOld = imported.length > histMax();
-        if (!confirm('Заменить текущую историю данными из резервной копии?' + (widenOld ? '\n\nЛимит истории будет увеличен, чтобы ничего не потерять.' : ''))) return;
+        if (!confirm('Заменить текущую историю данными из копии?\n\nВ копии записей: ' + imported.length + '.' + (widenOld ? '\n\nЛимит истории будет увеличен, чтобы ничего не потерять.' : '') + '\n\nВ течение 10 минут замену можно отменить.')) return;
+        takeUndoSnapshot('restore');
         if (widenOld){ ui.histMax = imported.length <= 100 ? 100 : 0; saveUI(); }
         archives = imported;
         var saved = saveArchives();
         renderHist();
-        setStorageStatus(saved ? 'История восстановлена. Рекомендуем сразу сохранить новую копию.' : 'История загружена в эту сессию, но Safari не смог сохранить её автоматически. Сохраните копию.', !saved);
+        renderUndo();
+        setStorageStatus(saved ? 'История восстановлена.' : 'История загружена в эту сессию, но Safari не смог сохранить её автоматически. Сохраните копию.', !saved);
         return;
       }
 
@@ -5252,7 +5326,10 @@ function importHistoryFile(file){
       // После перезапуска действует лимит из копии (если его там нет — без лимита по умолчанию)
       var effMax = uiB ? (limitOf(uiB) !== null ? limitOf(uiB) : 0) : ui.histMax;
       var widen = imported.length > (effMax > 0 ? effMax : Infinity);
-      if (!confirm('Заменить текущие данные копией?\n\nВ копии: ' + parts.join(', ') + '.' + (widen ? '\n\nЛимит истории будет увеличен, чтобы ничего не потерять.' : ''))) return;
+      var when = data.exportedAt ? new Date(data.exportedAt) : null;
+      var whenTxt = when && !isNaN(when.getTime()) ? ' от ' + fmtDay(when.getTime()) : '';
+      if (!confirm('Заменить текущие данные копией' + whenTxt + '?\n\nВ копии: ' + parts.join(', ') + '.' + (widen ? '\n\nЛимит истории будет увеличен, чтобы ничего не потерять.' : '') + '\n\nВ течение 10 минут замену можно отменить.')) return;
+      takeUndoSnapshot('restore');
 
       var ok = true;
       var put = function(k, v){
@@ -5305,6 +5382,7 @@ function renderHist(){
   try { renderBk(); } catch(e){}
   var list = $('histList');
   var clearBtn = $('histClearBtn');
+  clearBtn.textContent = archives.length ? 'Очистить историю (' + archives.length + ')' : 'Очистить историю';
   if (!archives.length){
     list.innerHTML = '<p class="hist-empty">Пока пусто. Нажмите «Сохранить в историю», чтобы запомнить текущий.</p>';
     clearBtn.disabled = true;
@@ -5480,11 +5558,13 @@ function doUndo(){
 $('toastUndo').addEventListener('click', doUndo);
 
 $('saveHistBtn2').addEventListener('click', function(){ addToHist(); });
-$('exportHistBtn').addEventListener('click', function(){ downloadBackup(backupFile()); });
-$('sendHistBtn').addEventListener('click', sendBackup);
-$('bkSend').addEventListener('click', sendBackup);
+$('bkSaveBtn').addEventListener('click', function(){ sendBackup('bkSaveBtn'); });
+$('bkSend').addEventListener('click', function(){ sendBackup('bkSend'); });
+$('undoDo').addEventListener('click', undoRestore);
+$('undoOk').addEventListener('click', dropUndo);
 $('bkLater').addEventListener('click', function(){ bk.snooze = dayKey(Date.now()); saveBk(); renderBk(); });
-document.addEventListener('visibilitychange', function(){ if (!document.hidden) renderBk(); });
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) { renderBk(); renderUndo(); } });
+setInterval(renderUndo, 30000);
 $('importHistBtn').addEventListener('click', function(){ $('importHistFile').click(); });
 $('importHistFile').addEventListener('change', function(){
   var file = this.files && this.files[0];
@@ -5545,6 +5625,7 @@ safe(applyUI);
 safe(load);
 safe(renderHist);
 checkStorage();
+renderUndo();
 update();
 
 /* Вкладки */
@@ -5669,7 +5750,16 @@ Array.prototype.forEach.call(document.querySelectorAll('[data-hist]'), function(
 });
 
 $('wipeBtn').addEventListener('click', function(){
-  if (!confirm('Стереть расчёт, отметки и историю?\n\nБудут удалены поля расчёта, отметки в чек-листе и вся история. Настройки останутся. Это нельзя отменить.')) return;
+  var parts = [];
+  if (archives.length) parts.push('записей: ' + archives.length);
+  var nDone = Object.keys(doneAll).length;
+  if (nDone) parts.push('отметок о резке: ' + nDone);
+  if (Object.keys(cntLogAll).length) parts.push('журнал счётчика');
+  try { if (localStorage.getItem(KEY)) parts.push('введённые значения'); } catch(e){}
+  if (!confirm('Стереть расчёт, отметки, счётчик и историю?\n\nБудет удалено: ' + (parts.length ? parts.join(', ') : 'текущий расчёт') +
+      '.\nНастройки останутся.\n\nВ течение 10 минут стирание можно отменить.')) return;
+  if (!takeUndoSnapshot('wipe') &&
+      !confirm('Не хватило места, чтобы подготовить возврат: после стирания данные вернуть не получится.\n\nВсё равно стереть?')) return;
   try {
     [KEY, DONE_KEY, OLD_DONE_KEY, ARCH_KEY, CNT_LOG_KEY].forEach(function(k){ localStorage.removeItem(k); });
   } catch(e){}
