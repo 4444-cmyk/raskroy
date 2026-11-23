@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-23.51">
+<meta name="app-build" content="2026-11-23.53">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1897,6 +1897,7 @@ button:active{filter:brightness(.97)}
 /* ── Tab bar ── */
 [data-off]{display:none !important}
 body.is-scrap .pipe-only{display:none !important}
+body.is-bundle .pipe-only.bundle-show{display:block !important}
 body:not(.is-scrap) .scrap-only{display:none !important}
 body.is-scrap .scrap-only{display:block}
 body.is-scrap .nrow.scrap-only{display:grid}
@@ -2609,6 +2610,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
     <h2>Параметры</h2>
     <div class="theme-row" id="modeRow" role="group" aria-label="Режим" style="margin:0 0 16px">
       <button type="button" class="opt-chip on" data-mode="0" aria-pressed="true">Трубы</button>
+      <button type="button" class="opt-chip" data-mode="2" aria-pressed="false">Остаток пачки</button>
       <button type="button" class="opt-chip" data-mode="1" aria-pressed="false">Обрезки</button>
     </div>
     <div class="fields">
@@ -2685,7 +2687,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
           <button type="button" class="sb" data-t="t" data-s="0.1" aria-label="Толще">+</button>
         </div>
       </div>
-      <div class="pipe-only">
+      <div class="pipe-only bundle-show">
         <div class="lbl-row">
           <label for="L">Длина, мм</label>
           <button type="button" class="lenset" id="lenReset" aria-label="Вернуть 6000 мм" style="visibility:hidden">6000</button>
@@ -2776,6 +2778,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
         <button type="button" class="nbtn" id="scrapSaveBtn">В историю</button>
       </div>
       <button type="button" class="nbtn sec" id="undoBtn" style="width:100%;margin-top:10px">Назад</button>
+      <button type="button" class="nbtn sec pipe-only" id="handoffBtn" style="width:100%;margin-top:8px">Передать смену</button>
       <details class="more" id="moreBox">
         <summary><span>Брак и остатки</span><span class="more-b" id="moreBadge"></span></summary>
         <div class="badctl" role="group" aria-label="Брак">
@@ -3074,7 +3077,8 @@ var IDS = ['q','p','L','b','d','t','h'];
 var KEY = 'pipecalc.v1';
 var S = null;
 var PF = 0;   // 1 — перфорированная труба: только пометка, на раскрой не влияет
-var MODE = 0; // 0 — трубы, 1 — обрезки (без расчёта труб)
+var MODE = 0; // 0 — трубы, 1 — обрезки или остаток пачки (без плана)
+var BUNDLE = 0; // 1 — остаток пачки: считаем целые трубы, заготовок по ним заранее неизвестно
 
 function setPf(v){
   PF = v ? 1 : 0;
@@ -3087,12 +3091,14 @@ function setPf(v){
 
 function setMode(v){
   MODE = v ? 1 : 0;
+  BUNDLE = v === 2 ? 1 : 0;
   Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function(b){
-    var on = (+b.getAttribute('data-mode')) === MODE;
+    var on = (+b.getAttribute('data-mode')) === (BUNDLE ? 2 : MODE);
     b.className = 'opt-chip' + (on ? ' on' : '');
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
   document.body.classList.toggle('is-scrap', !!MODE);
+  document.body.classList.toggle('is-bundle', !!BUNDLE);
   var foldTitle = document.querySelector('#foldDia .fold-title');
   if (foldTitle) foldTitle.textContent = MODE ? 'Размер' : 'Размер трубы';
 }
@@ -3112,7 +3118,7 @@ function save(){
     var o = {};
     IDS.forEach(function(id){ o[id] = $(id).value; });
     o.pf = PF;
-    o.mode = MODE;
+    o.mode = BUNDLE ? 2 : MODE;
     localStorage.setItem(KEY, JSON.stringify(o));
   }catch(e){}
 }
@@ -3126,7 +3132,7 @@ function load(){
       if (o && o[id] !== undefined && o[id] !== null && o[id] !== '') $(id).value = o[id];
     });
     if (o && o.pf) setPf(1);
-    if (o && o.mode) setMode(1);
+    if (o && o.mode) setMode(+o.mode === 2 ? 2 : 1);
   }catch(e){}
 }
 
@@ -3152,13 +3158,18 @@ function putScrap(sig, v){
   r.scrap = Math.max(0, v);
 }
 
+function pipesText(pcs, per){
+  var f = Math.floor(pcs / per), r = pcs - f * per, t = f + ' ' + plural(f, 'труба', 'трубы', 'труб');
+  return r > 0 ? (f > 0 ? t + ' + ' + r + ' шт' : r + ' шт') : t;
+}
+
 function calc(){
   var L = +$('L').value, p = +$('p').value, q = +$('q').value, b = +$('b').value;
   var have = $('h').value === '' ? 0 : +$('h').value;
   var qAll = q;
   var scrap = MODE === 1;
 
-  if (!(p > 0) || (!scrap && !(L > 0 && q > 0 && b > 0))){
+  if (!(p > 0) || (!scrap && !(L > 0 && q > 0 && b > 0)) || (BUNDLE && !(L > 0))){
     $('err').textContent = 'Заполните все поля положительными числами';
     S = null;
     return;
@@ -3192,12 +3203,24 @@ function calc(){
 
   if (scrap){
     // Обрезки: счётчик нарезанного, план заранее неизвестен
-    jobSig = ['s', p, +$('d').value || 0, +$('t').value || 0].join('|') + (PF ? '|pf' : '');
+    if (BUNDLE && p > L){
+      $('err').textContent = 'Заготовка длиннее трубы';
+      S = null;
+      return;
+    }
+    jobSig = (BUNDLE ? ['r', p, L, +$('d').value || 0, +$('t').value || 0] : ['s', p, +$('d').value || 0, +$('t').value || 0]).join('|') + (PF ? '|pf' : '');
     bad = getBad(jobSig);
     extra = 0;
     q0 = 0;
     q = getScrap(jobSig);
-    per = 1; full = 0; rem = 0; n = 0; bn = 0; wFull = 0; wLast = 0;
+    per = BUNDLE ? Math.max(1, Math.floor(L / p + 1e-9)) : 1;
+    full = 0; rem = 0; n = 0; bn = 0;
+    wFull = BUNDLE ? Math.round((L - per * p) * 1000) / 1000 : 0;
+    wLast = 0;
+    var hintEl = document.querySelector('.fhint.scrap-only');
+    if (hintEl) hintEl.textContent = BUNDLE
+      ? 'Отмечайте целые трубы — заготовки посчитаются по длине трубы. Сколько труб осталось, заранее неизвестно'
+      : 'Считайте заготовки по мере резки — число заранее неизвестно';
   } else {
     q0 = q;
     jobSig = [q0, p, L, +$('d').value || 0, +$('t').value || 0, 0].join('|') + (PF ? '|pf' : '');
@@ -3213,18 +3236,18 @@ function calc(){
     wLast = rem > 0 ? Math.round((L - rem * p) * 1000) / 1000 : 0;
   }
 
-  S = {L:L, p:p, q:q, q0:q0, bad:bad, x:extra, sig:jobSig, h:have, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, mode:MODE};
+  S = {L:L, p:p, q:q, q0:q0, bad:bad, x:extra, sig:jobSig, h:have, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, mode:MODE, bundle:BUNDLE};
 
   var cap = document.querySelector('.hero .cap-top');
-  if (cap) cap.textContent = scrap ? 'Из обрезков' : 'Нужно нарезать';
+  if (cap) cap.textContent = scrap ? (BUNDLE ? 'Остаток пачки' : 'Из обрезков') : 'Нужно нарезать';
 
   if (scrap){
     var total = q;
     $('hsMain').textContent = total > 0
       ? total + ' ' + plural(total, 'заготовка', 'заготовки', 'заготовок')
       : 'Пока 0';
-    $('hs').textContent = 'по ' + num(p) + ' мм';
-    $('hs2').textContent = bad > 0 ? 'брак ' + bad : 'Отмечайте в чек-листе по мере резки';
+    $('hs').textContent = 'по ' + num(p) + ' мм' + (BUNDLE ? ' · труба ' + num(L) + ' мм' : '');
+    $('hs2').textContent = bad > 0 ? 'брак ' + bad : (BUNDLE ? (total > 0 ? pipesText(total, per) : 'Отмечайте трубы по мере резки') : 'Отмечайте в чек-листе по мере резки');
   } else {
     var hero = heroTexts(n, full, rem, per, have, bad);
     $('hsMain').textContent = hero.main;
@@ -3571,6 +3594,7 @@ function renderList(){
     $('pt1l').textContent = plural(cd, 'заготовка', 'заготовки', 'заготовок');
     $('pt2').innerHTML = '<span class="stat-num">' + num(S.p) + '</span>'; 
     $('pt2l').textContent = 'мм';
+    if (S.bundle){ var pn = Math.floor(cd / S.per); $('pt2').innerHTML = '<span class="stat-num">' + pn + '</span>'; $('pt2l').textContent = plural(pn, 'труба', 'трубы', 'труб'); }
     $('pfill').style.width = '0';
     $('pfill').parentNode.style.display = 'none';
     $('progressMeta').style.display = 'none';
@@ -3585,16 +3609,19 @@ function renderList(){
     $('xNote').style.display = 'none';
     var more = $('moreBox');
     if (more) more.style.display = 'none';
-    $('nowT').textContent = cd > 0 ? ('Нарезано ' + cd + ' шт') : 'Начните резку';
-    $('nowS').textContent = 'Из обрезков · ' + num(S.p) + ' мм';
+    $('nowT').textContent = cd > 0 ? ('Нарезано ' + cd + ' шт' + (S.bundle ? ' · ' + pipesText(cd, S.per) : '')) : 'Начните резку';
+    $('nowS').textContent = (S.bundle ? 'Остаток пачки · ' + num(S.p) + ' мм · труба ' + num(S.L) + ' мм' : 'Из обрезков · ' + num(S.p) + ' мм');
     // Две крупные кнопки рядом: +1 и +10
     $('nextBtn').style.display = 'none';
     $('pieceBtn').style.display = '';
-    $('pieceBtn').textContent = '+1';
+    $('pieceBtn').textContent = S.bundle ? '+1 труба' : '+1';
     $('pieceBtn').className = 'nbtn main';
     $('pieceBtn').disabled = false;
     $('plus10Btn').style.display = '';
-    $('plus10Btn').textContent = '+10';
+    $('plus10Btn').textContent = S.bundle ? '+10 труб' : '+10';
+    $('plus20Btn').textContent = S.bundle ? '+1 заготовка' : '+20';
+    $('plus20Btn').style.gridColumn = S.bundle ? '1 / -1' : '';
+    $('plus50Btn').style.display = S.bundle ? 'none' : '';
     $('plus10Btn').className = 'nbtn main';
     $('plus10Btn').disabled = false;
     var ar = $('actRow2');
@@ -3880,7 +3907,7 @@ function bumpScrap(delta){
 
 $('pieceBtn').addEventListener('click', function(){
   if (!S) return;
-  if (S.mode === 1){ bumpScrap(1); return; }
+  if (S.mode === 1){ bumpScrap(S.bundle ? S.per : 1); return; }
   if (nextIdx < 0) return;
   var pdBefore = cntStats().pd;
   if (apply([[nextIdx, (cnt[nextIdx] || 0) + 1]])){
@@ -3898,23 +3925,23 @@ $('pieceBtn').addEventListener('click', function(){
 
 $('nextBtn').addEventListener('click', function(){
   if (!S) return;
-  if (S.mode === 1){ bumpScrap(1); return; }
+  if (S.mode === 1){ bumpScrap(S.bundle ? S.per : 1); return; }
   if (nextIdx < 0) return;
   apply([[nextIdx, pcOf(nextIdx)]]);
 });
 
 $('plus10Btn').addEventListener('click', function(){
   if (!S) return;
-  if (S.mode === 1){ bumpScrap(10); return; }
+  if (S.mode === 1){ bumpScrap(10 * (S.bundle ? S.per : 1)); return; }
   if (nextIdx < 0) return;
   markWholePipes(10);   // только целые нетронутые трубы подряд — то же, что написано на кнопке
 });
 $('plus20Btn').addEventListener('click', function(){
   if (!S || S.mode !== 1) return;
-  bumpScrap(20);
+  bumpScrap(S.bundle ? 1 : 20);
 });
 $('plus50Btn').addEventListener('click', function(){
-  if (!S || S.mode !== 1) return;
+  if (!S || S.mode !== 1 || S.bundle) return;
   bumpScrap(50);
 });
 var scrapResetTimer = null;
@@ -3947,6 +3974,39 @@ $('scrapResetBtn').addEventListener('click', function(){
   }
 });
 $('scrapSaveBtn').addEventListener('click', function(){ addToHist(); });
+
+/* Передача смены: в историю уходит то, что реально нарезано, сменщику остаётся разница */
+$('handoffBtn').addEventListener('click', function(){
+  var id = 'handoffBtn', orig = 'Передать смену';
+  if (!S || S.mode === 1) return;
+  var st = cntStats(), bad = Number(S.bad) || 0;
+  var done = Math.max(0, st.cd - bad);
+  var left = Math.max(0, Number(S.q0) - done);
+  if (done <= 0) { flashBtn(id, 'Пока ничего не нарезано', orig); return; }
+  if (left <= 0) { flashBtn(id, 'Всё нарезано — сохраните в историю', orig); return; }
+  var w = function(k, a, b2, c){ return k + ' ' + plural(k, a, b2, c); };
+  if (!confirm('Передать смену?\n\nВ историю запишется: ' + w(done, 'заготовка', 'заготовки', 'заготовок') +
+      '.\nСменщику останется: ' + w(left, 'заготовка', 'заготовки', 'заготовок') +
+      '.\n\nВ расчёте сразу выставится «Уже есть: ' + ((Number(S.h) || 0) + done) + '».')) return;
+  var per = Number(S.per) || 1, q = st.cd, b = Number($('b').value) || 1;
+  var full = Math.floor(q / per), rem = q - full * per, n = full + (rem > 0 ? 1 : 0);
+  var entry = {
+    ts: Date.now(), q: q, p: Number(S.p), L: Number(S.L) || 0, h: Number(S.h) || 0,
+    bad: bad, x: Number(S.x) || 0, b: b, d: Number($('d').value) || 0, t: Number($('t').value) || 0,
+    pf: PF ? 1 : 0, mode: 0, n: n, bn: Math.ceil(n / b), per: per, rem: rem,
+    wFull: Number(S.wFull) || 0, wLast: rem > 0 ? Math.round((Number(S.L) - rem * Number(S.p)) * 1000) / 1000 : 0,
+    left: left
+  };
+  var have = Number(S.h) || 0;
+  archives.unshift(entry);
+  if (archives.length > histMax()) archives = archives.slice(0, histMax());
+  saveArchives();
+  $('h').value = have + done;
+  $('h').dispatchEvent(new Event('input', {bubbles: true}));
+  renderHist();
+  feedback(false);
+  flashBtn(id, 'Записано · сменщику ' + left, orig);
+});
 
 $('undoBtn').addEventListener('click', function(){
   if (!S || !hist.length) return;
@@ -4061,12 +4121,12 @@ function renderCounter(){
   if (scrap){
     var v = S.q;
     capEl.className = 'cnt-cap';
-    capEl.textContent = 'Из обрезков';
+    capEl.textContent = S.bundle ? 'Остаток пачки' : 'Из обрезков';
     el.className = 'cnt scrap';
     setCntNum(v);
     $('cntSub').textContent = plural(v, 'заготовка', 'заготовки', 'заготовок');
-    $('cntG1').textContent = 'Резать по ' + num(S.p) + ' мм';
-    $('cntG2').textContent = S.bad > 0 ? ('Брак: ' + S.bad) : 'Отмечайте по мере резки';
+    $('cntG1').textContent = 'Резать по ' + num(S.p) + ' мм' + (S.bundle ? ' · труба ' + num(S.L) + ' мм' : '');
+    $('cntG2').textContent = S.bad > 0 ? ('Брак: ' + S.bad) : (S.bundle ? (v > 0 ? pipesText(v, S.per) : 'Отмечайте трубы по мере резки') : 'Отмечайте по мере резки');
     $('cntCard2K').textContent = 'Последняя отметка';
     if (last){
       var lk = last[1];
@@ -4078,10 +4138,13 @@ function renderCounter(){
       $('cntPcsOf').textContent = 'Пока без отметок';
     }
     $('cntDim').textContent = '';
-    $('cntP1s').textContent = 'заготовка';
+    $('cntP1s').textContent = S.bundle ? 'труба' : 'заготовка';
     $('cntP10b').textContent = '+10';
-    $('cntP10s').textContent = 'заготовок';
+    $('cntP10s').textContent = S.bundle ? 'труб' : 'заготовок';
     $('cntP10').disabled = false;
+    $('cntP20').innerHTML = S.bundle ? '<b>+1</b><span>заготовка</span>' : '<b>+20</b><span>заготовок</span>';
+    $('cntP50').style.display = S.bundle ? 'none' : '';
+    $('cntP20').style.gridColumn = S.bundle ? '1 / -1' : '';
   } else {
     var st = cntStats(), left = S.n - st.pd, pct = S.q > 0 ? Math.min(100, Math.round(st.cd / S.q * 100)) : 0;
     var groups = {}, ii;
@@ -4233,7 +4296,7 @@ function markWholePipes(max){
   if (ch.length) apply(ch);
 }
 $('cntP20').addEventListener('click', function(){ cntAdd($('plus20Btn'), false); });
-$('cntP50').addEventListener('click', function(){ cntAdd($('plus50Btn'), false); });
+$('cntP50').addEventListener('click', function(){ if (S && S.bundle) return; cntAdd($('plus50Btn'), false); });
 $('cntP10').addEventListener('click', function(){
   if (S && S.mode === 1) cntAdd($('plus10Btn'), false);
   else cntAdd(function(){ markWholePipes(10); }, false);
@@ -4589,7 +4652,7 @@ function archiveLine(item){
   var good = item.q - bad;
   var xs = item.x > 0 ? item.x : 0;
   var head = item.mode
-    ? 'Обрезки' + (item.d > 0 ? ' ' + dia + (item.t > 0 ? '/' + wall : '') : '') + (item.pf ? ' перф.' : '')
+    ? (item.bundle ? 'Остаток пачки' : 'Обрезки') + (item.d > 0 ? ' ' + dia + (item.t > 0 ? '/' + wall : '') : '') + (item.pf ? ' перф.' : '')
     : dia + '/' + wall + (item.pf ? ' перф.' : '');
   return head + ' ×' + num(item.p) + ' — ' + good + ' шт' + (item.h > 0 ? ' из ' + (good + item.h) : '') + (xs > 0 ? ' + ' + xs + ' из остатков = ' + (good + xs) : '') + (bad > 0 ? ', брак ' + bad : '');
 }
@@ -4858,7 +4921,7 @@ function remainText(){
   var d = +$('d').value || 0, t = +$('t').value || 0;
   var head = (d > 0 ? 'Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' ' : '') + (PF ? 'перф. ' : '') + '×' + num(S.p);
   if (S.mode === 1){
-    return 'Нарезано из обрезков\n' + head + ' — ' + S.q + ' шт' + (S.bad > 0 ? ' (брак ' + S.bad + ')' : '');
+    return (S.bundle ? 'Остаток пачки, нарезано\n' : 'Нарезано из обрезков\n') + head + ' — ' + S.q + ' шт' + (S.bundle ? ' (' + pipesText(S.q, S.per) + ')' : '') + (S.bad > 0 ? ' (брак ' + S.bad + ')' : '');
   }
   var cd = 0, groups = {}, any = false, i;
   for (i = 0; i < S.n; i++){
@@ -5287,7 +5350,7 @@ function cleanArchives(list, limit){
       ts:Number(item.ts), q:Number(item.q), p:Number(item.p), L:Number(item.L) || 0,
       b:Number(item.b) || 1, h:Number(item.h) || 0, bad:Number(item.bad) || 0, x:Number(item.x) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0, pf:item.pf ? 1 : 0, mode:item.mode ? 1 : 0,
       n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
-      rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0
+      rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0, left:Number(item.left) || 0, bundle:item.bundle ? 1 : 0
     };
   }).sort(function(a,b){ return b.ts-a.ts; }).slice(0, limit === undefined ? histMax() : limit);
 }
@@ -5419,7 +5482,8 @@ function renderHist(){
       var sub;
       if (item.mode) {
         var sec = item.d > 0 ? (' · Ø' + num(item.d) + (item.t > 0 ? '×' + num(item.t) : '')) : '';
-        sub = 'Из обрезков' + sec + ' · ' + item.q + ' ' + plural(item.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(item.p) + ' мм';
+        sub = (item.bundle ? 'Остаток пачки' : 'Из обрезков') + sec + ' · ' + item.q + ' ' + plural(item.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(item.p) + ' мм' +
+              (item.bundle && item.per > 0 ? ' · ' + pipesText(item.q, item.per) : '');
       } else if (rem > 0) {
         sub = full + ' × ' + per + ' шт + 1 × ' + rem + ' шт' +
               (item.wLast > 0 ? ', остаток ' + fmt(item.wLast) + ' мм' : '');
@@ -5427,6 +5491,7 @@ function renderHist(){
         sub = item.n + ' × ' + per + ' шт' +
               (item.wFull >= 0 ? ', обрезок ' + fmt(item.wFull) + ' мм' : '');
       }
+      if (item.left > 0) sub += ' · передано сменщику: ' + item.left;
       h += '<div class="hist-item" data-idx="' + idx + '">' +
         '<div class="hist-time">' + formatTime(item.ts) + '</div>' +
         '<div class="hist-body"><p class="hist-title">' + title + '</p><p class="hist-sub">' + sub + '</p></div>' +
@@ -5460,6 +5525,7 @@ function addToHist(){
     t: Number($('t').value) || 0,
     pf: PF ? 1 : 0,
     mode: S.mode ? 1 : 0,
+    bundle: S.bundle ? 1 : 0,
     n: Number(S.n),
     bn: Number(S.bn) || 0,
     per: Number(S.per) || 0,
@@ -5471,7 +5537,7 @@ function addToHist(){
   // Осознанный повтор (позже) сохраняется отдельной записью.
   var a0 = archives[0];
   if (a0 && entry.ts - a0.ts < 3000 && a0.q === entry.q && a0.p === entry.p && a0.L === entry.L &&
-      a0.d === entry.d && a0.t === entry.t && (a0.pf || 0) === entry.pf && (a0.mode || 0) === entry.mode &&
+      a0.d === entry.d && a0.t === entry.t && (a0.pf || 0) === entry.pf && (a0.mode || 0) === entry.mode && (a0.bundle || 0) === entry.bundle &&
       (a0.h || 0) === entry.h && (a0.bad || 0) === entry.bad && (a0.x || 0) === entry.x) {
     archives[0] = entry;
   } else {
@@ -5508,7 +5574,7 @@ function restoreHist(idx){
   $('d').value = item.d || 0;
   $('t').value = item.t || 0;
   setPf(item.pf);
-  setMode(isScrap ? 1 : 0);
+  setMode(isScrap ? (item.bundle ? 2 : 1) : 0);
   update();
   if (S && curSig) {
     var changed = false;
