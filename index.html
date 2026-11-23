@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-23.59">
+<meta name="app-build" content="2026-11-23.60">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -118,6 +118,7 @@
 }
 
 html, body {
+  touch-action: pan-x pan-y;
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -4552,6 +4553,13 @@ Array.prototype.forEach.call(document.querySelectorAll('.theme-chip'), function(
     applyTheme();
   });
 });
+/* Запрет увеличения двумя пальцами (pinch-zoom) */
+['gesturestart','gesturechange','gestureend'].forEach(function(t){
+  document.addEventListener(t, function(e){ e.preventDefault(); }, {passive:false});
+});
+document.addEventListener('touchmove', function(e){
+  if (e.touches && e.touches.length > 1) e.preventDefault();
+}, {passive:false});
 $('scaleRange').addEventListener('input', function(){
   ui.scale = Number(this.value) || 100;
   applyScale();
