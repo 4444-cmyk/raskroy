@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-23.58">
+<meta name="app-build" content="2026-11-23.59">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2281,18 +2281,21 @@ button.hist-day:active{opacity:.7}
 .hist-grp.open .hd-c{transform:rotate(-90deg)}
 .hist-grp:not(.open) .hist-grp-b{display:none}
 .hist-grp-b{padding:0 0 6px}
-.hist-item{display:block;padding:0}
-.hist-row1{display:flex;align-items:center;gap:12px;min-height:48px;padding:4px 0}
-.hist-row1 .hist-title{margin:0;flex:1;min-width:0}
-.hist-row1 .hist-chev{flex:none;font-size:20px;line-height:1;color:var(--muted);transform:rotate(90deg);transition:transform .18s ease}
-.hist-item.open .hist-chev{transform:rotate(-90deg)}
-.hist-more{display:none;padding:0 0 12px 54px}
-.hist-item.open .hist-more{display:block}
-.hist-more .hist-sub{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.4;margin:0 0 10px}
-.hist-act{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.hist-act .nbtn{height:44px;font-size:15px}
-.hist-act .nbtn.del{color:var(--danger)}
 .hist-more-btn{width:100%;margin-top:10px;min-height:44px;font-size:15px}
+.hist-item{display:block;position:relative;overflow:hidden;padding:0}
+.hist-fg{
+  display:flex;align-items:center;gap:12px;padding:12px 0;
+  background:var(--card);position:relative;z-index:1;
+  touch-action:pan-y;transition:transform .22s cubic-bezier(.2,.8,.2,1);
+  -webkit-user-select:none;user-select:none;
+}
+.hist-fg.drag{transition:none}
+.hist-item .hist-title{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
+.hist-del-bg{
+  position:absolute;right:0;top:0;bottom:0;width:88px;margin:0;padding:0;border:0;
+  background:var(--danger);color:#fff;font-family:inherit;font-size:15px;font-weight:600;
+  cursor:pointer;touch-action:manipulation;
+}
 /* Empty states: ясное сообщение и спокойная визуальная опора */
 .hist-empty, .share-empty {
   display: grid;
@@ -5566,6 +5569,10 @@ function renderHist(){
       var wall = item.t > 0 ? num(item.t) : '—';
       var title = archiveLine(item);
       var rem = item.rem > 0 ? item.rem : 0;
+      if (!item.mode){
+        var offW = rem > 0 ? item.wLast : item.wFull;
+        if (offW > 0) title = title.replace(' — ', ', ' + (rem > 0 ? 'остаток ' : 'обрезок ') + fmt(offW) + ' мм — ');
+      }
       var per = item.per > 0 ? item.per : 0;
       var full = item.n - (rem > 0 ? 1 : 0);
       var sub;
@@ -5574,24 +5581,17 @@ function renderHist(){
         sub = (item.bundle ? 'Остаток пачки' : 'Из обрезков') + sec + ' · ' + item.q + ' ' + plural(item.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(item.p) + ' мм' +
               (item.bundle && item.per > 0 ? ' · ' + pipesText(item.q, item.per) : '');
       } else if (rem > 0) {
-        sub = full + ' × ' + per + ' шт + 1 × ' + rem + ' шт' +
-              (item.wLast > 0 ? ', остаток ' + fmt(item.wLast) + ' мм' : '');
+        sub = full + ' × ' + per + ' шт + 1 × ' + rem + ' шт';
       } else {
-        sub = item.n + ' × ' + per + ' шт' +
-              (item.wFull >= 0 ? ', обрезок ' + fmt(item.wFull) + ' мм' : '');
+        sub = item.n + ' × ' + per + ' шт';
       }
       if (item.left > 0) sub += ' · передано сменщику: ' + item.left;
       h += '<div class="hist-item" data-idx="' + idx + '">' +
-        '<div class="hist-row1">' +
+        '<button type="button" class="hist-del-bg" data-del="' + idx + '">Удалить</button>' +
+        '<div class="hist-fg">' +
           '<div class="hist-time">' + formatTime(item.ts) + '</div>' +
-          '<p class="hist-title">' + title + '</p>' +
-          '<span class="hist-chev" aria-hidden="true">›</span>' +
+          '<div class="hist-body"><p class="hist-title">' + title + '</p><p class="hist-sub">' + sub + '</p></div>' +
         '</div>' +
-        '<div class="hist-more"><p class="hist-sub">' + sub + '</p>' +
-          '<div class="hist-act">' +
-            '<button type="button" class="nbtn main" data-load="' + idx + '">Загрузить</button>' +
-            '<button type="button" class="nbtn sec del" data-del="' + idx + '">Удалить</button>' +
-          '</div></div>' +
       '</div>';
     });
     h += '</div></div>';
@@ -5751,11 +5751,6 @@ $('histList').addEventListener('click', function(e){
     if (gone.length) showUndo([{item: gone[0], idx: i}]);
     return;
   }
-  var ld = e.target.closest ? e.target.closest('[data-load]') : null;
-  if (ld){
-    restoreHist(+ld.getAttribute('data-load'));
-    return;
-  }
   if (e.target.closest && e.target.closest('[data-more]')){
     histDaysShown += HIST_STEP;
     renderHist();
@@ -5772,11 +5767,59 @@ $('histList').addEventListener('click', function(e){
   }
   var item = e.target.closest ? e.target.closest('.hist-item') : null;
   if (item){
-    var was = item.classList.contains('open');
-    Array.prototype.forEach.call($('histList').querySelectorAll('.hist-item.open'), function(n){ n.classList.remove('open'); });
-    if (!was) item.classList.add('open');
+    if (histSwiped){ histSwiped = false; return; }
+    if (item.classList.contains('swiped')){ histCloseSwipe(); return; }
+    if (histCloseSwipe()) return;
+    restoreHist(+item.getAttribute('data-idx'));
   }
 });
+
+/* Свайп справа налево открывает «Удалить» (как в iOS) */
+var histSwiped = false, SWIPE_W = 88, swp = null;
+function histCloseSwipe(except){
+  var any = false;
+  Array.prototype.forEach.call($('histList').querySelectorAll('.hist-item.swiped'), function(n){
+    if (n === except) return;
+    n.classList.remove('swiped');
+    n.firstChild.nextSibling.style.transform = '';
+    any = true;
+  });
+  return any;
+}
+$('histList').addEventListener('pointerdown', function(e){
+  var fg = e.target.closest ? e.target.closest('.hist-fg') : null;
+  if (!fg || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  var item = fg.parentNode;
+  swp = {fg: fg, item: item, x: e.clientX, y: e.clientY, base: item.classList.contains('swiped') ? -SWIPE_W : 0, dx: 0, on: false, id: e.pointerId};
+  histCloseSwipe(item);
+});
+$('histList').addEventListener('pointermove', function(e){
+  if (!swp || e.pointerId !== swp.id) return;
+  var dx = e.clientX - swp.x, dy = e.clientY - swp.y;
+  if (!swp.on){
+    if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
+    swp.on = true;
+    swp.fg.classList.add('drag');
+    try { swp.fg.setPointerCapture(e.pointerId); } catch(_){}
+  }
+  swp.dx = dx;
+  var t = Math.max(-SWIPE_W - 24, Math.min(0, swp.base + dx));
+  swp.fg.style.transform = 'translateX(' + t + 'px)';
+});
+function histSwipeEnd(e){
+  if (!swp || e.pointerId !== swp.id) return;
+  var s = swp; swp = null;
+  if (!s.on) return;
+  histSwiped = true;
+  setTimeout(function(){ histSwiped = false; }, 350);
+  s.fg.classList.remove('drag');
+  var final = s.base + s.dx;
+  var open = final < -SWIPE_W / 2;
+  s.item.classList.toggle('swiped', open);
+  s.fg.style.transform = open ? 'translateX(' + (-SWIPE_W) + 'px)' : '';
+}
+$('histList').addEventListener('pointerup', histSwipeEnd);
+$('histList').addEventListener('pointercancel', histSwipeEnd);
 
 $('histClearBtn').addEventListener('click', function(){
   if (!archives.length) return;
