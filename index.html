@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.71">
+<meta name="app-build" content="2026-11-24.72">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2880,12 +2880,15 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
         </div>
         <p class="set-d" id="histDesc"></p>
       </div>
-      <div class="set-sw">
+      <div class="set-sw" id="updRow">
         <div>
           <p class="set-l">Обновление</p>
           <p class="set-d" id="verTxt"></p>
         </div>
-        <button type="button" class="chip" id="updChkBtn">Проверить</button>
+        <div style="display:flex;gap:8px;align-items:center;flex:none">
+          <button type="button" class="chip on" id="updInlineBtn" hidden>Обновить</button>
+          <button type="button" class="chip" id="updChkBtn">Проверить</button>
+        </div>
       </div>
       <div>
         <button type="button" class="nbtn sec" id="histClearBtn" style="width:100%;min-height:44px;color:var(--danger)">Очистить историю</button>
@@ -3645,7 +3648,7 @@ function renderList(){
     $('nowT').textContent = isLastPipe ? 'Последняя труба №' + (nextIdx + 1) : 'Следующая: труба №' + (nextIdx + 1);
     $('nowS').textContent = 'На трубе: ' + cn + ' из ' + pcn + ' по ' + S.p + ' мм · закрыто ' + pd + ' из ' + S.n + ' труб';
     $('nextBtn').textContent = cn > 0 ? 'Дорезать трубу' : '+1 труба';
-    $('pieceBtn').textContent = '+1 заготовка (ещё ' + needNow + ')';
+    $('pieceBtn').textContent = '+1 заготовка';
     $('pieceBtn').disabled = false;
     $('nextBtn').disabled = false;
     // «+N» отмечает только целые нетронутые трубы подряд (как в счётчике); начатую и короткую последнюю — кнопка «+1 труба»
@@ -5569,6 +5572,7 @@ function checkVersion(force){
     if (theirs && theirs !== mine) {
       verShown = true;
       $('updBanner').hidden = false;
+      if ($('updInlineBtn')) $('updInlineBtn').hidden = false;
     }
   }).catch(function(){});
   try {
@@ -5579,11 +5583,20 @@ function setVerStatus(txt){
   var meta = document.querySelector('meta[name="app-build"]');
   $('verTxt').textContent = 'Версия ' + (meta ? meta.getAttribute('content') : '?') + (txt ? ' · ' + txt : '');
 }
+function showNewVersionUI(){
+  verShown = true;
+  $('updBanner').hidden = false;
+  if ($('updInlineBtn')) $('updInlineBtn').hidden = false;
+  setVerStatus('доступна новая');
+}
+if ($('updInlineBtn')){
+  $('updInlineBtn').addEventListener('click', function(){ $('updDo').click(); });
+}
 $('updChkBtn').addEventListener('click', function(){
   var btn = $('updChkBtn');
   var meta = document.querySelector('meta[name="app-build"]');
   var mine = meta ? meta.getAttribute('content') : null;
-  if (verShown) { $('updBanner').hidden = false; setVerStatus('доступна новая'); return; }
+  if (verShown) { showNewVersionUI(); return; }
   if (!/^https?:$/.test(location.protocol) || !window.fetch || !mine) { setVerStatus('проверка работает только на сайте'); return; }
   if (navigator.onLine === false) { setVerStatus('нет сети'); return; }
   btn.textContent = '…';
@@ -5593,9 +5606,7 @@ $('updChkBtn').addEventListener('click', function(){
   }).then(function(t){
     var theirs = buildOf(t);
     if (theirs && theirs !== mine) {
-      verShown = true;
-      $('updBanner').hidden = false;
-      setVerStatus('доступна новая');
+      showNewVersionUI();
     } else {
       setVerStatus('последняя версия');
     }
