@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.62">
+<meta name="app-build" content="2026-11-24.63">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -5607,7 +5607,7 @@ function renderHist(){
     h += '<div class="hist-grp' + (open ? ' open' : '') + '" data-day="' + g.key + '">' +
       '<button type="button" class="hist-day" aria-expanded="' + (open ? 'true' : 'false') + '">' +
       '<span class="hd-l">' + g.label + '</span>' +
-      '<span class="hd-n">' + g.items.length + ' ' + plural(g.items.length, 'расчёт', 'расчёта', 'расчётов') + '</span>' +
+      '<span class="hd-n">' + g.items.length + ' ' + plural(g.items.length, 'запись', 'записи', 'записей') + '</span>' +
       '<i class="hd-c" aria-hidden="true">›</i></button><div class="hist-grp-b">';
     g.items.forEach(function(entry){
       var item = entry.item;
