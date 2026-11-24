@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.72">
+<meta name="app-build" content="2026-11-24.73">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1892,7 +1892,6 @@ body.is-scrap #pieceBtn { order: -1; }
 :root{--ui-scale:.9;--ios-blue:#0a84ff;--ios-glass:rgba(255,255,255,.58)}
 @supports (zoom:1){
   .app{zoom:var(--ui-scale);max-width:calc(520px / var(--ui-scale))}
-  .tabbar{zoom:var(--ui-scale);width:min(calc((100% - 24px) / var(--ui-scale)), 496px)}
   .toast,.sheet{zoom:var(--ui-scale)}
 }
 #setCard{
@@ -2059,7 +2058,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb
   right:auto;
   bottom:max(9px, env(safe-area-inset-bottom));
   width:min(calc(100% - 24px), 496px);
-  transform:translateX(-50%);
+  transform:translate3d(-50%, 0, 0);
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+  will-change:transform;
   padding:6px;
   border:1px solid color-mix(in srgb, var(--line) 75%, transparent);
   border-radius:25px;
