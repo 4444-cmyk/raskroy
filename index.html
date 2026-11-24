@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-23.61">
+<meta name="app-build" content="2026-11-24.62">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -327,9 +327,22 @@ body::before {
 }
 
 .hero .sub:empty,
-.hero .sub2:empty {
+.hero .sub2:empty,
+.hero .hsize:empty {
   display: none;
 }
+
+.hero .hsize {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  opacity: 0.95;
+  position: relative;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero .sub2 { white-space: pre-line; }
 
 /* Copy button */
 .actions {
@@ -2644,6 +2657,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
   </div>
   <div class="hero" data-tab="calc">
     <p class="cap-top">Нужно нарезать</p>
+    <p class="hsize" id="hsSize"></p>
     <p class="big" id="hsMain">—</p>
     <p class="sub" id="hs"></p>
     <p class="sub2" id="hs2"></p>
@@ -2873,7 +2887,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
   <div class="card" id="histCard" data-tab="hist">
     <h2>Сохранённые</h2>
     <div id="histList" aria-live="polite"></div>
-    <button type="button" class="nbtn sec" id="shareBtn" style="width:100%;margin-top:12px;min-height:44px;font-size:15px">Отправить расчёты</button>
+    <button type="button" class="nbtn sec" id="shareBtn" style="width:100%;margin-top:12px;min-height:44px;font-size:15px">Поделиться историей</button>
   </div>
 
   <div class="card set-card" id="setCard" data-tab="set">
@@ -3084,7 +3098,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
 </div>
 
 <div class="toast" id="shareToast" role="status" aria-live="polite" hidden>
-  <span>Сохранено</span>
+  <span id="shareToastTxt">Сохранено</span>
   <button type="button" id="shareToastBtn">Поделиться</button>
 </div>
 
@@ -3307,6 +3321,11 @@ function calc(){
 
   var cap = document.querySelector('.hero .cap-top');
   if (cap) cap.textContent = scrap ? (BUNDLE ? 'Остаток пачки' : 'Из обрезков') : 'Нужно нарезать';
+  var hsz = $('hsSize');
+  if (hsz){
+    var hd = +$('d').value || 0, ht = +$('t').value || 0;
+    hsz.textContent = hd > 0 ? 'Ø' + num(hd) + (ht > 0 ? '/' + num(ht) : '') + (PF ? ' перф.' : '') + ' ×' + num(p) : '';
+  }
 
   if (scrap){
     var total = q;
@@ -3322,7 +3341,7 @@ function calc(){
     var spare = bn * b - n;
     var pack = bn + ' ' + plural(bn, 'пачка', 'пачки', 'пачек');
     if (spare > 0) pack += ', останется ' + spare;
-    $('hs2').textContent = (hero.sub2 ? hero.sub2 + ' · ' : '') + pack;
+    $('hs2').textContent = (hero.sub2 ? hero.sub2 + '\n' : '') + pack;
     $('packNote').textContent = '';
     $('cutsNote').textContent = '';
     $('bar1').style.display = full > 0 ? '' : 'none';
@@ -4075,7 +4094,7 @@ $('handoffBtn').addEventListener('click', function(){
   var total = (Number(S.q0) || 0) + have;
   var msg = 'Передано сменщику: ' + left + ' шт.\nНарезано ' + done + ' из ' + total + ' · труба ' + num(S.L) + ' мм.\n' + remainText() +
             '\nВ приложении: нужно ' + total + ', уже есть ' + (have + done) + '.';
-  sendShareText(msg, id);
+  showShareToast(entry, msg, 'Передано');
   };
   $('handoffSheet').removeAttribute('hidden');
   $('handoffBg').removeAttribute('hidden');
@@ -4915,9 +4934,10 @@ function buildShareText(items){
         out.push(''); // blank line when Ø or wall changes
       }
       var ap = archiveParts(item);
-      out.push(ap.title + '.');
-      if (ap.lead) out.push(ap.lead + '.');
-      if (item.left > 0) out.push('Передано сменщику: ' + item.left + ' шт.');
+      var line = ap.title + '.';
+      if (ap.lead) line += ' ' + ap.lead + '.';
+      if (item.left > 0) line += ' Передано сменщику: ' + item.left + ' шт.';
+      out.push(line);
       lastPipe = pk;
     });
   });
@@ -4970,7 +4990,8 @@ function sendShareText(t, btnId){
   if (navigator.share) {
     navigator.share({ text: t }).then(function(){
       finish(); flash('Отправлено');
-    }).catch(function(){
+    }).catch(function(e){
+      if (e && e.name === 'AbortError') { finish(); return; }   // окно закрыли — ничего не копируем
       copyText(t).then(function(){ finish(); flash('Скопировано'); }, function(){ finish(); flash('Ошибка'); });
     });
   } else {
@@ -4979,9 +5000,11 @@ function sendShareText(t, btnId){
 }
 
 /* Тост «Сохранено · Поделиться» */
-var shareToastTimer = null, shareToastItem = null;
-function showShareToast(item){
+var shareToastTimer = null, shareToastItem = null, shareToastMsg = null;
+function showShareToast(item, msg, label){
   shareToastItem = item;
+  shareToastMsg = msg || null;
+  $('shareToastTxt').textContent = label || 'Сохранено';
   var el = $('shareToast');
   // если сейчас виден тост «Отменить», поднимаем этот выше
   el.style.bottom = $('toast').hasAttribute('hidden') ? '' : 'calc(148px + env(safe-area-inset-bottom))';
@@ -4993,13 +5016,14 @@ function hideShareToast(){
   clearTimeout(shareToastTimer);
   shareToastTimer = null;
   shareToastItem = null;
+  shareToastMsg = null;
   $('shareToast').setAttribute('hidden', '');
 }
 $('shareToastBtn').addEventListener('click', function(){
-  var it = shareToastItem;
+  var it = shareToastItem, msg = shareToastMsg;
   hideShareToast();
   if (!it) return;
-  var t = buildShareText([it]);
+  var t = msg || buildShareText([it]);
   if (t) sendShareText(t, null);
 });
 
@@ -5070,7 +5094,7 @@ function schemeCanvas(){
   if (full > 0) blocks.push({title: 'Целая труба × ' + full, cuts: S.per, off: S.wFull, word: 'обрезок'});
   if (S.rem > 0) blocks.push({title: full > 0 ? 'Последняя труба' : 'Труба', cuts: S.rem, off: S.wLast, word: 'остаток'});
 
-  var big = $('hsMain').textContent, sub = $('hs').textContent, sub2 = $('hs2').textContent;
+  var big = $('hsMain').textContent, sub = $('hs').textContent, sub2 = $('hs2').textContent.replace(/\s*\n\s*/g, ' · ');
   var bsz = Number($('b').value) || 1, spare = S.bn * bsz - S.n;
   var head = [
     'Труба' + (PF ? ' перфорированная' : '') + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм',
