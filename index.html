@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.73">
+<meta name="app-build" content="2026-11-24.75">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2410,10 +2410,10 @@ button.is-busy::before {
 body.has-wall #wall{display:block}
 body.has-wall::before{display:none}
 body.has-wall{
-  --glass:color-mix(in srgb,var(--card) max(var(--panel,80%), 62%),transparent);
-  --tile:color-mix(in srgb,var(--card) max(var(--panel,80%), 68%),transparent);
-  --text2:color-mix(in srgb,var(--text) 78%,transparent);
-  --muted:color-mix(in srgb,var(--text) 64%,transparent);
+  --glass:color-mix(in srgb,var(--card) max(var(--panel,80%), 72%),transparent);
+  --tile:color-mix(in srgb,var(--card) max(var(--panel,80%), 76%),transparent);
+  --text2:color-mix(in srgb,var(--text) 82%,transparent);
+  --muted:color-mix(in srgb,var(--text) 68%,transparent);
 }
 body.has-wall .card{background:var(--glass)}
 body.has-wall #setCard{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}
@@ -2422,7 +2422,7 @@ body.has-wall .card,body.has-wall .stage,body.has-wall .step{-webkit-backdrop-fi
 .wall-prev .wp-bg{position:absolute;inset:0;background-size:cover;background-position:center}
 .wall-prev .wp-bg.pat::before{content:"";position:absolute;inset:0;background:var(--wall-ink);-webkit-mask-image:var(--wall-mask);mask-image:var(--wall-mask);-webkit-mask-size:150px 150px;mask-size:150px 150px;-webkit-mask-repeat:repeat;mask-repeat:repeat}
 .wall-prev .wp-bg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,var(--wall-dim,0))}
-.wall-prev .wp-card{position:absolute;inset:12px 14px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--text);background:color-mix(in srgb,var(--card) var(--panel,80%),transparent);border:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.wall-prev .wp-card{position:absolute;inset:12px 14px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--text);background:color-mix(in srgb,var(--card) max(var(--panel,80%), 72%),transparent);border:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .wall-fold{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0;border:0;background:transparent;color:var(--text);font:inherit;cursor:pointer;touch-action:manipulation;text-align:left}
 #setCard .wall-fold .set-l{margin:0}
 .wall-chev{width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--text2);display:grid;place-items:center;flex:none;transition:transform .2s ease}
@@ -3649,7 +3649,7 @@ function renderList(){
     var isLastPipe = S.rem > 0 && nextIdx === S.n - 1;
     $('nowT').textContent = isLastPipe ? 'Последняя труба №' + (nextIdx + 1) : 'Следующая: труба №' + (nextIdx + 1);
     $('nowS').textContent = 'На трубе: ' + cn + ' из ' + pcn + ' по ' + S.p + ' мм · закрыто ' + pd + ' из ' + S.n + ' труб';
-    $('nextBtn').textContent = cn > 0 ? 'Дорезать трубу' : '+1 труба';
+    $('nextBtn').textContent = cn > 0 ? 'Дорезать трубу' : (isLastPipe ? 'Последняя труба' : '+1 целая труба');
     $('pieceBtn').textContent = '+1 заготовка';
     $('pieceBtn').disabled = false;
     $('nextBtn').disabled = false;
