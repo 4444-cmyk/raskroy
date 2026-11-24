@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.68">
+<meta name="app-build" content="2026-11-24.71">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1719,14 +1719,18 @@ body.is-scrap #pieceBtn { order: -1; }
 @keyframes tile-nudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .tile.nudge{animation:tile-nudge .26s ease}
 /* Big mode */
+@keyframes tile-focus{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--done-bg) 45%,transparent)}100%{box-shadow:0 0 0 8px transparent}}
+.tile.ping{animation:tile-focus .55s ease-out}
+
 #listCard.big .tiles {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 11px;
+  gap: 12px;
 }
 
 #listCard.big .tile {
-  height: 82px;
+  height: 84px;
   border-radius: 22px;
+  padding: 4px;
 }
 
 #listCard.big .tile b {
@@ -1781,6 +1785,15 @@ body.is-scrap #pieceBtn { order: -1; }
 
 #listCard.big .nowS {
   font-size: 15px;
+}
+
+#listCard.big .more summary {
+  min-height: 48px;
+  font-size: 15px;
+}
+
+#listCard.big .more .badctl {
+  margin-top: 10px;
 }
 
 /* ── Weekly backup reminder ── */
@@ -3542,6 +3555,7 @@ function renderList(){
   $('pieceBtn').style.display = '';
   $('pieceBtn').textContent = '+1 заготовка';
   $('pieceBtn').className = 'nbtn';
+  $('plus10Btn').style.display = '';
   $('plus10Btn').textContent = '+10 труб';
   $('plus10Btn').className = 'nbtn main';
   var ar2 = $('actRow2');
@@ -3620,15 +3634,18 @@ function renderList(){
     $('nowT').textContent = 'Всё распилено';
     $('nowS').textContent = 'Отрезано заготовок: ' + cd + ' из ' + S.q;
     $('nextBtn').textContent = '+1 труба';
+    $('pieceBtn').textContent = '+1 заготовка';
     $('pieceBtn').disabled = true;
     $('nextBtn').disabled = true;
+    $('plus10Btn').style.display = 'none';
     $('plus10Btn').disabled = true;
   } else {
-    var pcn = pcOf(nextIdx), cn = Math.min(cnt[nextIdx] || 0, pcn);
+    var pcn = pcOf(nextIdx), cn = Math.min(cnt[nextIdx] || 0, pcn), needNow = pcn - cn;
     var isLastPipe = S.rem > 0 && nextIdx === S.n - 1;
     $('nowT').textContent = isLastPipe ? 'Последняя труба №' + (nextIdx + 1) : 'Следующая: труба №' + (nextIdx + 1);
-    $('nowS').textContent = 'Отрезано заготовок: ' + cn + ' из ' + pcn + ' по ' + S.p + ' мм';
+    $('nowS').textContent = 'На трубе: ' + cn + ' из ' + pcn + ' по ' + S.p + ' мм · закрыто ' + pd + ' из ' + S.n + ' труб';
     $('nextBtn').textContent = cn > 0 ? 'Дорезать трубу' : '+1 труба';
+    $('pieceBtn').textContent = '+1 заготовка (ещё ' + needNow + ')';
     $('pieceBtn').disabled = false;
     $('nextBtn').disabled = false;
     // «+N» отмечает только целые нетронутые трубы подряд (как в счётчике); начатую и короткую последнюю — кнопка «+1 труба»
@@ -3639,10 +3656,14 @@ function renderList(){
         wholeRun++;
       }
     }
-    $('plus10Btn').disabled = wholeRun < 2;
-    $('plus10Btn').textContent = wholeRun >= 2
-      ? '+' + wholeRun + ' ' + plural(wholeRun, 'целая труба', 'целые трубы', 'целых труб')
-      : '+10 целых труб';
+    if (wholeRun >= 2){
+      $('plus10Btn').style.display = '';
+      $('plus10Btn').disabled = false;
+      $('plus10Btn').textContent = '+' + wholeRun + ' ' + plural(wholeRun, 'целая труба', 'целые трубы', 'целых труб');
+    } else {
+      $('plus10Btn').style.display = 'none';
+      $('plus10Btn').disabled = true;
+    }
   }
 
   $('badVal').textContent = S.bad;
@@ -3807,18 +3828,31 @@ function bumpScrap(delta){
   feedback(delta > 0);
 }
 
+function pingNextTile(){
+  var el = $('tiles') ? $('tiles').querySelector('.tile.next') : null;
+  if (!el) return;
+  el.classList.remove('ping');
+  void el.offsetWidth;
+  el.classList.add('ping');
+  try {
+    var r = el.getBoundingClientRect();
+    if (r.top < 80 || r.bottom > window.innerHeight - 90) {
+      el.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+  } catch(e){}
+}
 $('pieceBtn').addEventListener('click', function(){
   if (!S) return;
   if (S.mode === 1){ bumpScrap(S.bundle ? S.per : 1); return; }
   if (nextIdx < 0) return;
-  apply([[nextIdx, (cnt[nextIdx] || 0) + 1]]);
+  if (apply([[nextIdx, (cnt[nextIdx] || 0) + 1]])) pingNextTile();
 });
 
 $('nextBtn').addEventListener('click', function(){
   if (!S) return;
   if (S.mode === 1){ bumpScrap(S.bundle ? S.per : 1); return; }
   if (nextIdx < 0) return;
-  apply([[nextIdx, pcOf(nextIdx)]]);
+  if (apply([[nextIdx, pcOf(nextIdx)]])) pingNextTile();
 });
 
 $('plus10Btn').addEventListener('click', function(){
@@ -3826,6 +3860,7 @@ $('plus10Btn').addEventListener('click', function(){
   if (S.mode === 1){ bumpScrap(10 * (S.bundle ? S.per : 1)); return; }
   if (nextIdx < 0) return;
   markWholePipes(10);   // только целые нетронутые трубы подряд — то же, что написано на кнопке
+  pingNextTile();
 });
 $('plus20Btn').addEventListener('click', function(){
   if (!S || S.mode !== 1) return;
@@ -4196,6 +4231,9 @@ function safe(fn){
 }
 
 function update(){
+  if (typeof scrapResetArm === 'function') scrapResetArm(false);
+  if (typeof resetArm === 'function') resetArm(false);
+  if (typeof rangeArm === 'function') rangeArm(false);
   safe(calc);
   safe(drawDia);
   safe(syncList);
@@ -5200,26 +5238,40 @@ function addToHist(){
     if (bs && S && S.mode === 1) flashBtn('scrapSaveBtn', 'Пока 0', 'В историю');
     return;
   }
+  var st = !S.mode ? cntStats() : null;
+  if (st && !(st.cd > 0)) {
+    if (b2) {
+      b2.textContent = 'Пока нет отметок';
+      setTimeout(function(){ b2.textContent = 'Сохранить в историю'; }, 1800);
+    }
+    return;
+  }
+  var qCut = S.mode ? Number(S.q) : Number(st.cd);
+  var per = Number(S.per) || 0;
+  var b = Number($('b').value) || 1;
+  var fullCut = (!S.mode && per > 0) ? Math.floor(qCut / per) : Number(S.n) - (Number(S.rem) > 0 ? 1 : 0);
+  var remCut = (!S.mode && per > 0) ? (qCut - fullCut * per) : Number(S.rem);
+  var nCut = !S.mode ? (fullCut + (remCut > 0 ? 1 : 0)) : Number(S.n);
   var entry = {
     ts: Date.now(),
-    q: Number(S.q),
+    q: qCut,
     p: Number(S.p),
     L: Number(S.L) || 0,
     h: Number(S.h) || 0,
     bad: Number(S.bad) || 0,
     x: Number(S.x) || 0,
-    b: Number($('b').value) || 1,
+    b: b,
     d: Number($('d').value) || 0,
     t: Number($('t').value) || 0,
     pf: PF ? 1 : 0,
     mode: S.mode ? 1 : 0,
     bundle: S.bundle ? 1 : 0,
-    n: Number(S.n),
-    bn: Number(S.bn) || 0,
-    per: Number(S.per) || 0,
-    rem: Number(S.rem) || 0,
+    n: nCut,
+    bn: nCut > 0 ? Math.ceil(nCut / b) : 0,
+    per: per,
+    rem: remCut,
     wFull: Number(S.wFull) || 0,
-    wLast: Number(S.wLast) || 0
+    wLast: remCut > 0 ? Math.round((Number(S.L) - remCut * Number(S.p)) * 1000) / 1000 : 0
   };
   // Защита только от случайного двойного нажатия: тот же раскрой в течение 3 секунд записывается один раз.
   // Осознанный повтор (позже) сохраняется отдельной записью.
