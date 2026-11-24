@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.76">
+<meta name="app-build" content="2026-11-24.77">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -3196,10 +3196,7 @@ function calc(){
     var hero = heroTexts(n, full, rem, per, have, bad);
     $('hsMain').textContent = hero.main;
     $('hs').textContent = hero.sub;
-    var spare = bn * b - n;
-    var pack = bn + ' ' + plural(bn, 'пачка', 'пачки', 'пачек');
-    if (spare > 0) pack += ', останется ' + spare;
-    $('hs2').textContent = (hero.sub2 ? hero.sub2 + '\n' : '') + pack;
+    $('hs2').textContent = hero.sub2;
     $('packNote').textContent = '';
     $('cutsNote').textContent = '';
     $('bar1').style.display = full > 0 ? '' : 'none';
@@ -3501,21 +3498,19 @@ function leftBreakdown(groups){
 //   «Всего 45 труб · 400 заготовок · …»   — числа для сверки, мелко
 function heroTexts(n, full, rem, per, have, bad){
   function pipes(k){ return k + ' ' + plural(k, 'труба', 'трубы', 'труб'); }
+  function wholePipes(k){ return k + ' ' + plural(k, 'целая труба', 'целые трубы', 'целых труб'); }
   function pieces(k){ return k + '\u00a0' + plural(k, 'заготовка', 'заготовки', 'заготовок'); }
-  var total = full * per + rem;
-  var main, sub = '', sub2 = '';
+  var main, sub = '', sub2 = 'Всего ' + pipes(n);
   if (rem > 0 && full === 0) {
-    main = '1 труба × ' + pieces(rem);
+    main = '1 труба на ' + pieces(rem);
   } else if (rem > 0) {
-    main = pipes(full) + ' × ' + pieces(per);
-    sub = '+\u00a01 труба × ' + pieces(rem);
-    sub2 = 'Всего ' + pipes(n) + ' · ' + pieces(total);
+    main = wholePipes(full) + ' × ' + pieces(per);
+    sub = '+\u00a01 труба на ' + pieces(rem);
   } else {
-    main = pipes(n) + ' × ' + pieces(per);
-    sub2 = 'Всего ' + pieces(total);
+    main = wholePipes(n) + ' × ' + pieces(per);
   }
-  if (have > 0) sub2 += (sub2 ? ' · ' : '') + 'уже есть ' + pieces(have);
-  if (bad > 0) sub2 += (sub2 ? ' · ' : '') + 'брак ' + pieces(bad);
+  if (have > 0) sub2 += ' · уже есть ' + pieces(have);
+  if (bad > 0) sub2 += ' · брак ' + pieces(bad);
   return {main: main, sub: sub, sub2: sub2};
 }
 
