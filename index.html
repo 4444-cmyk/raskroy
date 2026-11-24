@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.75">
+<meta name="app-build" content="2026-11-24.76">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1812,11 +1812,21 @@ body.is-scrap #pieceBtn { order: -1; }
 
 /* ── Update banner ── */
 .upd-banner{
-  margin:0 0 12px;
+  position:fixed;
+  top:max(12px, env(safe-area-inset-top));
+  left:max(16px, env(safe-area-inset-left));
+  right:max(16px, env(safe-area-inset-right));
+  z-index:120;
+  max-width:448px;
+  margin:0 auto;
   padding:14px 16px;
-  border-radius:var(--radius-md);
-  background:var(--acc-bg);
-  color:var(--acc-fg);
+  border-radius:24px;
+  background:var(--card);
+  border:1px solid var(--line);
+  color:var(--text);
+  box-shadow:0 12px 34px rgba(15,25,45,.18);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+  backdrop-filter:blur(24px) saturate(160%);
 }
 .upd-banner[hidden]{display:none}
 .upd-banner p{margin:0 0 10px;font-size:15px;line-height:1.4;font-weight:600}
@@ -2136,31 +2146,45 @@ button:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb
 
 /* Расчёт: более читаемые значения и удобные сенсорные поля */
 .hero[data-tab="calc"] {
-  padding: 28px 24px 26px;
+  padding: 24px 22px 22px;
   border-radius: 30px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .hero[data-tab="calc"] .cap-top {
   font-size: 12px;
-  letter-spacing: .11em;
-  margin-bottom: 10px;
+  letter-spacing: .09em;
+  margin-bottom: 6px;
+  opacity: .82;
+}
+.hero[data-tab="calc"] .hsize {
+  display: inline-block;
+  padding: 4px 11px;
+  margin: 0 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .18);
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -.01em;
 }
 .hero[data-tab="calc"] .big {
-  font-size: clamp(32px, 8vw, 40px);
-  line-height: 1.12;
-  letter-spacing: -.035em;
+  font-size: clamp(28px, 7.5vw, 36px);
+  line-height: 1.15;
+  letter-spacing: -.03em;
   font-weight: 750;
 }
 .hero[data-tab="calc"] .sub {
-  font-size: 19px;
+  font-size: 18px;
   line-height: 1.3;
-  margin-top: 9px;
+  margin-top: 7px;
+  font-weight: 650;
 }
 .hero[data-tab="calc"] .sub2 {
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 13.5px;
+  line-height: 1.45;
   margin-top: 10px;
-  opacity: .88;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, .2);
+  opacity: .92;
 }
 .card[data-tab="calc"] {
   padding: 22px;
@@ -5572,9 +5596,7 @@ function checkVersion(force){
   }).then(function(t){
     var theirs = buildOf(t);
     if (theirs && theirs !== mine) {
-      verShown = true;
-      $('updBanner').hidden = false;
-      if ($('updInlineBtn')) $('updInlineBtn').hidden = false;
+      showNewVersionUI();
     }
   }).catch(function(){});
   try {
@@ -5587,7 +5609,7 @@ function setVerStatus(txt){
 }
 function showNewVersionUI(){
   verShown = true;
-  $('updBanner').hidden = false;
+  if (ui.tab !== 'set') $('updBanner').hidden = false;
   if ($('updInlineBtn')) $('updInlineBtn').hidden = false;
   setVerStatus('доступна новая');
 }
