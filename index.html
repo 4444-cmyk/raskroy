@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.63">
+<meta name="app-build" content="2026-11-24.65">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2493,6 +2493,7 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
   padding:calc(env(safe-area-inset-top,0px) + 8px) 16px calc(env(safe-area-inset-bottom,0px) + 12px);
   overscroll-behavior:contain;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .cnt[hidden]{display:none}
+body.kb-open .tabbar{visibility:hidden;pointer-events:none}   /* пока открыта клавиатура, панель не всплывает над ней */
 body.cnt-open .app,body.cnt-open .tabbar{visibility:hidden}   /* под счётчиком виден только фон приложения */
 .cnt-top{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:52px}
 .cnt-top .cnt-tb{height:48px;border-radius:999px;font-size:17px;font-weight:600}
@@ -2628,6 +2629,20 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
 }
 @keyframes cntPop{0%{transform:scale(.9);opacity:.55}100%{transform:scale(1);opacity:1}}
 @keyframes cntFly{0%{opacity:0;transform:translate(-50%,10px) scale(.8)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-34px) scale(1.05)}}
+
+/* Чек-лист: контурные кнопки одного вида */
+#listCard .nbtn.sec,
+#listCard .lshare{
+  height:48px;
+  font-size:15px;
+  font-weight:600;
+  color:var(--text);
+  background:transparent;
+  border:1px solid var(--line);
+}
+#listCard .lshare{margin:4px 0 18px}
+#listCard.big .nbtn.sec{height:52px;font-size:16px}
+#listCard.big .lshare{height:52px;font-size:16px}
 </style>
 </head>
 <body>
@@ -2852,7 +2867,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
         <div class="range" id="xEditRow" hidden style="margin-top:8px">
           <span>Из остатков:</span>
           <input id="xInput" type="number" inputmode="numeric" min="0" max="100000" aria-label="Количество из остатков" style="width:78px">
-          <button type="button" class="nbtn" id="xOkBtn">ОК</button>
+          <button type="button" class="nbtn main" id="xOkBtn">ОК</button>
         </div>
         <p class="nowB" id="xNote"></p>
       </details>
@@ -2866,7 +2881,7 @@ body.has-wall .cnt-b:not(.cnt-b-piece):disabled{background:var(--glass)}
       <input id="rFrom" type="number" inputmode="numeric" value="1" min="1" aria-label="С номера">
       <span>по</span>
       <input id="rTo" type="number" inputmode="numeric" value="1" min="1" aria-label="По номер">
-      <button type="button" class="nbtn" id="rBtn">Отметить</button>
+      <button type="button" class="nbtn main" id="rBtn">Отметить</button>
     </div>
 
     <button type="button" class="nbtn sec" id="resetDone" style="width:100%;margin-top:14px;min-height:44px">Сбросить отметки</button>
@@ -5925,6 +5940,20 @@ try {
   var _bm = document.querySelector('meta[name="app-build"]');
   if (_bm) $('verTxt').textContent = 'Версия ' + _bm.getAttribute('content');
 } catch(e){}
+
+/* Клавиатура открыта (фокус в поле ввода): прячем нижнюю панель, иначе она всплывает над клавиатурой */
+(function(){
+  var SEL = 'input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=file]), textarea, select, [contenteditable=""], [contenteditable="true"]';
+  function typing(el){ return !!(el && el.matches && el.matches(SEL)); }
+  document.addEventListener('focusin', function(e){
+    if (typing(e.target)) document.body.classList.add('kb-open');
+  });
+  document.addEventListener('focusout', function(){
+    setTimeout(function(){
+      if (!typing(document.activeElement)) document.body.classList.remove('kb-open');
+    }, 120);
+  });
+})();
 
 /* Офлайн-режим и защита данных от очистки (только на https) */
 try {
