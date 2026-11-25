@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.78">
+<meta name="app-build" content="2026-11-25.81">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2469,7 +2469,7 @@ body.has-wall .card,body.has-wall .stage,body.has-wall .step{-webkit-backdrop-fi
 #setCard .nbtn.sec,#bkCard #importHistBtn,#histCard #shareBtn,
 #setCard #updChkBtn,#setCard .set-sw .chip{border-radius:999px}
 .sheet-actions .nbtn,.bk-act .nbtn{border-radius:999px}
-.tile,#listCard.big .tile{border-radius:24px}
+.tile,#listCard.big .tile,.stat{border-radius:24px}
 .chip,.badctl{border-radius:999px}
 .step,.card[data-tab="calc"] .step{border-radius:26px}
 .hero{border-radius:34px}
@@ -2529,6 +2529,7 @@ body.has-wall[data-accent] .hero{
 body[data-accent] .nbtn.main{box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 35%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
 body[data-accent] #listCard .tile.on{box-shadow:0 5px 16px color-mix(in srgb,var(--accent) 22%,transparent),inset 0 1px 0 rgba(255,255,255,.22)}
 body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 30%,transparent)}
+body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 32%,transparent)}
 
 /* Чек-лист: контурные кнопки одного вида */
 #listCard .nbtn.sec,
@@ -2699,8 +2700,7 @@ body[data-accent] #setCard .theme-chip.on,body[data-accent] #setCard .opt-chip.o
     <div class="pipe" id="bar2"></div>
     <p class="cap" id="c2"></p>
     <p class="cap" id="packNote" style="margin-bottom:6px"></p>
-    <p class="cap" id="cutsNote" style="margin-bottom:12px"></p>
-    <button type="button" class="nbtn sec" id="imgBtn" style="width:100%;margin-top:0;min-height:44px">Отправить картинкой</button>
+    <p class="cap" id="cutsNote" style="margin-bottom:0"></p>
   </div>
 
   <div class="card" id="listEmpty" data-tab="list" data-off>
@@ -4682,154 +4682,6 @@ $('leftShareBtn').addEventListener('click', function(){
   var t = remainText();
   if (!t){ flashBtn('leftShareBtn', 'Заполните поля'); return; }
   sendShareText(t, 'leftShareBtn');
-});
-
-/* Картинка со схемой раскроя */
-function rrPath(c, x, y, w, h, r){
-  c.beginPath();
-  c.moveTo(x + r, y);
-  c.lineTo(x + w - r, y); c.arcTo(x + w, y, x + w, y + r, r);
-  c.lineTo(x + w, y + h - r); c.arcTo(x + w, y + h, x + w - r, y + h, r);
-  c.lineTo(x + r, y + h); c.arcTo(x, y + h, x, y + h - r, r);
-  c.lineTo(x, y + r); c.arcTo(x, y, x + r, y, r);
-  c.closePath();
-}
-
-function schemeCanvas(){
-  var W = 1080, P = 56, BW = W - 2 * P, BH = 120;
-  var FONT = '-apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
-  var d = +$('d').value || 0, t = +$('t').value || 0;
-  var full = S.rem > 0 ? S.n - 1 : S.n;
-  var blocks = [];
-  if (full > 0) blocks.push({title: 'Целая труба × ' + full, cuts: S.per, off: S.wFull, word: 'обрезок'});
-  if (S.rem > 0) blocks.push({title: full > 0 ? 'Последняя труба' : 'Труба', cuts: S.rem, off: S.wLast, word: 'остаток'});
-
-  var big = $('hsMain').textContent, sub = $('hs').textContent, sub2 = $('hs2').textContent.replace(/\s*\n\s*/g, ' · ');
-  var bsz = Number($('b').value) || 1, spare = S.bn * bsz - S.n;
-  var head = [
-    'Труба' + (PF ? ' перфорированная' : '') + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм',
-    S.q + ' ' + plural(S.q, 'заготовка', 'заготовки', 'заготовок') + ' по ' + num(S.p) + ' мм',
-    'Пачек: ' + S.bn + ', в пачке ' + bsz + (spare > 0 ? ', останется ' + spare : '')
-  ];
-  var yBig = P + 60, ySub = yBig + (sub ? 56 : 0), ySub2 = ySub + (sub2 ? 48 : 0), yHead = ySub2 + 62;
-  var y0 = yHead + (head.length - 1) * 48 + 48, BLK = 250, H = y0 + blocks.length * BLK + 96;
-
-  var cv = document.createElement('canvas');
-  cv.width = W; cv.height = H;
-  var c = cv.getContext('2d');
-  c.fillStyle = '#ffffff'; c.fillRect(0, 0, W, H);
-  c.textBaseline = 'alphabetic'; c.textAlign = 'left';
-
-  function fitFont(txt, weight, size){
-    var f = size;
-    c.font = weight + ' ' + f + 'px ' + FONT;
-    while (f > 22 && c.measureText(txt).width > BW){ f -= 2; c.font = weight + ' ' + f + 'px ' + FONT; }
-  }
-  c.fillStyle = '#000000'; fitFont(big, 700, 64);
-  c.fillText(big, P, yBig);
-  if (sub){
-    c.fillStyle = '#4a4a4f'; fitFont(sub, 600, 40);
-    c.fillText(sub, P, ySub);
-  }
-  if (sub2){
-    c.fillStyle = '#6b6b70'; fitFont(sub2, 500, 32);
-    c.fillText(sub2, P, ySub2);
-  }
-  c.fillStyle = '#4a4a4f'; c.font = '500 34px ' + FONT;
-  head.forEach(function(line, i){ c.fillText(line, P, yHead + i * 48); });
-
-  blocks.forEach(function(bk, bi){
-    var y = y0 + bi * BLK;
-    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    c.fillStyle = '#000000'; c.font = '700 36px ' + FONT;
-    c.fillText(bk.title, P, y + 36);
-
-    var by = y + 60, pw = S.p / S.L * BW;
-    c.save();
-    rrPath(c, P, by, BW, BH, 30); c.clip();
-    c.fillStyle = '#ffffff'; c.fillRect(P, by, BW, BH);
-    c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.font = '700 32px ' + FONT;
-    var showNum = c.measureText(num(S.p)).width + 16 < pw;
-    for (var i = 0; i < bk.cuts; i++){
-      var x = P + i * pw;
-      c.fillStyle = '#d6e8ff'; c.fillRect(x, by, pw, BH);
-      if (pw > 6){ c.fillStyle = '#ffffff'; c.fillRect(x + pw - 3, by, 3, BH); }
-      if (showNum){ c.fillStyle = '#0051c7'; c.fillText(num(S.p), x + pw / 2, by + BH / 2 + 1); }
-    }
-    var rest = Math.max(S.L - bk.cuts * S.p, 0);
-    if (rest > 0){
-      var rx = P + bk.cuts * pw, rw = rest / S.L * BW;
-      c.fillStyle = '#ffe9c4'; c.fillRect(rx, by, rw, BH);
-      if (rest / S.L > 0.08){
-        c.font = '600 32px ' + FONT; c.fillStyle = '#8a4a00';
-        c.fillText(String(fmt(bk.off)), rx + rw / 2, by + BH / 2 + 1);
-      }
-    }
-    c.restore();
-    rrPath(c, P, by, BW, BH, 30);
-    c.strokeStyle = '#c7c7cc'; c.lineWidth = 2; c.stroke();
-
-    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    c.fillStyle = '#4a4a4f'; c.font = '500 32px ' + FONT;
-    c.fillText(bk.cuts + ' × ' + num(S.p) + ' мм, ' + bk.word + ' ' + fmt(bk.off) + ' мм', P, by + BH + 46);
-  });
-
-  // легенда и дата
-  var ly = H - 48;
-  c.fillStyle = '#d6e8ff'; rrPath(c, P, ly - 22, 28, 28, 8); c.fill();
-  c.fillStyle = '#4a4a4f'; c.font = '500 28px ' + FONT; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-  c.fillText('заготовка', P + 42, ly + 2);
-  var lx = P + 42 + c.measureText('заготовка').width + 40;
-  c.fillStyle = '#ffe9c4'; rrPath(c, lx, ly - 22, 28, 28, 8); c.fill();
-  c.fillStyle = '#4a4a4f'; c.fillText('остаток', lx + 42, ly + 2);
-  c.textAlign = 'right';
-  c.fillText(formatShareDate(Date.now()), W - P, ly + 2);
-  return cv;
-}
-
-function schemeFileName(){
-  var d = +$('d').value || 0, t = +$('t').value || 0;
-  return formatShareDate(Date.now()) +
-    (d > 0 ? ' · Ø' + num(d) + (t > 0 ? '×' + num(t) : '') : '') + (PF ? ' · перф.' : '') +
-    ' · ' + num(S.p) + ' мм - ' + (+$('q').value || S.q) + '.png';
-}
-
-function dataUrlToBlob(u){
-  var bin = atob(u.split(',')[1]);
-  var arr = new Uint8Array(bin.length);
-  for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-  return new Blob([arr], {type: 'image/png'});
-}
-
-function saveBlobFile(blob, name){
-  var a = document.createElement('a');
-  var url = URL.createObjectURL(blob);
-  a.href = url; a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
-}
-
-$('imgBtn').addEventListener('click', function(){
-  if (!S){ flashBtn('imgBtn', 'Заполните поля'); return; }
-  var blob;
-  try { blob = dataUrlToBlob(schemeCanvas().toDataURL('image/png')); }
-  catch(e){ flashBtn('imgBtn', 'Ошибка'); return; }
-  var fname = schemeFileName();
-  var file = null;
-  try { file = new File([blob], fname, {type: 'image/png'}); } catch(e){}
-  if (file && navigator.share && navigator.canShare && navigator.canShare({files: [file]})) {
-    navigator.share({files: [file]}).then(function(){
-      flashBtn('imgBtn', 'Отправлено');
-    }).catch(function(e){
-      if (e && e.name === 'AbortError') return;
-      saveBlobFile(blob, fname); flashBtn('imgBtn', 'Скачано');
-    });
-  } else {
-    saveBlobFile(blob, fname);
-    flashBtn('imgBtn', 'Скачано');
-  }
 });
 
 /* ── History ── */
