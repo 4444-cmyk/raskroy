@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-24.77">
+<meta name="app-build" content="2026-11-24.78">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -3182,7 +3182,9 @@ function calc(){
   var hsz = $('hsSize');
   if (hsz){
     var hd = +$('d').value || 0, ht = +$('t').value || 0;
-    hsz.textContent = hd > 0 ? 'Ø' + num(hd) + (ht > 0 ? '/' + num(ht) : '') + (PF ? ' перф.' : '') + ' ×' + num(p) : '';
+    var hCnt = scrap ? q : qAll;
+    var headSize = (hd > 0 ? 'Ø' + num(hd) + (ht > 0 ? '/' + num(ht) : '') + ' ' : '') + (PF ? 'перф. ' : '') + '×' + num(p);
+    hsz.textContent = hCnt > 0 ? (headSize + ' - ' + hCnt + ' шт.') : headSize;
   }
 
   if (scrap){
