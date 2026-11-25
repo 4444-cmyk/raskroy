@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-25.81">
+<meta name="app-build" content="2026-11-25.82">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2802,6 +2802,7 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
     <h2>Сохранённые</h2>
     <div id="histList" aria-live="polite"></div>
     <button type="button" class="nbtn sec" id="shareBtn" style="width:100%;margin-top:12px;min-height:44px;font-size:15px">Поделиться историей</button>
+    <button type="button" class="nbtn sec" id="histClearBtn" style="width:100%;margin-top:8px;min-height:44px;font-size:15px;color:var(--danger)">Очистить историю</button>
   </div>
 
   <div class="card set-card" id="setCard" data-tab="set">
@@ -2915,10 +2916,6 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
           <button type="button" class="chip on" id="updInlineBtn" hidden>Обновить</button>
           <button type="button" class="chip" id="updChkBtn">Проверить</button>
         </div>
-      </div>
-      <div>
-        <button type="button" class="nbtn sec" id="histClearBtn" style="width:100%;min-height:44px;color:var(--danger)">Очистить историю</button>
-        <p class="set-d" style="margin-top:6px">Удалит все сохранённые записи. Сразу после очистки можно отменить.</p>
       </div>
       <div style="margin-top:6px;padding-top:14px;border-top:1px solid var(--line)">
         <button type="button" class="nbtn sec" id="wipeBtn" style="width:100%;min-height:44px;color:var(--danger)">Стереть расчёт, отметки и историю</button>
@@ -5041,11 +5038,11 @@ function renderHist(){
   clearBtn.textContent = archives.length ? 'Очистить историю (' + archives.length + ')' : 'Очистить историю';
   if (!archives.length){
     list.innerHTML = '<p class="hist-empty">Пока пусто. Нажмите «Сохранить в историю», чтобы запомнить текущий.</p>';
-    clearBtn.disabled = true;
+    clearBtn.hidden = true;
     $('shareBtn').hidden = true;
     return;
   }
-  clearBtn.disabled = false;
+  clearBtn.hidden = false;
   $('shareBtn').hidden = false;
 
   // group by day (archives is already newest-first)
