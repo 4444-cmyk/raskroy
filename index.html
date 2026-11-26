@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-25.82">
+<meta name="app-build" content="2026-11-25.85">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -828,6 +828,47 @@ label {
   background: var(--done-bg);
   color: var(--done-fg);
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.preset-row {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--soft);
+}
+
+.preset-row .pz {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text2);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.preset-row .pz:active {
+  transform: scale(0.97);
+}
+
+.preset-row .pz.on {
+  background: var(--done-bg);
+  color: var(--done-fg);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+body[data-accent] .preset-row .pz.on,
+body[data-accent] #pfRow .pf-opt.on {
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .size-fields {
@@ -2620,7 +2661,7 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
   <div class="card" id="diaCard" data-tab="calc">
     <button type="button" class="fold-head" id="foldDia" aria-expanded="false">
       <span class="fold-title">Размер трубы</span>
-      <span class="fold-val" id="foldDiaVal">Ø50 × 1,2</span>
+      <span class="fold-val" id="foldDiaVal">Ø51 × 1,2</span>
       <span class="fold-chev" aria-hidden="true">›</span>
     </button>
     <div class="fold-body" id="foldDiaBody" hidden>
@@ -2633,7 +2674,7 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
           <line id="dimL" class="dim" x1="0" y1="0" x2="0" y2="0"/>
           <line id="dimT1" class="dim" x1="0" y1="0" x2="0" y2="0"/>
           <line id="dimT2" class="dim" x1="0" y1="0" x2="0" y2="0"/>
-          <text id="dimTxt" class="dimt" x="160" y="130" text-anchor="middle">Ø50 мм</text>
+          <text id="dimTxt" class="dimt" x="160" y="130" text-anchor="middle">Ø51 мм</text>
           <g id="wGrp">
             <polyline id="wLine" class="wl" points="0,0 0,0 0,0"/>
             <circle id="wDot" class="wd" cx="0" cy="0" r="2.6"/>
@@ -2644,23 +2685,25 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
       </div>
     </div>
     <div class="fields size-fields">
-      <div>
-        <label for="d">Диаметр, мм</label>
-        <div class="step">
-          <button type="button" class="sb" data-t="d" data-s="-1" aria-label="Меньше">−</button>
-          <input id="d" type="number" inputmode="decimal" value="50" min="1" step="any">
-          <button type="button" class="sb" data-t="d" data-s="1" aria-label="Больше">+</button>
+      <div class="wide">
+        <label id="dLbl">Диаметр, мм</label>
+        <div class="preset-row" data-for="d" role="group" aria-labelledby="dLbl">
+          <button type="button" class="pz" data-v="38" aria-pressed="false">38</button>
+          <button type="button" class="pz" data-v="43" aria-pressed="false">43</button>
+          <button type="button" class="pz" data-v="48" aria-pressed="false">48</button>
+          <button type="button" class="pz" data-v="51" aria-pressed="true">51</button>
         </div>
+        <input id="d" type="hidden" value="51">
       </div>
-      <div>
-        <label for="t">Толщина стенки, мм</label>
-        <div class="step">
-          <button type="button" class="sb" data-t="t" data-s="-0.1" aria-label="Тоньше">−</button>
-          <input id="t" type="number" inputmode="decimal" value="1.2" min="0.1" step="any">
-          <button type="button" class="sb" data-t="t" data-s="0.1" aria-label="Толще">+</button>
+      <div class="wide">
+        <label id="tLbl">Толщина стенки, мм</label>
+        <div class="preset-row" data-for="t" role="group" aria-labelledby="tLbl">
+          <button type="button" class="pz" data-v="1.2" aria-pressed="true">1,2</button>
+          <button type="button" class="pz" data-v="1.5" aria-pressed="false">1,5</button>
         </div>
+        <input id="t" type="hidden" value="1.2">
       </div>
-      <div class="pipe-only bundle-show">
+      <div class="wide pipe-only bundle-show">
         <div class="lbl-row">
           <label for="L">Длина трубы, мм</label>
           <button type="button" class="lenset" id="lenReset" aria-label="Вернуть 6000 мм" style="visibility:hidden">6000</button>
@@ -2669,14 +2712,6 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
           <button type="button" class="sb" data-t="L" data-s="-100" aria-label="Короче">−</button>
           <input id="L" type="number" inputmode="decimal" value="6000" min="1" step="any">
           <button type="button" class="sb" data-t="L" data-s="100" aria-label="Длиннее">+</button>
-        </div>
-      </div>
-      <div class="pipe-only">
-        <label for="b">Труб в пачке</label>
-        <div class="step">
-          <button type="button" class="sb" data-t="b" data-s="-1" aria-label="Меньше труб в пачке">−</button>
-          <input id="b" type="number" inputmode="decimal" value="50" min="1" step="any">
-          <button type="button" class="sb" data-t="b" data-s="1" aria-label="Больше труб в пачке">+</button>
         </div>
       </div>
       <div class="wide">
@@ -3009,7 +3044,7 @@ window.onerror = function(msg, src, line){
   }
 };
 
-var IDS = ['q','p','L','b','d','t','h'];
+var IDS = ['q','p','L','d','t','h'];
 var KEY = 'pipecalc.v1';
 var S = null;
 var PF = 0;   // 1 — перфорированная труба: только пометка, на раскрой не влияет
@@ -3067,7 +3102,7 @@ function load(){
     IDS.forEach(function(id){
       if (o && o[id] !== undefined && o[id] !== null && o[id] !== '') $(id).value = o[id];
     });
-    if (o && o.pf) setPf(1);
+    if (o && o.pf !== undefined) setPf(o.pf ? 1 : 0);
     if (o && o.mode) setMode(+o.mode === 2 ? 2 : 1);
   }catch(e){}
 }
@@ -3100,12 +3135,12 @@ function pipesText(pcs, per){
 }
 
 function calc(){
-  var L = +$('L').value, p = +$('p').value, q = +$('q').value, b = +$('b').value;
+  var L = +$('L').value, p = +$('p').value, q = +$('q').value;
   var have = $('h').value === '' ? 0 : +$('h').value;
   var qAll = q;
   var scrap = MODE === 1;
 
-  if (!(p > 0) || (!scrap && !(L > 0 && q > 0 && b > 0)) || (BUNDLE && !(L > 0))){
+  if (!(p > 0) || (!scrap && !(L > 0 && q > 0)) || (BUNDLE && !(L > 0))){
     $('err').textContent = 'Заполните все поля положительными числами';
     S = null;
     return;
@@ -3116,8 +3151,8 @@ function calc(){
       S = null;
       return;
     }
-    if (q !== Math.floor(q) || b !== Math.floor(b) || have !== Math.floor(have)){
-      $('err').textContent = 'Количество заготовок, «Уже есть» и труб в пачке — целые числа';
+    if (q !== Math.floor(q) || have !== Math.floor(have)){
+      $('err').textContent = 'Количество заготовок и «Уже есть» — целые числа';
       S = null;
       return;
     }
@@ -3135,7 +3170,7 @@ function calc(){
   }
   $('err').textContent = '';
 
-  var q0, jobSig, bad, extra, per, full, rem, n, bn, wFull, wLast;
+  var q0, jobSig, bad, extra, per, full, rem, n, wFull, wLast;
 
   if (scrap){
     // Обрезки: счётчик нарезанного, план заранее неизвестен
@@ -3150,7 +3185,7 @@ function calc(){
     q0 = 0;
     q = getScrap(jobSig);
     per = BUNDLE ? Math.max(1, Math.floor(L / p + 1e-9)) : 1;
-    full = 0; rem = 0; n = 0; bn = 0;
+    full = 0; rem = 0; n = 0;
     wFull = BUNDLE ? Math.round((L - per * p) * 1000) / 1000 : 0;
     wLast = 0;
     var hintEl = document.querySelector('.fhint.scrap-only');
@@ -3167,12 +3202,11 @@ function calc(){
     full  = Math.floor(q / per);
     rem   = q - full * per;
     n     = full + (rem > 0 ? 1 : 0);
-    bn    = Math.ceil(n / b);
     wFull = Math.round((L - per * p) * 1000) / 1000;
     wLast = rem > 0 ? Math.round((L - rem * p) * 1000) / 1000 : 0;
   }
 
-  S = {L:L, p:p, q:q, q0:q0, bad:bad, x:extra, sig:jobSig, h:have, n:n, bn:bn, per:per, rem:rem, wFull:wFull, wLast:wLast, mode:MODE, bundle:BUNDLE};
+  S = {L:L, p:p, q:q, q0:q0, bad:bad, x:extra, sig:jobSig, h:have, n:n, per:per, rem:rem, wFull:wFull, wLast:wLast, mode:MODE, bundle:BUNDLE};
 
   var cap = document.querySelector('.hero .cap-top');
   if (cap) cap.textContent = scrap ? (BUNDLE ? 'Остаток пачки' : 'Из обрезков') : 'Нужно нарезать';
@@ -3261,7 +3295,27 @@ function pipeTo(r, w){
   }
   pipeAnim = requestAnimationFrame(step);
 }
+function syncPresets(){
+  Array.prototype.forEach.call(document.querySelectorAll('.preset-row'), function(row){
+    var field = $(row.getAttribute('data-for'));
+    var v = field ? +field.value : NaN;
+    Array.prototype.forEach.call(row.querySelectorAll('.pz'), function(b){
+      var on = Math.abs(+b.getAttribute('data-v') - v) < 1e-9;
+      b.className = 'pz' + (on ? ' on' : '');
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  });
+}
+Array.prototype.forEach.call(document.querySelectorAll('.preset-row .pz'), function(b){
+  b.addEventListener('click', function(){
+    var field = $(b.parentNode.getAttribute('data-for'));
+    if (!field) return;
+    field.value = b.getAttribute('data-v');
+    update();
+  });
+});
 function drawDia(){
+  syncPresets();
   var d = +$('d').value;
   if (!(d > 0)) return;
   var t = +$('t').value;
@@ -3284,7 +3338,10 @@ function drawDia(){
 $('lenReset').addEventListener('click', function(){ $('L').value = '6000'; update(); });
 Array.prototype.forEach.call(document.querySelectorAll('.pf-opt'), function(b){
   b.addEventListener('click', function(){
-    setPf(+b.getAttribute('data-pf'));
+    var v = +b.getAttribute('data-pf');
+    // при переходе на перфорацию подставляем стандартный размер 43 × 1,2
+    if (v === 1 && PF !== 1){ $('d').value = '43'; $('t').value = '1.2'; }
+    setPf(v);
     update();
   });
 });
@@ -3938,12 +3995,12 @@ $('handoffBtn').addEventListener('click', function(){
   $('hoLeftL').textContent = plural(left, 'заготовка', 'заготовки', 'заготовок');
   $('hoNote').textContent = 'Сменщику уйдёт сообщение с остатком. Ваш расчёт не изменится';
   handoffRun = function(){
-  var per = Number(S.per) || 1, q = st.cd, b = Number($('b').value) || 1;
+  var per = Number(S.per) || 1, q = st.cd;
   var full = Math.floor(q / per), rem = q - full * per, n = full + (rem > 0 ? 1 : 0);
   var entry = {
     ts: Date.now(), q: q, p: Number(S.p), L: Number(S.L) || 0, h: Number(S.h) || 0,
-    bad: bad, x: Number(S.x) || 0, b: b, d: Number($('d').value) || 0, t: Number($('t').value) || 0,
-    pf: PF ? 1 : 0, mode: 0, n: n, bn: Math.ceil(n / b), per: per, rem: rem,
+    bad: bad, x: Number(S.x) || 0, d: Number($('d').value) || 0, t: Number($('t').value) || 0,
+    pf: PF ? 1 : 0, mode: 0, n: n, per: per, rem: rem,
     wFull: Number(S.wFull) || 0, wLast: rem > 0 ? Math.round((Number(S.L) - rem * Number(S.p)) * 1000) / 1000 : 0,
     left: left
   };
@@ -4307,7 +4364,7 @@ function summaryText(){
   lines.push('Раскрой труб');
   lines.push('────────────');
   lines.push('Труба' + (PF ? ' перфорированная' : '') + (d > 0 ? ' Ø' + num(d) + (t > 0 ? '×' + num(t) : '') + ' мм' : '') + ', длина ' + S.L + ' мм');
-  lines.push('Нужно труб: ' + S.n + ' (' + S.bn + ' ' + plural(S.bn, 'пачка', 'пачки', 'пачек') + ')');
+  lines.push('Нужно труб: ' + S.n);
   lines.push('Заготовок: ' + S.q + ' по ' + num(S.p) + ' мм');
   lines.push('Из целой трубы: ' + S.per + ' ' + plural(S.per, 'заготовка', 'заготовки', 'заготовок') + ', обрезок ' + fmt(S.wFull) + ' мм');
   if (S.rem > 0) lines.push('Последняя труба: ' + S.rem + ' ' + plural(S.rem, 'заготовка', 'заготовки', 'заготовок') + ', остаток ' + fmt(S.wLast) + ' мм');
@@ -4936,8 +4993,8 @@ function cleanArchives(list, limit){
   }).map(function(item){
     return {
       ts:Number(item.ts), q:Number(item.q), p:Number(item.p), L:Number(item.L) || 0,
-      b:Number(item.b) || 1, h:Number(item.h) || 0, bad:Number(item.bad) || 0, x:Number(item.x) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0, pf:item.pf ? 1 : 0, mode:item.mode ? 1 : 0,
-      n:Number(item.n), bn:Number(item.bn) || 0, per:Number(item.per) || 0,
+      h:Number(item.h) || 0, bad:Number(item.bad) || 0, x:Number(item.x) || 0, d:Number(item.d) || 0, t:Number(item.t) || 0, pf:item.pf ? 1 : 0, mode:item.mode ? 1 : 0,
+      n:Number(item.n), per:Number(item.per) || 0,
       rem:Number(item.rem) || 0, wFull:Number(item.wFull) || 0, wLast:Number(item.wLast) || 0, left:Number(item.left) || 0, bundle:item.bundle ? 1 : 0
     };
   }).sort(function(a,b){ return b.ts-a.ts; }).slice(0, limit === undefined ? histMax() : limit);
@@ -5123,7 +5180,6 @@ function addToHist(){
   }
   var qCut = S.mode ? Number(S.q) : Number(st.cd);
   var per = Number(S.per) || 0;
-  var b = Number($('b').value) || 1;
   var fullCut = (!S.mode && per > 0) ? Math.floor(qCut / per) : Number(S.n) - (Number(S.rem) > 0 ? 1 : 0);
   var remCut = (!S.mode && per > 0) ? (qCut - fullCut * per) : Number(S.rem);
   var nCut = !S.mode ? (fullCut + (remCut > 0 ? 1 : 0)) : Number(S.n);
@@ -5135,14 +5191,12 @@ function addToHist(){
     h: Number(S.h) || 0,
     bad: Number(S.bad) || 0,
     x: Number(S.x) || 0,
-    b: b,
     d: Number($('d').value) || 0,
     t: Number($('t').value) || 0,
     pf: PF ? 1 : 0,
     mode: S.mode ? 1 : 0,
     bundle: S.bundle ? 1 : 0,
     n: nCut,
-    bn: nCut > 0 ? Math.ceil(nCut / b) : 0,
     per: per,
     rem: remCut,
     wFull: Number(S.wFull) || 0,
@@ -5185,7 +5239,6 @@ function restoreHist(idx){
   }
   $('p').value = item.p;
   if (item.L) $('L').value = item.L;
-  if (item.b) $('b').value = item.b;
   $('h').value = isScrap ? 0 : (item.h || 0);
   $('d').value = item.d || 0;
   $('t').value = item.t || 0;
