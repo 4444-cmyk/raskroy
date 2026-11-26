@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-25.86">
+<meta name="app-build" content="2026-11-25.87">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -837,6 +837,10 @@ label {
   padding: 3px;
   border-radius: 999px;
   background: var(--soft);
+}
+
+.preset-row + .dstep {
+  margin-top: 8px;
 }
 
 .preset-row .pz {
@@ -2693,7 +2697,11 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
           <button type="button" class="pz" data-v="48" aria-pressed="false">48</button>
           <button type="button" class="pz" data-v="51" aria-pressed="true">51</button>
         </div>
-        <input id="d" type="hidden" value="51">
+        <div class="step dstep">
+          <button type="button" class="sb" data-t="d" data-s="-1" aria-label="Меньше">−</button>
+          <input id="d" type="number" inputmode="decimal" value="51" min="1" step="any" aria-label="Диаметр, мм, любой размер">
+          <button type="button" class="sb" data-t="d" data-s="1" aria-label="Больше">+</button>
+        </div>
       </div>
       <div class="wide">
         <label id="tLbl">Толщина стенки, мм</label>
