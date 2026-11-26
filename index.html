@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-25.85">
+<meta name="app-build" content="2026-11-25.86">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -4340,16 +4340,37 @@ function stopHold(){
 Array.prototype.forEach.call(document.querySelectorAll('.sb'), function(btn){
   var id = btn.getAttribute('data-t');
   var s = +btn.getAttribute('data-s');
+  var down = false, moved = false, repeating = false, touchLike = false, sx = 0, sy = 0;
   btn.addEventListener('pointerdown', function(e){
-    e.preventDefault();
     stopHold();
-    bump(id, s);
+    down = true; moved = false; repeating = false;
+    touchLike = !!e.pointerType && e.pointerType !== 'mouse';
+    sx = e.clientX; sy = e.clientY;
+    // Мышь: считаем сразу. Палец: ждём отпускания, иначе касание в начале прокрутки считалось бы нажатием
+    if (!touchLike){
+      e.preventDefault();
+      bump(id, s);
+    }
     holdT = setTimeout(function(){
+      holdT = null;
+      if (!down || moved) return;
+      repeating = true;
+      if (touchLike) bump(id, s);
       holdI = setInterval(function(){ bump(id, s); }, 70);
     }, 450);
   });
-  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){
-    btn.addEventListener(ev, stopHold);
+  btn.addEventListener('pointermove', function(e){
+    if (!down || !touchLike || moved) return;
+    if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 10){ moved = true; stopHold(); }
+  });
+  btn.addEventListener('pointerup', function(){
+    var tap = down && touchLike && !moved && !repeating;
+    down = false;
+    stopHold();
+    if (tap) bump(id, s);
+  });
+  ['pointerleave','pointercancel'].forEach(function(ev){
+    btn.addEventListener(ev, function(){ down = false; stopHold(); });
   });
   btn.addEventListener('click', function(e){
     if (e.detail === 0) bump(id, s);
