@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026-11-25.87">
+<meta name="app-build" content="2026-11-25.89">
 <meta name="apple-mobile-web-app-title" content="Раскрой">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -837,6 +837,10 @@ label {
   padding: 3px;
   border-radius: 999px;
   background: var(--soft);
+}
+
+.pf-top {
+  margin-top: 12px;
 }
 
 .preset-row + .dstep {
@@ -2668,6 +2672,13 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
       <span class="fold-val" id="foldDiaVal">Ø51 × 1,2</span>
       <span class="fold-chev" aria-hidden="true">›</span>
     </button>
+    <div class="pf-top">
+      <label id="pfLbl">Тип трубы</label>
+      <div class="theme-row" id="pfRow" role="group" aria-labelledby="pfLbl">
+        <button type="button" class="pf-opt on" data-pf="0" aria-pressed="true">Обычная</button>
+        <button type="button" class="pf-opt" data-pf="1" aria-pressed="false">Перфорация</button>
+      </div>
+    </div>
     <div class="fold-body" id="foldDiaBody" hidden>
       <div class="stage">
         <svg viewBox="0 0 320 130" role="img" aria-label="Сечение трубы с размерами">
@@ -2720,13 +2731,6 @@ body[data-accent] #listCard .chip.on{box-shadow:0 2px 8px color-mix(in srgb,var(
           <button type="button" class="sb" data-t="L" data-s="-100" aria-label="Короче">−</button>
           <input id="L" type="number" inputmode="decimal" value="6000" min="1" step="any">
           <button type="button" class="sb" data-t="L" data-s="100" aria-label="Длиннее">+</button>
-        </div>
-      </div>
-      <div class="wide">
-        <label>Тип трубы</label>
-        <div class="theme-row" id="pfRow" role="group" aria-label="Тип трубы">
-          <button type="button" class="pf-opt on" data-pf="0" aria-pressed="true">Обычная</button>
-          <button type="button" class="pf-opt" data-pf="1" aria-pressed="false">Перфорация</button>
         </div>
       </div>
     </div>
